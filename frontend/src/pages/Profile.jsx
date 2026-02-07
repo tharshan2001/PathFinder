@@ -1,84 +1,92 @@
 import { useApp } from '../context/AppContext';
-import { MapPin, Edit2, Award, Zap } from 'lucide-react';
+import { MapPin, Edit2 } from 'lucide-react';
 
 export default function Profile() {
   const { user, getEnrolledCourses } = useApp();
   const enrolledCourses = getEnrolledCourses();
 
   return (
-    <div className="animate-in space-y-6">
+    <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Profile Header */}
       <div className="card">
-        <div className="flex items-start gap-6">
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px' }}>
           <img
             src={user.avatar}
             alt={user.name}
-            className="w-24 h-24 rounded-2xl"
+            style={{ width: '96px', height: '96px', borderRadius: '16px' }}
           />
-          <div className="flex-1">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-[#0F172A]">{user.name}</h1>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0F172A' }}>{user.name}</h1>
               <button className="btn btn-outline btn-sm">
                 <Edit2 size={14} />
                 Edit Profile
               </button>
             </div>
-            <p className="text-[#334155] mt-1">Software Developer · Full Stack</p>
-            <p className="text-sm text-[#94A3B8] flex items-center gap-1 mt-2">
+            <p style={{ color: '#334155', marginTop: '4px' }}>Software Developer · Full Stack</p>
+            <p style={{ fontSize: '14px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px' }}>
               <MapPin size={14} />
               San Francisco, CA
             </p>
-            <p className="text-sm text-[#0284C7] mt-2">{user.connections}+ connections</p>
+            <p style={{ fontSize: '14px', color: '#0D9488', marginTop: '8px' }}>{user.connections}+ connections</p>
           </div>
         </div>
 
-        {/* Bio */}
-        <p className="mt-6 text-[#334155] leading-relaxed">
+        <p style={{ marginTop: '24px', color: '#334155', lineHeight: 1.6 }}>
           Passionate about building great products. Experienced in React, Node.js, and cloud technologies. 
           Always learning and exploring new technologies.
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
         {[
-          { label: 'Courses Completed', value: enrolledCourses.length, color: '#B91C1C' },
+          { label: 'Courses Completed', value: enrolledCourses.length, color: '#0D9488' },
           { label: 'Hours Learned', value: '47', color: '#059669' },
           { label: 'Certificates', value: '3', color: '#D97706' },
           { label: 'Profile Views', value: '142', color: '#0284C7' },
         ].map((stat) => (
-          <div key={stat.label} className="card text-center">
-            <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
-            <p className="text-sm text-[#94A3B8] mt-1">{stat.label}</p>
+          <div key={stat.label} className="card" style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '24px', fontWeight: 700, color: stat.color }}>{stat.value}</p>
+            <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>{stat.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
         {/* Skills */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-[#0F172A] mb-4">Skills</h2>
-          <div className="flex flex-wrap gap-2">
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Skills</h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {user.skills.map((skill) => (
-              <span key={skill} className="tag tag-primary">{skill}</span>
+              <span key={skill} style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 600,
+                background: '#CCFBF1',
+                color: '#0D9488',
+              }}>
+                {skill}
+              </span>
             ))}
           </div>
         </div>
 
         {/* Achievements */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-[#0F172A] mb-4">Achievements</h2>
-          <div className="space-y-3">
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Achievements</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {[
               { icon: '🚀', title: 'Fast Learner', desc: 'Completed 5 courses' },
               { icon: '🔥', title: '7-Day Streak', desc: 'Consistent learning' },
               { icon: '⭐', title: 'Top Performer', desc: 'Top 10% in quizzes' },
             ].map((badge) => (
-              <div key={badge.title} className="flex items-center gap-3 p-3 rounded-xl bg-[#FAFAFA]">
-                <span className="text-2xl">{badge.icon}</span>
+              <div key={badge.title} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', background: '#F8FAFC' }}>
+                <span style={{ fontSize: '24px' }}>{badge.icon}</span>
                 <div>
-                  <p className="font-medium text-[#0F172A]">{badge.title}</p>
-                  <p className="text-xs text-[#94A3B8]">{badge.desc}</p>
+                  <p style={{ fontWeight: 500, color: '#0F172A' }}>{badge.title}</p>
+                  <p style={{ fontSize: '12px', color: '#64748B' }}>{badge.desc}</p>
                 </div>
               </div>
             ))}
@@ -89,25 +97,24 @@ export default function Profile() {
       {/* Current Learning */}
       {enrolledCourses.length > 0 && (
         <div className="card">
-          <h2 className="text-lg font-semibold text-[#0F172A] mb-4">Currently Learning</h2>
-          <div className="space-y-4">
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Currently Learning</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {enrolledCourses.slice(0, 3).map((course) => (
-              <div key={course._id} className="flex items-center gap-4">
+              <div key={course._id} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <img
                   src={course.thumbnail}
                   alt={course.title}
-                  className="w-16 h-12 rounded-lg object-cover"
+                  style={{ width: '64px', height: '48px', borderRadius: '8px', objectFit: 'cover' }}
                 />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[#0F172A] line-clamp-1">{course.title}</p>
-                  <div className="flex items-center gap-3 mt-1">
-                    <div className="flex-1 h-2 bg-[#E2E8F0] rounded-full">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontWeight: 500, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
+                    <div style={{ flex: 1, height: '8px', background: '#E2E8F0', borderRadius: '4px' }}>
                       <div 
-                        className="h-full bg-[#059669] rounded-full"
-                        style={{ width: `${user.progress[course._id] || 0}%` }}
+                        style={{ height: '100%', background: '#0D9488', borderRadius: '4px', width: `${user.progress[course._id] || 0}%` }}
                       />
                     </div>
-                    <span className="text-sm font-medium text-[#059669]">
+                    <span style={{ fontSize: '14px', fontWeight: 500, color: '#0D9488' }}>
                       {user.progress[course._id] || 0}%
                     </span>
                   </div>

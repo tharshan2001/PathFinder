@@ -6,12 +6,12 @@ export default function Notifications() {
 
   const getIcon = (type) => {
     const icons = {
-      course: <BookOpen size={18} className="text-[#0284C7]" />,
-      job: <Briefcase size={18} className="text-[#D97706]" />,
-      connection: <Users size={18} className="text-[#059669]" />,
-      message: <MessageCircle size={18} className="text-[#7C3AED]" />,
+      course: <BookOpen size={18} color="#0284C7" />,
+      job: <Briefcase size={18} color="#D97706" />,
+      connection: <Users size={18} color="#059669" />,
+      message: <MessageCircle size={18} color="#7C3AED" />,
     };
-    return icons[type] || <Bell size={18} className="text-[#B91C1C]" />;
+    return icons[type] || <Bell size={18} color="#0D9488" />;
   };
 
   const formatTime = (timestamp) => {
@@ -25,12 +25,12 @@ export default function Notifications() {
   const unread = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="animate-in space-y-6 max-w-2xl">
+    <div className="animate-in" style={{ maxWidth: '42rem', display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-3xl font-bold text-[#0F172A]">Notifications</h1>
-          <p className="text-[#94A3B8] mt-1">
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#0F172A' }}>Notifications</h1>
+          <p style={{ color: '#64748B', marginTop: '4px' }}>
             {unread > 0 ? `${unread} unread notifications` : 'All caught up!'}
           </p>
         </div>
@@ -43,31 +43,48 @@ export default function Notifications() {
       </div>
 
       {/* List */}
-      <div className="card p-0 divide-y divide-[#F1F5F9]">
-        {notifications.map((n) => (
+      <div className="card" style={{ padding: 0 }}>
+        {notifications.map((n, index) => (
           <div
             key={n._id}
             onClick={() => markNotificationRead(n._id)}
-            className={`flex items-start gap-4 p-4 cursor-pointer transition-colors ${
-              !n.read ? 'bg-[#FEF2F2]' : 'hover:bg-[#FAFAFA]'
-            }`}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '16px',
+              padding: '16px',
+              cursor: 'pointer',
+              background: !n.read ? '#F0FDFA' : 'transparent',
+              borderBottom: index < notifications.length - 1 ? '1px solid #F1F5F9' : 'none',
+              transition: 'background 0.15s ease',
+            }}
           >
-            <div className="w-10 h-10 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center">
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              background: 'white',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}>
               {getIcon(n.type)}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className={`text-sm ${!n.read ? 'font-semibold text-[#0F172A]' : 'text-[#334155]'}`}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: '14px', color: !n.read ? '#0F172A' : '#64748B', fontWeight: !n.read ? 600 : 400 }}>
                 {n.message}
               </p>
-              <p className="text-xs text-[#94A3B8] mt-1">{formatTime(n.timestamp)}</p>
+              <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '4px' }}>{formatTime(n.timestamp)}</p>
             </div>
-            <div className="flex items-center gap-2">
-              {!n.read && <span className="w-2 h-2 rounded-full bg-[#B91C1C]" />}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+              {!n.read && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#0D9488' }} />}
               <button
                 onClick={(e) => { e.stopPropagation(); dismissNotification(n._id); }}
-                className="p-1 rounded hover:bg-[#FEE2E2] transition-colors"
+                style={{ padding: '4px', borderRadius: '4px', border: 'none', background: 'transparent', cursor: 'pointer' }}
               >
-                <X size={14} className="text-[#94A3B8]" />
+                <X size={14} color="#94A3B8" />
               </button>
             </div>
           </div>
@@ -75,10 +92,10 @@ export default function Notifications() {
       </div>
 
       {notifications.length === 0 && (
-        <div className="card text-center py-16">
-          <Bell size={48} className="mx-auto text-[#E2E8F0] mb-4" />
-          <h3 className="text-lg font-semibold text-[#0F172A] mb-2">No notifications</h3>
-          <p className="text-[#94A3B8]">You're all caught up!</p>
+        <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
+          <Bell size={48} color="#E2E8F0" style={{ margin: '0 auto 16px' }} />
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '8px' }}>No notifications</h3>
+          <p style={{ color: '#64748B' }}>You're all caught up!</p>
         </div>
       )}
     </div>

@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { Route, Target, BookOpen, Briefcase, ArrowRight, Check, Lock } from 'lucide-react';
 
 export default function LearningPath() {
-  const { learningPaths, courses, user } = useApp();
+  const { learningPaths, courses } = useApp();
 
-  const activePath = learningPaths[0]; // Full Stack Web Developer path
+  const activePath = learningPaths[0];
   const pathCourses = activePath.courses.map(id => courses.find(c => c._id === id)).filter(Boolean);
 
   const milestones = [
@@ -17,86 +17,93 @@ export default function LearningPath() {
   ];
 
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div className="glass-card p-6 bg-gradient-to-r from-indigo-500/10 to-teal-500/10 mb-8">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-teal-500">
-            <Route className="text-white" size={28} />
+      <div className="card" style={{ background: 'linear-gradient(135deg, #F0FDFA, #E0F2FE)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: 'linear-gradient(135deg, #0D9488, #0284C7)' }}>
+            <Route color="white" size={28} />
           </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2">{activePath.title}</h1>
-            <p className="text-gray-400 mb-4">{activePath.description}</p>
-            <div className="flex flex-wrap gap-4 text-sm">
-              <span className="flex items-center gap-2">
-                <Target size={16} className="text-indigo-400" />
+          <div style={{ flex: 1 }}>
+            <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#0F172A', marginBottom: '8px' }}>{activePath.title}</h1>
+            <p style={{ color: '#64748B', marginBottom: '16px' }}>{activePath.description}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '14px', color: '#334155' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Target size={16} color="#0D9488" />
                 {activePath.duration} program
               </span>
-              <span className="flex items-center gap-2">
-                <BookOpen size={16} className="text-teal-400" />
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BookOpen size={16} color="#0D9488" />
                 {activePath.courses.length} courses
               </span>
-              <span className="flex items-center gap-2">
-                <Briefcase size={16} className="text-amber-400" />
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Briefcase size={16} color="#D97706" />
                 Career-focused
               </span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-400 mb-1">Your Progress</p>
-            <p className="text-3xl font-bold gradient-text">{activePath.progress}%</p>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '4px' }}>Your Progress</p>
+            <p style={{ fontSize: '28px', fontWeight: 700, color: '#0D9488' }}>{activePath.progress}%</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
         {/* Main content - Learning path */}
-        <div className="lg:col-span-2">
-          <h2 className="text-xl font-semibold mb-6">Your Learning Journey</h2>
+        <div>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '24px' }}>Your Learning Journey</h2>
           
-          <div className="space-y-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {milestones.map((milestone, index) => (
-              <div key={milestone.id} className="relative">
+              <div key={milestone.id} style={{ position: 'relative' }}>
                 {/* Connector line */}
                 {index < milestones.length - 1 && (
-                  <div className={`absolute left-6 top-14 w-0.5 h-full -mb-6 ${
-                    milestone.completed ? 'bg-gradient-to-b from-emerald-500 to-indigo-500' : 'bg-white/10'
-                  }`} />
+                  <div style={{
+                    position: 'absolute',
+                    left: '23px',
+                    top: '56px',
+                    width: '2px',
+                    height: 'calc(100% + 24px)',
+                    background: milestone.completed ? '#0D9488' : '#E2E8F0',
+                  }} />
                 )}
                 
-                <div className={`card ${milestone.current ? 'border-indigo-500/50' : ''}`}>
-                  <div className="flex items-start gap-4">
-                    {/* Status icon */}
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      milestone.completed 
-                        ? 'bg-emerald-500' 
-                        : milestone.current 
-                          ? 'bg-indigo-500' 
-                          : 'bg-white/10'
-                    }`}>
+                <div className="card" style={{ border: milestone.current ? '2px solid #0D9488' : undefined }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      background: milestone.completed ? '#0D9488' : milestone.current ? '#0D9488' : '#E2E8F0',
+                    }}>
                       {milestone.completed ? (
-                        <Check size={24} className="text-white" />
+                        <Check size={24} color="white" />
                       ) : milestone.current ? (
-                        <span className="text-white font-bold">{milestone.id}</span>
+                        <span style={{ color: 'white', fontWeight: 700 }}>{milestone.id}</span>
                       ) : (
-                        <Lock size={18} className="text-gray-400" />
+                        <Lock size={18} color="#64748B" />
                       )}
                     </div>
 
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-lg">{milestone.title}</h3>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <h3 style={{ fontWeight: 600, fontSize: '16px', color: '#0F172A' }}>{milestone.title}</h3>
                         {milestone.completed && (
-                          <span className="badge badge-success">Completed</span>
+                          <span style={{ padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: '#D1FAE5', color: '#059669' }}>Completed</span>
                         )}
                         {milestone.current && (
-                          <span className="badge badge-primary">In Progress</span>
+                          <span style={{ padding: '4px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, background: '#CCFBF1', color: '#0D9488' }}>In Progress</span>
                         )}
                       </div>
                       
-                      <div className="flex flex-wrap gap-2 mb-3">
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
                         {milestone.courses.map((course) => (
-                          <span key={course} className="badge bg-white/5 text-gray-300">
+                          <span key={course} style={{ padding: '4px 12px', borderRadius: '6px', fontSize: '13px', background: '#F1F5F9', color: '#64748B' }}>
                             {course}
                           </span>
                         ))}
@@ -117,74 +124,57 @@ export default function LearningPath() {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Overall progress */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Overall Progress</h3>
-            <div className="relative w-32 h-32 mx-auto mb-4">
-              <svg className="w-32 h-32 transform -rotate-90">
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="56"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth="12"
-                />
-                <circle
-                  cx="64"
-                  cy="64"
-                  r="56"
-                  fill="none"
-                  stroke="url(#pathGradient)"
-                  strokeWidth="12"
-                  strokeDasharray={`${activePath.progress * 3.52} 352`}
-                  strokeLinecap="round"
-                />
-                <defs>
-                  <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#4F46E5" />
-                    <stop offset="100%" stopColor="#14B8A6" />
-                  </linearGradient>
-                </defs>
+          <div className="card" style={{ textAlign: 'center' }}>
+            <h3 style={{ fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Overall Progress</h3>
+            <div style={{ position: 'relative', width: '128px', height: '128px', margin: '0 auto 16px' }}>
+              <svg width="128" height="128" style={{ transform: 'rotate(-90deg)' }}>
+                <circle cx="64" cy="64" r="56" fill="none" stroke="#E2E8F0" strokeWidth="12" />
+                <circle cx="64" cy="64" r="56" fill="none" stroke="#0D9488" strokeWidth="12"
+                  strokeDasharray={`${activePath.progress * 3.52} 352`} strokeLinecap="round" />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold">{activePath.progress}%</span>
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '28px', fontWeight: 700, color: '#0D9488' }}>{activePath.progress}%</span>
               </div>
             </div>
-            <div className="text-center text-sm text-gray-400">
-              <p>2 of 5 milestones completed</p>
-            </div>
+            <p style={{ fontSize: '14px', color: '#64748B' }}>2 of 5 milestones completed</p>
           </div>
 
           {/* Skills you'll gain */}
           <div className="card">
-            <h3 className="font-semibold mb-4">Skills You'll Gain</h3>
-            <div className="flex flex-wrap gap-2">
+            <h3 style={{ fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Skills You'll Gain</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {activePath.skills.map((skill) => (
-                <span key={skill} className="badge badge-secondary">{skill}</span>
+                <span key={skill} style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, background: '#CCFBF1', color: '#0D9488' }}>
+                  {skill}
+                </span>
               ))}
             </div>
           </div>
 
           {/* Recommended courses */}
           <div className="card">
-            <h3 className="font-semibold mb-4">Continue With</h3>
-            <div className="space-y-3">
+            <h3 style={{ fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Continue With</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {pathCourses.slice(0, 2).map((course) => (
                 <Link
                   key={course._id}
                   to={`/courses/${course._id}`}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    background: '#F8FAFC',
+                    textDecoration: 'none',
+                  }}
                 >
-                  <img
-                    src={course.thumbnail}
-                    alt={course.title}
-                    className="w-12 h-12 rounded-lg object-cover"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm line-clamp-1">{course.title}</h4>
-                    <p className="text-xs text-gray-400">{course.duration}</p>
+                  <img src={course.thumbnail} alt={course.title} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h4 style={{ fontWeight: 500, fontSize: '14px', color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</h4>
+                    <p style={{ fontSize: '12px', color: '#64748B' }}>{course.duration}</p>
                   </div>
                 </Link>
               ))}

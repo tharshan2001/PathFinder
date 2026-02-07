@@ -15,20 +15,20 @@ export default function Dashboard() {
         <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#0F172A' }}>
           Welcome back, {user.name.split(' ')[0]} 👋
         </h1>
-        <p style={{ color: '#94A3B8', marginTop: '4px' }}>Here's what's happening with your learning journey</p>
+        <p style={{ color: '#64748B', marginTop: '4px' }}>Here's what's happening with your learning journey</p>
       </div>
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
         {[
-          { label: 'Courses Enrolled', value: enrolledCourses.length, color: '#B91C1C' },
+          { label: 'Courses Enrolled', value: enrolledCourses.length, color: '#0D9488' },
           { label: 'Hours Learned', value: '47', color: '#059669' },
           { label: 'Skills Gained', value: '12', color: '#D97706' },
           { label: 'Certificates', value: '3', color: '#0284C7' },
         ].map((stat) => (
           <div key={stat.label} className="card" style={{ textAlign: 'center' }}>
             <p style={{ fontSize: '30px', fontWeight: 700, color: stat.color }}>{stat.value}</p>
-            <p style={{ fontSize: '14px', color: '#94A3B8', marginTop: '4px' }}>{stat.label}</p>
+            <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>{stat.label}</p>
           </div>
         ))}
       </div>
@@ -38,7 +38,7 @@ export default function Dashboard() {
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Continue Learning</h2>
-            <Link to="/courses" style={{ fontSize: '14px', color: '#B91C1C', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Link to="/courses" style={{ fontSize: '14px', color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
               View all <ArrowRight size={14} />
             </Link>
           </div>
@@ -54,7 +54,7 @@ export default function Dashboard() {
                   gap: '16px', 
                   padding: '16px', 
                   borderRadius: '12px', 
-                  background: '#FAFAFA',
+                  background: '#F8FAFC',
                   textDecoration: 'none',
                 }}
               >
@@ -78,15 +78,15 @@ export default function Dashboard() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <h3 style={{ fontWeight: 500, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</h3>
-                  <p style={{ fontSize: '14px', color: '#94A3B8' }}>{course.provider}</p>
+                  <p style={{ fontSize: '14px', color: '#64748B' }}>{course.provider}</p>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#059669' }}>{user.progress[course._id] || 0}%</p>
+                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#0D9488' }}>{user.progress[course._id] || 0}%</p>
                   <div style={{ width: '96px', height: '8px', background: '#E2E8F0', borderRadius: '4px', marginTop: '4px' }}>
                     <div 
                       style={{ 
                         height: '100%', 
-                        background: '#059669', 
+                        background: '#0D9488', 
                         borderRadius: '4px',
                         width: `${user.progress[course._id] || 0}%`
                       }}
@@ -105,7 +105,7 @@ export default function Dashboard() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Recommended Courses</h2>
-            <Link to="/courses" style={{ fontSize: '14px', color: '#B91C1C', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Link to="/courses" style={{ fontSize: '14px', color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
               Browse all <ArrowRight size={14} />
             </Link>
           </div>
@@ -119,7 +119,7 @@ export default function Dashboard() {
         {/* Trending Skills */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <TrendingUp size={18} color="#B91C1C" />
+            <TrendingUp size={18} color="#0D9488" />
             <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Trending Skills</h2>
           </div>
           <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -134,14 +134,14 @@ export default function Dashboard() {
                   justifyContent: 'center', 
                   fontSize: '12px', 
                   fontWeight: 700,
-                  background: i === 0 ? '#B91C1C' : i === 1 ? '#D97706' : i === 2 ? '#059669' : '#F1F5F9',
-                  color: i < 3 ? 'white' : '#94A3B8',
+                  background: i === 0 ? '#0D9488' : i === 1 ? '#14B8A6' : i === 2 ? '#2DD4BF' : '#F1F5F9',
+                  color: i < 3 ? 'white' : '#64748B',
                 }}>
                   {i + 1}
                 </span>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A' }}>{trend.skill}</p>
-                  <p style={{ fontSize: '12px', color: '#059669' }}>{trend.growth} growth</p>
+                  <p style={{ fontSize: '12px', color: '#0D9488' }}>{trend.growth} growth</p>
                 </div>
               </div>
             ))}
@@ -153,10 +153,10 @@ export default function Dashboard() {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Briefcase size={18} color="#B91C1C" />
+            <Briefcase size={18} color="#0D9488" />
             <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Jobs For You</h2>
           </div>
-          <Link to="/jobs" style={{ fontSize: '14px', color: '#B91C1C', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <Link to="/jobs" style={{ fontSize: '14px', color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
             View all jobs <ArrowRight size={14} />
           </Link>
         </div>

@@ -37,9 +37,9 @@ export default function CourseCard({ course }) {
           }}
         >
           {isSaved ? (
-            <BookmarkCheck size={16} color="#B91C1C" />
+            <BookmarkCheck size={16} color="#0D9488" />
           ) : (
-            <Bookmark size={16} color="#94A3B8" />
+            <Bookmark size={16} color="#64748B" />
           )}
         </button>
 
@@ -48,8 +48,8 @@ export default function CourseCard({ course }) {
             position: 'absolute',
             top: '12px',
             left: '12px',
-            background: '#D1FAE5',
-            color: '#059669',
+            background: '#CCFBF1',
+            color: '#0D9488',
             padding: '4px 10px',
             borderRadius: '6px',
             fontSize: '12px',
@@ -69,12 +69,12 @@ export default function CourseCard({ course }) {
               borderRadius: '6px',
               fontSize: '12px',
               fontWeight: 600,
-              background: course.level === 'Beginner' ? '#D1FAE5' : course.level === 'Intermediate' ? '#FEF3C7' : '#FEE2E2',
-              color: course.level === 'Beginner' ? '#059669' : course.level === 'Intermediate' ? '#D97706' : '#B91C1C',
+              background: course.level === 'Beginner' ? '#D1FAE5' : course.level === 'Intermediate' ? '#FEF3C7' : '#CCFBF1',
+              color: course.level === 'Beginner' ? '#059669' : course.level === 'Intermediate' ? '#D97706' : '#0D9488',
             }}>
               {course.level}
             </span>
-            <span style={{ fontSize: '12px', color: '#94A3B8' }}>{course.category}</span>
+            <span style={{ fontSize: '12px', color: '#64748B' }}>{course.category}</span>
           </div>
 
           {/* Title */}
@@ -92,7 +92,7 @@ export default function CourseCard({ course }) {
           </h3>
 
           {/* Provider */}
-          <p style={{ fontSize: '14px', color: '#94A3B8', marginTop: '4px' }}>{course.provider}</p>
+          <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>{course.provider}</p>
 
           {/* Rating */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
@@ -100,11 +100,11 @@ export default function CourseCard({ course }) {
               <Star size={14} color="#D97706" fill="#D97706" />
               <span style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A' }}>{course.rating}</span>
             </div>
-            <span style={{ fontSize: '12px', color: '#94A3B8' }}>({course.totalRatings.toLocaleString()})</span>
+            <span style={{ fontSize: '12px', color: '#64748B' }}>({course.totalRatings.toLocaleString()})</span>
           </div>
 
           {/* Meta */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '12px', fontSize: '12px', color: '#94A3B8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '12px', fontSize: '12px', color: '#64748B' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Clock size={12} />
               {course.duration}

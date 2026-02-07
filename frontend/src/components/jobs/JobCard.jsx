@@ -49,9 +49,9 @@ export default function JobCard({ job }) {
               }}
             >
               {isSaved ? (
-                <BookmarkCheck size={18} color="#B91C1C" />
+                <BookmarkCheck size={18} color="#0D9488" />
               ) : (
-                <Bookmark size={18} color="#94A3B8" />
+                <Bookmark size={18} color="#64748B" />
               )}
             </button>
           </div>
@@ -61,13 +61,13 @@ export default function JobCard({ job }) {
             {job.company}
           </p>
           
-          <p style={{ fontSize: '14px', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+          <p style={{ fontSize: '14px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
             <MapPin size={14} />
             {job.location}
             <span style={{
               marginLeft: '8px',
-              background: '#DBEAFE',
-              color: '#0284C7',
+              background: '#CCFBF1',
+              color: '#0D9488',
               padding: '2px 8px',
               borderRadius: '4px',
               fontSize: '12px',
@@ -78,11 +78,11 @@ export default function JobCard({ job }) {
           </p>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px' }}>
-            <p style={{ fontWeight: 600, color: '#D97706', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <p style={{ fontWeight: 600, color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <DollarSign size={14} />
               {job.salary}
             </p>
-            <p style={{ fontSize: '12px', color: '#94A3B8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <p style={{ fontSize: '12px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Clock size={12} />
               {daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}
             </p>

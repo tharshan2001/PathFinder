@@ -1,12 +1,11 @@
 import { useApp } from '../context/AppContext';
 import { 
   BarChart3, TrendingUp, BookOpen, Briefcase, 
-  Users, Clock, Target, ArrowUpRight, ArrowDownRight
+  Users, Clock, Target, ArrowUpRight
 } from 'lucide-react';
-import StatCard from '../components/ui/StatCard';
 
 export default function Analytics() {
-  const { user, courses, jobs, trends, getEnrolledCourses } = useApp();
+  const { user, trends, getEnrolledCourses } = useApp();
   const enrolledCourses = getEnrolledCourses();
 
   const weeklyData = [
@@ -22,53 +21,67 @@ export default function Analytics() {
   const maxHours = Math.max(...weeklyData.map(d => d.hours));
 
   const insights = [
-    { label: 'Total Learning Hours', value: '42', change: '+12%', positive: true },
-    { label: 'Courses Completed', value: '8', change: '+2', positive: true },
-    { label: 'Skills Gained', value: '15', change: '+4', positive: true },
-    { label: 'Job Match Score', value: '85%', change: '+5%', positive: true }
+    { label: 'Total Learning Hours', value: '42', change: '+12%' },
+    { label: 'Courses Completed', value: '8', change: '+2' },
+    { label: 'Skills Gained', value: '15', change: '+4' },
+    { label: 'Job Match Score', value: '85%', change: '+5%' }
   ];
 
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Analytics Dashboard</h1>
-        <p className="text-gray-400">Track your learning progress and career development</p>
+      <div>
+        <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#0F172A' }}>Analytics</h1>
+        <p style={{ color: '#64748B', marginTop: '4px' }}>Track your learning progress and career development</p>
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard title="Courses Enrolled" value={enrolledCourses.length} icon={BookOpen} color="indigo" trend="+2" />
-        <StatCard title="Completed Courses" value={user.completedCourses} icon={Target} color="teal" trend="+3" />
-        <StatCard title="Jobs Applied" value={user.appliedJobs} icon={Briefcase} color="amber" trend="+1" />
-        <StatCard title="Network Size" value={user.connections} icon={Users} color="emerald" trend="+8" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        {[
+          { label: 'Courses Enrolled', value: enrolledCourses.length, icon: BookOpen, color: '#0D9488' },
+          { label: 'Completed', value: user.completedCourses, icon: Target, color: '#059669' },
+          { label: 'Jobs Applied', value: user.appliedJobs, icon: Briefcase, color: '#D97706' },
+          { label: 'Network', value: user.connections, icon: Users, color: '#0284C7' }
+        ].map((stat) => (
+          <div key={stat.label} className="card">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <stat.icon size={20} color={stat.color} />
+              <span style={{ fontSize: '12px', color: '#059669', fontWeight: 600 }}>+12%</span>
+            </div>
+            <p style={{ fontSize: '28px', fontWeight: 700, color: stat.color }}>{stat.value}</p>
+            <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>{stat.label}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
         {/* Weekly activity chart */}
-        <div className="lg:col-span-2 card">
-          <div className="flex items-center justify-between mb-6">
+        <div className="card">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
             <div>
-              <h2 className="text-lg font-semibold">Weekly Learning Activity</h2>
-              <p className="text-sm text-gray-400">Hours spent learning this week</p>
+              <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Weekly Learning Activity</h2>
+              <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>Hours spent learning this week</p>
             </div>
-            <div className="flex items-center gap-2 text-emerald-400">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#059669' }}>
               <ArrowUpRight size={18} />
-              <span className="font-medium">+23% vs last week</span>
+              <span style={{ fontWeight: 500 }}>+23% vs last week</span>
             </div>
           </div>
           
-          <div className="flex items-end justify-between h-48 gap-4">
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '180px', gap: '16px' }}>
             {weeklyData.map((data) => (
-              <div key={data.day} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full flex flex-col items-center">
-                  <span className="text-xs text-gray-400 mb-1">{data.hours}h</span>
-                  <div 
-                    className="w-full rounded-t-lg bg-gradient-to-t from-indigo-600 to-indigo-400 transition-all hover:from-indigo-500 hover:to-indigo-300"
-                    style={{ height: `${(data.hours / maxHours) * 140}px` }}
-                  />
-                </div>
-                <span className="text-sm text-gray-400">{data.day}</span>
+              <div key={data.day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '12px', color: '#64748B' }}>{data.hours}h</span>
+                <div 
+                  style={{ 
+                    width: '100%', 
+                    borderRadius: '8px 8px 0 0',
+                    background: 'linear-gradient(to top, #0D9488, #14B8A6)',
+                    height: `${(data.hours / maxHours) * 140}px`,
+                    transition: 'height 0.3s ease'
+                  }}
+                />
+                <span style={{ fontSize: '14px', color: '#64748B' }}>{data.day}</span>
               </div>
             ))}
           </div>
@@ -76,17 +89,17 @@ export default function Analytics() {
 
         {/* Quick insights */}
         <div className="card">
-          <h2 className="text-lg font-semibold mb-4">Quick Insights</h2>
-          <div className="space-y-4">
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Quick Insights</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {insights.map((insight) => (
-              <div key={insight.label} className="flex items-center justify-between p-3 rounded-xl bg-white/5">
+              <div key={insight.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', background: '#F8FAFC' }}>
                 <div>
-                  <p className="text-sm text-gray-400">{insight.label}</p>
-                  <p className="text-xl font-bold">{insight.value}</p>
+                  <p style={{ fontSize: '14px', color: '#64748B' }}>{insight.label}</p>
+                  <p style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A' }}>{insight.value}</p>
                 </div>
-                <div className={`flex items-center gap-1 ${insight.positive ? 'text-emerald-400' : 'text-rose-400'}`}>
-                  {insight.positive ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                  <span className="text-sm font-medium">{insight.change}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#059669' }}>
+                  <ArrowUpRight size={16} />
+                  <span style={{ fontSize: '14px', fontWeight: 500 }}>{insight.change}</span>
                 </div>
               </div>
             ))}
@@ -94,24 +107,24 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
         {/* Skill progress */}
         <div className="card">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="text-teal-400" size={20} />
-            <h2 className="text-lg font-semibold">Skill Progress</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+            <TrendingUp size={20} color="#0D9488" />
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Skill Progress</h2>
           </div>
-          <div className="space-y-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {user.skills.map((skill, index) => {
               const progress = 90 - index * 15;
               return (
                 <div key={skill}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium">{skill}</span>
-                    <span className="text-sm text-gray-400">{progress}%</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A' }}>{skill}</span>
+                    <span style={{ fontSize: '14px', color: '#0D9488', fontWeight: 500 }}>{progress}%</span>
                   </div>
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: `${progress}%` }} />
+                  <div style={{ height: '8px', background: '#E2E8F0', borderRadius: '4px' }}>
+                    <div style={{ height: '100%', width: `${progress}%`, background: '#0D9488', borderRadius: '4px', transition: 'width 0.3s ease' }} />
                   </div>
                 </div>
               );
@@ -121,24 +134,28 @@ export default function Analytics() {
 
         {/* Market trends */}
         <div className="card">
-          <div className="flex items-center gap-2 mb-6">
-            <BarChart3 className="text-indigo-400" size={20} />
-            <h2 className="text-lg font-semibold">Market Demand Trends</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+            <BarChart3 size={20} color="#0D9488" />
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Market Demand Trends</h2>
           </div>
-          <div className="space-y-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {trends.slice(0, 5).map((trend, index) => (
-              <div key={trend._id} className="flex items-center gap-4">
-                <span className="text-lg font-bold text-gray-500 w-6">{index + 1}</span>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium">{trend.skill}</span>
-                    <span className="text-sm text-emerald-400">{trend.growth}</span>
+              <div key={trend._id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ 
+                  width: '24px', 
+                  fontSize: '14px', 
+                  fontWeight: 700, 
+                  color: index < 3 ? '#0D9488' : '#64748B' 
+                }}>
+                  {index + 1}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A' }}>{trend.skill}</span>
+                    <span style={{ fontSize: '14px', color: '#059669', fontWeight: 500 }}>{trend.growth}</span>
                   </div>
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill" 
-                      style={{ width: `${trend.demandScore}%` }}
-                    />
+                  <div style={{ height: '8px', background: '#E2E8F0', borderRadius: '4px' }}>
+                    <div style={{ height: '100%', width: `${trend.demandScore}%`, background: 'linear-gradient(90deg, #0D9488, #14B8A6)', borderRadius: '4px' }} />
                   </div>
                 </div>
               </div>
@@ -148,33 +165,35 @@ export default function Analytics() {
       </div>
 
       {/* Learning time distribution */}
-      <div className="card mt-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Clock className="text-amber-400" size={20} />
-          <h2 className="text-lg font-semibold">Learning Time Distribution</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {enrolledCourses.slice(0, 3).map((course) => (
-            <div key={course._id} className="p-4 rounded-xl bg-white/5">
-              <div className="flex items-center gap-3 mb-3">
-                <img
-                  src={course.thumbnail}
-                  alt={course.title}
-                  className="w-12 h-12 rounded-lg object-cover"
-                />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm line-clamp-1">{course.title}</h3>
-                  <p className="text-xs text-gray-400">{course.category}</p>
+      {enrolledCourses.length > 0 && (
+        <div className="card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+            <Clock size={20} color="#D97706" />
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Learning Time Distribution</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            {enrolledCourses.slice(0, 3).map((course) => (
+              <div key={course._id} style={{ padding: '16px', borderRadius: '12px', background: '#F8FAFC' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                  <img
+                    src={course.thumbnail}
+                    alt={course.title}
+                    style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{ fontWeight: 500, fontSize: '14px', color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</h3>
+                    <p style={{ fontSize: '12px', color: '#64748B' }}>{course.category}</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '14px' }}>
+                  <span style={{ color: '#64748B' }}>Time spent</span>
+                  <span style={{ fontWeight: 600, color: '#0D9488' }}>12.5 hrs</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">Time spent</span>
-                <span className="font-medium">12.5 hrs</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

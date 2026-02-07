@@ -23,16 +23,16 @@ export default function Forums() {
   };
 
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-amber-500/20">
-            <MessageCircle className="text-amber-400" size={24} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ padding: '12px', borderRadius: '12px', background: '#FEF3C7' }}>
+            <MessageCircle color="#D97706" size={24} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Discussion Forums</h1>
-            <p className="text-gray-400">Ask questions and share knowledge</p>
+            <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#0F172A' }}>Discussion Forums</h1>
+            <p style={{ color: '#64748B', marginTop: '4px' }}>Ask questions and share knowledge</p>
           </div>
         </div>
         <button className="btn btn-primary">
@@ -42,25 +42,35 @@ export default function Forums() {
       </div>
 
       {/* Search */}
-      <div className="glass-card p-4 mb-6">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+      <div className="card">
+        <div style={{ position: 'relative' }}>
+          <Search size={18} color="#64748B" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             placeholder="Search discussions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input pl-12 w-full"
+            className="input"
+            style={{ paddingLeft: '48px' }}
           />
         </div>
       </div>
 
       {/* Categories */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {['All', 'Web Development', 'Data Science', 'Cloud Computing', 'Career Advice'].map((cat) => (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        {['All', 'Web Development', 'Data Science', 'Cloud Computing', 'Career Advice'].map((cat, i) => (
           <button
             key={cat}
-            className={`badge ${cat === 'All' ? 'badge-primary' : 'bg-white/5 text-gray-300 hover:bg-white/10'} cursor-pointer`}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontWeight: 600,
+              fontSize: '14px',
+              border: 'none',
+              cursor: 'pointer',
+              background: i === 0 ? '#CCFBF1' : '#F1F5F9',
+              color: i === 0 ? '#0D9488' : '#64748B',
+            }}
           >
             {cat}
           </button>
@@ -68,43 +78,43 @@ export default function Forums() {
       </div>
 
       {/* Forum topics */}
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {filteredForums.map((forum) => (
-          <div key={forum._id} className="card hover-lift cursor-pointer">
-            <div className="flex items-start gap-4">
+          <div key={forum._id} className="card card-hover" style={{ cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
               <img
                 src={forum.creatorAvatar}
                 alt={forum.creatorName}
-                className="w-10 h-10 rounded-full"
+                style={{ width: '40px', height: '40px', borderRadius: '50%' }}
               />
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-lg mb-1 hover:text-indigo-400 transition-colors">
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontWeight: 600, fontSize: '16px', color: '#0F172A', marginBottom: '4px' }}>
                   {forum.topic}
                 </h3>
-                <div className="flex items-center gap-3 text-sm text-gray-400">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#64748B' }}>
                   <span>{forum.creatorName}</span>
                   <span>•</span>
-                  <span className="badge badge-secondary text-xs">{forum.category}</span>
+                  <span style={{ padding: '2px 8px', borderRadius: '6px', fontSize: '12px', background: '#F1F5F9', color: '#64748B' }}>{forum.category}</span>
                 </div>
               </div>
-              <div className="text-right text-sm text-gray-400">
-                <div className="flex items-center gap-1 justify-end mb-1">
+              <div style={{ textAlign: 'right', fontSize: '14px', color: '#64748B' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
                   <Clock size={14} />
                   <span>{formatTime(forum.lastActivity)}</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-6 mt-4 pt-4 border-t border-white/10 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #F1F5F9', fontSize: '14px', color: '#64748B' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <MessageSquare size={16} />
                 <span>{forum.replies} replies</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Eye size={16} />
                 <span>{forum.views} views</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <ThumbsUp size={16} />
                 <span>{Math.floor(forum.replies * 1.5)} likes</span>
               </div>
@@ -114,10 +124,10 @@ export default function Forums() {
       </div>
 
       {filteredForums.length === 0 && (
-        <div className="text-center py-16 card">
-          <MessageCircle size={48} className="mx-auto text-gray-500 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No discussions found</h3>
-          <p className="text-gray-400 mb-4">Be the first to start a conversation</p>
+        <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
+          <MessageCircle size={48} color="#E2E8F0" style={{ margin: '0 auto 16px' }} />
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '8px' }}>No discussions found</h3>
+          <p style={{ color: '#64748B', marginBottom: '16px' }}>Be the first to start a conversation</p>
           <button className="btn btn-primary">
             <Plus size={18} />
             Start a Discussion

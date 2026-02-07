@@ -12,7 +12,7 @@ import {
   Users,
   HelpCircle,
   Settings,
-  Flame
+  Compass as Logo
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -42,10 +42,10 @@ export default function Sidebar() {
     gap: '12px',
     padding: '12px 16px',
     borderRadius: '12px',
-    color: active ? '#B91C1C' : '#334155',
+    color: active ? '#0D9488' : '#64748B',
     fontWeight: 500,
     textDecoration: 'none',
-    background: active ? '#FEE2E2' : 'transparent',
+    background: active ? '#CCFBF1' : 'transparent',
     transition: 'all 0.15s ease',
   });
 
@@ -69,12 +69,12 @@ export default function Sidebar() {
             width: '40px',
             height: '40px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #B91C1C, #991B1B)',
+            background: 'linear-gradient(135deg, #0D9488, #0F766E)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-            <Flame color="white" size={22} />
+            <Logo color="white" size={22} />
           </div>
           <span style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A' }}>PathFinder</span>
         </Link>
@@ -100,7 +100,7 @@ export default function Sidebar() {
               <span style={{ flex: 1 }}>{item.label}</span>
               {item.badge > 0 && (
                 <span style={{
-                  background: '#B91C1C',
+                  background: '#0D9488',
                   color: 'white',
                   fontSize: '11px',
                   fontWeight: 700,
