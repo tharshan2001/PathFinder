@@ -1,110 +1,64 @@
 // models/User.js
 import mongoose from "mongoose";
 
+// Import all sub-schemas
+import { experienceSchema } from "./schemas/experience.js";
+import { educationSchema } from "./schemas/education.js";
+import { projectSchema } from "./schemas/project.js";
+import { certificationSchema } from "./schemas/certification.js";
+import { socialLinksSchema } from "./schemas/socialLinks.js";
+import { connectionRefSchema } from "./schemas/connectionRef.js";
+import { profileMediaSchema } from "./schemas/profileMedia.js";
+import { careerPreferencesSchema } from "./schemas/careerPreferences.js";
+
 const userSchema = new mongoose.Schema(
   {
     // Basic Identity
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: ["user", "admin", "mentor"], default: "user" },
 
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true
-    },
+    // Professional Profile
+    headline: { type: String, maxlength: 120, default: "" },
+    about: { type: String, maxlength: 2000, default: "" },
+    location: { type: String, default: "" },
 
-    password: {
-      type: String,
-      required: true
-    },
+    // Media
+    profileMedia: profileMediaSchema,
 
-    role: {
-      type: String,
-      enum: ["user", "admin", "mentor"],
-      default: "user"
-    },
+    // Experience & Education
+    experience: [experienceSchema],
+    education: [educationSchema],
 
-    // Professional Profile (LinkedIn-like)
-    headline: {
-      type: String,
-      default: ""
-    },
+    // Skills
+    skills: [skillEndorsementSchema],
 
-    location: {
-      type: String,
-      default: ""
-    },
+    // Projects & Certifications
+    projects: [projectSchema],
+    certifications: [certificationSchema],
 
-    about: {
-      type: String,
-      default: ""
-    },
+    // Social Links
+    socialLinks: socialLinksSchema,
 
-    // Skills & Learning
-    skills: [
-      {
-        type: String,
-        trim: true
-      }
-    ],
+    // Connections (lightweight)
+    connectionsCount: { type: Number, default: 0 },
+    followersCount: { type: Number, default: 0 },
+    connections: [connectionRefSchema], // optional snapshot
 
-    experienceLevel: {
-      type: String,
-      enum: ["Beginner", "Intermediate", "Advanced"],
-      default: "Beginner"
-    },
+    // Career Preferences
+    careerPreferences: careerPreferencesSchema,
 
-    learningPreferences: [
-      {
-        type: String
-      }
-    ],
-
-    // Counts (IMPORTANT – no heavy arrays)
-    connectionsCount: {
-      type: Number,
-      default: 0
-    },
-
-    profileViews: {
-      type: Number,
-      default: 0
-    },
+    // Profile Activity
+    profileViews: { type: Number, default: 0 },
+    lastActiveAt: { type: Date },
 
     // Saved Items
-    savedCourses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Course"
-      }
-    ],
-
-    savedJobs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Job"
-      }
-    ],
-
-    // Career Status
-    isOpenToWork: {
-      type: Boolean,
-      default: false
-    },
+    savedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
+    savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
 
     // Account State
-    isActive: {
-      type: Boolean,
-      default: true
-    },
-
-    lastActiveAt: {
-      type: Date
-    }
+    isActive: { type: Boolean, default: true }
   },
   {
     timestamps: true // createdAt & updatedAt
