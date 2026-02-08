@@ -22,11 +22,12 @@ export default function Sidebar() {
   const isActive = (path) => location.pathname === path;
 
   const mainNav = [
-    { path: '/', icon: Home, label: 'Dashboard' },
+    { path: '/', icon: Home, label: 'Home' },
+    { path: '/dashboard', icon: BarChart2, label: 'Dashboard' }, // Changed Icon to BarChart2
     { path: '/courses', icon: BookOpen, label: 'Courses' },
     { path: '/jobs', icon: Briefcase, label: 'Jobs' },
     { path: '/recommendations', icon: Compass, label: 'For You' },
-    { path: '/analytics', icon: BarChart2, label: 'Analytics' },
+    { path: '/analytics', icon: BarChart2, label: 'Running Stats' }, // Changed label to differentiate or keep unique icon if needed
   ];
 
   const secondaryNav = [
@@ -42,10 +43,10 @@ export default function Sidebar() {
     gap: '12px',
     padding: '12px 16px',
     borderRadius: '12px',
-    color: active ? '#0D9488' : '#64748B',
+    color: active ? 'var(--primary)' : 'var(--slate-500)',
     fontWeight: 500,
     textDecoration: 'none',
-    background: active ? '#CCFBF1' : 'transparent',
+    background: active ? 'var(--primary-light)' : 'transparent',
     transition: 'all 0.15s ease',
   });
 
@@ -57,7 +58,7 @@ export default function Sidebar() {
       bottom: 0,
       width: '260px',
       background: 'white',
-      borderRight: '1px solid #E2E8F0',
+      borderRight: '1px solid var(--slate-200)',
       display: 'flex',
       flexDirection: 'column',
       zIndex: 50,
@@ -69,14 +70,14 @@ export default function Sidebar() {
             width: '40px',
             height: '40px',
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #0D9488, #0F766E)',
+            background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}>
             <Logo color="white" size={22} />
           </div>
-          <span style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A' }}>PathFinder</span>
+          <span style={{ fontSize: '20px', fontWeight: 700, color: 'var(--slate-900)' }}>PathFinder</span>
         </Link>
       </div>
 
@@ -91,7 +92,7 @@ export default function Sidebar() {
           ))}
         </div>
 
-        <div style={{ height: '1px', background: '#E2E8F0', margin: '24px 0' }} />
+        <div style={{ height: '1px', background: 'var(--slate-200)', margin: '24px 0' }} />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {secondaryNav.map((item) => (
@@ -100,7 +101,7 @@ export default function Sidebar() {
               <span style={{ flex: 1 }}>{item.label}</span>
               {item.badge > 0 && (
                 <span style={{
-                  background: '#0D9488',
+                  background: 'var(--primary)',
                   color: 'white',
                   fontSize: '11px',
                   fontWeight: 700,
@@ -114,7 +115,7 @@ export default function Sidebar() {
           ))}
         </div>
 
-        <div style={{ height: '1px', background: '#E2E8F0', margin: '24px 0' }} />
+        <div style={{ height: '1px', background: 'var(--slate-200)', margin: '24px 0' }} />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <Link to="/forums" style={navLinkStyle(isActive('/forums'))}>
@@ -129,7 +130,7 @@ export default function Sidebar() {
       </nav>
 
       {/* User Profile */}
-      <div style={{ padding: '16px', borderTop: '1px solid #E2E8F0' }}>
+      <div style={{ padding: '16px', borderTop: '1px solid var(--slate-200)' }}>
         <Link
           to="/profile"
           style={{
@@ -151,14 +152,14 @@ export default function Sidebar() {
             <p style={{ 
               fontWeight: 600, 
               fontSize: '14px', 
-              color: '#0F172A',
+              color: 'var(--slate-900)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
             }}>
               {user.name}
             </p>
-            <p style={{ fontSize: '12px', color: '#94A3B8' }}>View profile</p>
+            <p style={{ fontSize: '12px', color: 'var(--slate-400)' }}>View profile</p>
           </div>
         </Link>
       </div>

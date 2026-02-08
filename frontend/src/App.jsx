@@ -20,13 +20,16 @@ import Forums from './pages/Forums';
 
 import './index.css';
 
+import FeedPage from './pages/FeedPage'; // Import FeedPage
+
 function App() {
   return (
     <AppProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
+            <Route index element={<FeedPage />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="courses" element={<Courses />} />
             <Route path="courses/:id" element={<CourseDetail />} />
             <Route path="jobs" element={<Jobs />} />

@@ -15,7 +15,7 @@ export default function JobDetail() {
   if (!job) {
     return (
       <div style={{ textAlign: 'center', padding: '64px 0' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#0F172A', marginBottom: '16px' }}>Job not found</h2>
+        <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--slate-900)', marginBottom: '16px' }}>Job not found</h2>
         <Link to="/jobs" className="btn btn-primary">Browse Jobs</Link>
       </div>
     );
@@ -26,7 +26,7 @@ export default function JobDetail() {
   return (
     <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Back button */}
-      <Link to="/jobs" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#64748B', textDecoration: 'none' }}>
+      <Link to="/jobs" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--slate-500)', textDecoration: 'none' }}>
         <ArrowLeft size={20} />
         Back to Jobs
       </Link>
@@ -37,16 +37,16 @@ export default function JobDetail() {
           {/* Header */}
           <div className="card">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '24px' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '12px', background: '#F0FDFA', border: '1px solid #CCFBF1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '12px', background: 'var(--slate-50)', border: '1px solid var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img src={job.companyLogo} alt={job.company} style={{ width: '48px', height: '48px', borderRadius: '8px' }} />
               </div>
               <div style={{ flex: 1 }}>
-                <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#0F172A', marginBottom: '4px' }}>{job.title}</h1>
-                <p style={{ fontSize: '18px', color: '#0D9488', fontWeight: 500 }}>{job.company}</p>
+                <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--slate-900)', marginBottom: '4px' }}>{job.title}</h1>
+                <p style={{ fontSize: '18px', color: 'var(--primary)', fontWeight: 500 }}>{job.company}</p>
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', color: '#64748B' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', color: 'var(--slate-500)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <MapPin size={18} />
                 <span>{job.location}</span>
@@ -71,8 +71,8 @@ export default function JobDetail() {
                 borderRadius: '8px',
                 fontSize: '12px',
                 fontWeight: 600,
-                background: job.remote === 'Remote' ? '#D1FAE5' : job.remote === 'Hybrid' ? '#FEF3C7' : '#F1F5F9',
-                color: job.remote === 'Remote' ? '#059669' : job.remote === 'Hybrid' ? '#D97706' : '#64748B',
+                background: job.remote === 'Remote' ? '#D1FAE5' : job.remote === 'Hybrid' ? '#FEF3C7' : 'var(--slate-100)',
+                color: job.remote === 'Remote' ? 'var(--emerald)' : job.remote === 'Hybrid' ? 'var(--amber)' : 'var(--slate-500)',
               }}>
                 {job.remote}
               </span>
@@ -80,32 +80,32 @@ export default function JobDetail() {
           </div>
 
           {/* Salary */}
-          <div className="card" style={{ background: 'linear-gradient(135deg, #F0FDFA, #E0F2FE)', border: '1px solid #CCFBF1' }}>
+          <div className="card" style={{ background: 'linear-gradient(135deg, var(--slate-50), #E0F2FE)', border: '1px solid var(--primary-light)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <DollarSign size={24} color="#0D9488" />
+              <DollarSign size={24} color="var(--primary)" />
               <div>
-                <p style={{ fontSize: '14px', color: '#64748B' }}>Salary Range</p>
-                <p style={{ fontSize: '24px', fontWeight: 700, color: '#0D9488' }}>{job.salary}</p>
+                <p style={{ fontSize: '14px', color: 'var(--slate-500)' }}>Salary Range</p>
+                <p style={{ fontSize: '24px', fontWeight: 700, color: 'var(--primary)' }}>{job.salary}</p>
               </div>
             </div>
           </div>
 
           {/* Description */}
           <div className="card">
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>About This Role</h2>
-            <p style={{ color: '#334155', lineHeight: 1.6 }}>{job.description}</p>
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px' }}>About This Role</h2>
+            <p style={{ color: 'var(--slate-700)', lineHeight: 1.6 }}>{job.description}</p>
           </div>
 
           {/* Requirements */}
           <div className="card">
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Requirements</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px' }}>Requirements</h2>
             <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {job.requirements.map((req, index) => (
                 <li key={index} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#CCFBF1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
-                    <span style={{ fontSize: '12px', color: '#0D9488', fontWeight: 600 }}>{index + 1}</span>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600 }}>{index + 1}</span>
                   </div>
-                  <span style={{ color: '#334155' }}>{req}</span>
+                  <span style={{ color: 'var(--slate-700)' }}>{req}</span>
                 </li>
               ))}
             </ul>
@@ -113,10 +113,10 @@ export default function JobDetail() {
 
           {/* Skills */}
           <div className="card">
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Required Skills</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px' }}>Required Skills</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {job.skillsRequired.map((skill) => (
-                <span key={skill} style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, background: '#CCFBF1', color: '#0D9488' }}>{skill}</span>
+                <span key={skill} style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, background: 'var(--primary-light)', color: 'var(--primary)' }}>{skill}</span>
               ))}
             </div>
           </div>
@@ -143,30 +143,30 @@ export default function JobDetail() {
             </div>
 
             {/* Company info */}
-            <div style={{ paddingTop: '24px', borderTop: '1px solid #E2E8F0' }}>
-              <h3 style={{ fontWeight: 600, color: '#0F172A', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Building2 size={18} color="#0D9488" />
+            <div style={{ paddingTop: '24px', borderTop: '1px solid var(--slate-200)' }}>
+              <h3 style={{ fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Building2 size={18} color="var(--primary)" />
                 About {job.company}
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: '#334155' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: 'var(--slate-700)' }}>
                 <p>
                   {job.company} is a leading company in the {job.category.toLowerCase()} industry, 
                   dedicated to innovation and excellence.
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748B' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--slate-500)' }}>
                   <MapPin size={14} />
                   <span>{job.location}</span>
                 </div>
               </div>
-              <button style={{ color: '#0D9488', fontSize: '14px', marginTop: '16px', background: 'none', border: 'none', cursor: 'pointer' }}>
+              <button style={{ color: 'var(--primary)', fontSize: '14px', marginTop: '16px', background: 'none', border: 'none', cursor: 'pointer' }}>
                 View company profile →
               </button>
             </div>
 
             {/* Similar jobs */}
-            <div style={{ paddingTop: '24px', marginTop: '24px', borderTop: '1px solid #E2E8F0' }}>
-              <h3 style={{ fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Similar Jobs</h3>
-              <p style={{ fontSize: '14px', color: '#64748B' }}>
+            <div style={{ paddingTop: '24px', marginTop: '24px', borderTop: '1px solid var(--slate-200)' }}>
+              <h3 style={{ fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px' }}>Similar Jobs</h3>
+              <p style={{ fontSize: '14px', color: 'var(--slate-500)' }}>
                 Explore more {job.category} positions
               </p>
               <Link to="/jobs" className="btn btn-outline" style={{ width: '100%', marginTop: '16px' }}>

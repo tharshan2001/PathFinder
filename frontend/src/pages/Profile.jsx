@@ -17,22 +17,22 @@ export default function Profile() {
           />
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0F172A' }}>{user.name}</h1>
+              <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--slate-900)' }}>{user.name}</h1>
               <button className="btn btn-outline btn-sm">
                 <Edit2 size={14} />
                 Edit Profile
               </button>
             </div>
-            <p style={{ color: '#334155', marginTop: '4px' }}>Software Developer · Full Stack</p>
-            <p style={{ fontSize: '14px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px' }}>
+            <p style={{ color: 'var(--slate-700)', marginTop: '4px' }}>Software Developer · Full Stack</p>
+            <p style={{ fontSize: '14px', color: 'var(--slate-500)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px' }}>
               <MapPin size={14} />
               San Francisco, CA
             </p>
-            <p style={{ fontSize: '14px', color: '#0D9488', marginTop: '8px' }}>{user.connections}+ connections</p>
+            <p style={{ fontSize: '14px', color: 'var(--primary)', marginTop: '8px' }}>{user.connections}+ connections</p>
           </div>
         </div>
 
-        <p style={{ marginTop: '24px', color: '#334155', lineHeight: 1.6 }}>
+        <p style={{ marginTop: '24px', color: 'var(--slate-700)', lineHeight: 1.6 }}>
           Passionate about building great products. Experienced in React, Node.js, and cloud technologies. 
           Always learning and exploring new technologies.
         </p>
@@ -41,14 +41,14 @@ export default function Profile() {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
         {[
-          { label: 'Courses Completed', value: enrolledCourses.length, color: '#0D9488' },
-          { label: 'Hours Learned', value: '47', color: '#059669' },
-          { label: 'Certificates', value: '3', color: '#D97706' },
-          { label: 'Profile Views', value: '142', color: '#0284C7' },
+          { label: 'Courses Completed', value: enrolledCourses.length, color: 'var(--primary)' },
+          { label: 'Hours Learned', value: '47', color: 'var(--emerald)' },
+          { label: 'Certificates', value: '3', color: 'var(--amber)' },
+          { label: 'Profile Views', value: '142', color: 'var(--blue)' },
         ].map((stat) => (
           <div key={stat.label} className="card" style={{ textAlign: 'center' }}>
             <p style={{ fontSize: '24px', fontWeight: 700, color: stat.color }}>{stat.value}</p>
-            <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>{stat.label}</p>
+            <p style={{ fontSize: '14px', color: 'var(--slate-500)', marginTop: '4px' }}>{stat.label}</p>
           </div>
         ))}
       </div>
@@ -56,7 +56,7 @@ export default function Profile() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
         {/* Skills */}
         <div className="card">
-          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Skills</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px' }}>Skills</h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {user.skills.map((skill) => (
               <span key={skill} style={{
@@ -64,8 +64,8 @@ export default function Profile() {
                 borderRadius: '8px',
                 fontSize: '13px',
                 fontWeight: 600,
-                background: '#CCFBF1',
-                color: '#0D9488',
+                background: 'var(--primary-light)',
+                color: 'var(--primary)',
               }}>
                 {skill}
               </span>
@@ -75,18 +75,18 @@ export default function Profile() {
 
         {/* Achievements */}
         <div className="card">
-          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Achievements</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px' }}>Achievements</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {[
               { icon: '🚀', title: 'Fast Learner', desc: 'Completed 5 courses' },
               { icon: '🔥', title: '7-Day Streak', desc: 'Consistent learning' },
               { icon: '⭐', title: 'Top Performer', desc: 'Top 10% in quizzes' },
             ].map((badge) => (
-              <div key={badge.title} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', background: '#F8FAFC' }}>
+              <div key={badge.title} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', background: 'var(--slate-50)' }}>
                 <span style={{ fontSize: '24px' }}>{badge.icon}</span>
                 <div>
-                  <p style={{ fontWeight: 500, color: '#0F172A' }}>{badge.title}</p>
-                  <p style={{ fontSize: '12px', color: '#64748B' }}>{badge.desc}</p>
+                  <p style={{ fontWeight: 500, color: 'var(--slate-900)' }}>{badge.title}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--slate-500)' }}>{badge.desc}</p>
                 </div>
               </div>
             ))}
@@ -97,7 +97,7 @@ export default function Profile() {
       {/* Current Learning */}
       {enrolledCourses.length > 0 && (
         <div className="card">
-          <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '16px' }}>Currently Learning</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '16px' }}>Currently Learning</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {enrolledCourses.slice(0, 3).map((course) => (
               <div key={course._id} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -107,14 +107,14 @@ export default function Profile() {
                   style={{ width: '64px', height: '48px', borderRadius: '8px', objectFit: 'cover' }}
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontWeight: 500, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</p>
+                  <p style={{ fontWeight: 500, color: 'var(--slate-900)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
-                    <div style={{ flex: 1, height: '8px', background: '#E2E8F0', borderRadius: '4px' }}>
+                    <div style={{ flex: 1, height: '8px', background: 'var(--slate-200)', borderRadius: '4px' }}>
                       <div 
-                        style={{ height: '100%', background: '#0D9488', borderRadius: '4px', width: `${user.progress[course._id] || 0}%` }}
+                        style={{ height: '100%', background: 'var(--primary)', borderRadius: '4px', width: `${user.progress[course._id] || 0}%` }}
                       />
                     </div>
-                    <span style={{ fontSize: '14px', fontWeight: 500, color: '#0D9488' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--primary)' }}>
                       {user.progress[course._id] || 0}%
                     </span>
                   </div>

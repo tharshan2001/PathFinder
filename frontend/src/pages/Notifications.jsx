@@ -6,12 +6,12 @@ export default function Notifications() {
 
   const getIcon = (type) => {
     const icons = {
-      course: <BookOpen size={18} color="#0284C7" />,
-      job: <Briefcase size={18} color="#D97706" />,
-      connection: <Users size={18} color="#059669" />,
-      message: <MessageCircle size={18} color="#7C3AED" />,
+      course: <BookOpen size={18} color="var(--blue)" />,
+      job: <Briefcase size={18} color="var(--amber)" />,
+      connection: <Users size={18} color="var(--emerald)" />,
+      message: <MessageCircle size={18} color="var(--purple)" />,
     };
-    return icons[type] || <Bell size={18} color="#0D9488" />;
+    return icons[type] || <Bell size={18} color="var(--primary)" />;
   };
 
   const formatTime = (timestamp) => {
@@ -29,8 +29,8 @@ export default function Notifications() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#0F172A' }}>Notifications</h1>
-          <p style={{ color: '#64748B', marginTop: '4px' }}>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: 'var(--slate-900)' }}>Notifications</h1>
+          <p style={{ color: 'var(--slate-500)', marginTop: '4px' }}>
             {unread > 0 ? `${unread} unread notifications` : 'All caught up!'}
           </p>
         </div>
@@ -54,8 +54,8 @@ export default function Notifications() {
               gap: '16px',
               padding: '16px',
               cursor: 'pointer',
-              background: !n.read ? '#F0FDFA' : 'transparent',
-              borderBottom: index < notifications.length - 1 ? '1px solid #F1F5F9' : 'none',
+              background: !n.read ? 'var(--slate-50)' : 'transparent',
+              borderBottom: index < notifications.length - 1 ? '1px solid var(--slate-100)' : 'none',
               transition: 'background 0.15s ease',
             }}
           >
@@ -64,7 +64,7 @@ export default function Notifications() {
               height: '40px',
               borderRadius: '50%',
               background: 'white',
-              border: '1px solid #E2E8F0',
+              border: '1px solid var(--slate-200)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -73,29 +73,29 @@ export default function Notifications() {
               {getIcon(n.type)}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: '14px', color: !n.read ? '#0F172A' : '#64748B', fontWeight: !n.read ? 600 : 400 }}>
+              <p style={{ fontSize: '14px', color: !n.read ? 'var(--slate-900)' : 'var(--slate-500)', fontWeight: !n.read ? 600 : 400 }}>
                 {n.message}
               </p>
-              <p style={{ fontSize: '12px', color: '#94A3B8', marginTop: '4px' }}>{formatTime(n.timestamp)}</p>
+              <p style={{ fontSize: '12px', color: 'var(--slate-400)', marginTop: '4px' }}>{formatTime(n.timestamp)}</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-              {!n.read && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#0D9488' }} />}
+              {!n.read && <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)' }} />}
               <button
                 onClick={(e) => { e.stopPropagation(); dismissNotification(n._id); }}
                 style={{ padding: '4px', borderRadius: '4px', border: 'none', background: 'transparent', cursor: 'pointer' }}
               >
-                <X size={14} color="#94A3B8" />
+                <X size={14} color="var(--slate-400)" />
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      {notifications.length === 0 && (
+        {notifications.length === 0 && (
         <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-          <Bell size={48} color="#E2E8F0" style={{ margin: '0 auto 16px' }} />
-          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '8px' }}>No notifications</h3>
-          <p style={{ color: '#64748B' }}>You're all caught up!</p>
+          <Bell size={48} color="var(--slate-200)" style={{ margin: '0 auto 16px' }} />
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '8px' }}>No notifications</h3>
+          <p style={{ color: 'var(--slate-500)' }}>You're all caught up!</p>
         </div>
       )}
     </div>

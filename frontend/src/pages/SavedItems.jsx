@@ -15,12 +15,12 @@ export default function SavedItems() {
     <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <div style={{ padding: '12px', borderRadius: '12px', background: '#CCFBF1' }}>
-          <Bookmark color="#0D9488" size={24} />
+        <div style={{ padding: '12px', borderRadius: '12px', background: 'var(--primary-light)' }}>
+          <Bookmark color="var(--primary)" size={24} />
         </div>
         <div>
-          <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#0F172A' }}>Saved Items</h1>
-          <p style={{ color: '#64748B', marginTop: '4px' }}>Your bookmarked courses and jobs</p>
+          <h1 style={{ fontSize: '30px', fontWeight: 700, color: 'var(--slate-900)' }}>Saved Items</h1>
+          <p style={{ color: 'var(--slate-500)', marginTop: '4px' }}>Your bookmarked courses and jobs</p>
         </div>
       </div>
 
@@ -35,9 +35,9 @@ export default function SavedItems() {
             padding: '12px 24px',
             borderRadius: '12px',
             fontWeight: 500,
-            border: activeTab === 'courses' ? '1px solid #0D9488' : '1px solid #E2E8F0',
-            background: activeTab === 'courses' ? '#CCFBF1' : 'white',
-            color: activeTab === 'courses' ? '#0D9488' : '#64748B',
+            border: activeTab === 'courses' ? '1px solid var(--primary)' : '1px solid var(--slate-200)',
+            background: activeTab === 'courses' ? 'var(--primary-light)' : 'white',
+            color: activeTab === 'courses' ? 'var(--primary)' : 'var(--slate-500)',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
           }}
@@ -54,9 +54,9 @@ export default function SavedItems() {
             padding: '12px 24px',
             borderRadius: '12px',
             fontWeight: 500,
-            border: activeTab === 'jobs' ? '1px solid #0D9488' : '1px solid #E2E8F0',
-            background: activeTab === 'jobs' ? '#CCFBF1' : 'white',
-            color: activeTab === 'jobs' ? '#0D9488' : '#64748B',
+            border: activeTab === 'jobs' ? '1px solid var(--primary)' : '1px solid var(--slate-200)',
+            background: activeTab === 'jobs' ? 'var(--primary-light)' : 'white',
+            color: activeTab === 'jobs' ? 'var(--primary)' : 'var(--slate-500)',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
           }}
@@ -76,9 +76,9 @@ export default function SavedItems() {
           </div>
         ) : (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <BookOpen size={48} color="#E2E8F0" style={{ margin: '0 auto 16px' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '8px' }}>No saved courses</h3>
-            <p style={{ color: '#64748B' }}>Courses you save will appear here</p>
+            <BookOpen size={48} color="var(--slate-200)" style={{ margin: '0 auto 16px' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '8px' }}>No saved courses</h3>
+            <p style={{ color: 'var(--slate-500)' }}>Courses you save will appear here</p>
           </div>
         )
       ) : (
@@ -90,9 +90,9 @@ export default function SavedItems() {
           </div>
         ) : (
           <div className="card" style={{ textAlign: 'center', padding: '64px 24px' }}>
-            <Briefcase size={48} color="#E2E8F0" style={{ margin: '0 auto 16px' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '8px' }}>No saved jobs</h3>
-            <p style={{ color: '#64748B' }}>Jobs you save will appear here</p>
+            <Briefcase size={48} color="var(--slate-200)" style={{ margin: '0 auto 16px' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '8px' }}>No saved jobs</h3>
+            <p style={{ color: 'var(--slate-500)' }}>Jobs you save will appear here</p>
           </div>
         )
       )}

@@ -20,7 +20,7 @@ export default function JobCard({ job }) {
             height: '48px', 
             borderRadius: '12px', 
             objectFit: 'cover',
-            background: '#F1F5F9',
+            background: 'var(--slate-100)',
             flexShrink: 0,
           }}
         />
@@ -29,7 +29,7 @@ export default function JobCard({ job }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none' }}>
-              <h3 style={{ fontWeight: 600, color: '#0F172A', fontSize: '15px' }}>
+              <h3 style={{ fontWeight: 600, color: 'var(--slate-900)', fontSize: '15px' }}>
                 {job.title}
               </h3>
             </Link>
@@ -49,25 +49,25 @@ export default function JobCard({ job }) {
               }}
             >
               {isSaved ? (
-                <BookmarkCheck size={18} color="#0D9488" />
+                <BookmarkCheck size={18} color="var(--primary)" />
               ) : (
-                <Bookmark size={18} color="#64748B" />
+                <Bookmark size={18} color="var(--slate-500)" />
               )}
             </button>
           </div>
 
-          <p style={{ fontSize: '14px', color: '#334155', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--slate-700)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
             <Building2 size={14} />
             {job.company}
           </p>
           
-          <p style={{ fontSize: '14px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--slate-500)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
             <MapPin size={14} />
             {job.location}
             <span style={{
               marginLeft: '8px',
-              background: '#CCFBF1',
-              color: '#0D9488',
+              background: 'var(--primary-light)',
+              color: 'var(--primary)',
               padding: '2px 8px',
               borderRadius: '4px',
               fontSize: '12px',
@@ -78,11 +78,11 @@ export default function JobCard({ job }) {
           </p>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px' }}>
-            <p style={{ fontWeight: 600, color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <p style={{ fontWeight: 600, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <DollarSign size={14} />
               {job.salary}
             </p>
-            <p style={{ fontSize: '12px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <p style={{ fontSize: '12px', color: 'var(--slate-500)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Clock size={12} />
               {daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}
             </p>

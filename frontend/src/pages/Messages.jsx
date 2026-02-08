@@ -19,16 +19,16 @@ export default function Messages() {
         {/* Sidebar */}
         <div style={{ width: '300px', borderRight: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '16px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A', marginBottom: '12px' }}>Messages</h2>
+            <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--slate-900)', marginBottom: '12px' }}>Messages</h2>
             <div style={{ position: 'relative' }}>
-              <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+              <Search size={16} color="var(--slate-400)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
                 placeholder="Search..."
                 style={{
                   width: '100%',
                   padding: '8px 12px 8px 36px',
-                  background: '#F1F5F9',
+                  background: 'var(--slate-100)',
                   borderRadius: '8px',
                   fontSize: '14px',
                   border: 'none',
@@ -51,21 +51,21 @@ export default function Messages() {
                   gap: '12px',
                   textAlign: 'left',
                   border: 'none',
-                  background: selectedChat?._id === chat._id ? '#F0FDFA' : 'transparent',
+                  background: selectedChat?._id === chat._id ? 'var(--slate-50)' : 'transparent',
                   cursor: 'pointer',
                   transition: 'background 0.15s ease',
                 }}
               >
                 <div style={{ position: 'relative', flexShrink: 0 }}>
                   <img src={chat.senderAvatar} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                  <span style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: '#059669', border: '2px solid white', borderRadius: '50%' }} />
+                  <span style={{ position: 'absolute', bottom: 0, right: 0, width: '12px', height: '12px', background: 'var(--emerald)', border: '2px solid white', borderRadius: '50%' }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '14px', fontWeight: chat.unread ? 600 : 500, color: '#0F172A' }}>{chat.senderName}</p>
-                  <p style={{ fontSize: '12px', color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{chat.lastMessage}</p>
+                  <p style={{ fontSize: '14px', fontWeight: chat.unread ? 600 : 500, color: 'var(--slate-900)' }}>{chat.senderName}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--slate-500)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{chat.lastMessage}</p>
                 </div>
                 {chat.unread > 0 && (
-                  <span style={{ width: '20px', height: '20px', background: '#0D9488', color: 'white', fontSize: '11px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ width: '20px', height: '20px', background: 'var(--primary)', color: 'white', fontSize: '11px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {chat.unread}
                   </span>
                 )}
@@ -77,15 +77,15 @@ export default function Messages() {
         {/* Chat */}
         {selectedChat ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '16px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ padding: '16px', borderBottom: '1px solid var(--slate-200)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <img src={selectedChat.senderAvatar} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
               <div>
-                <p style={{ fontWeight: 600, color: '#0F172A' }}>{selectedChat.senderName}</p>
-                <p style={{ fontSize: '12px', color: '#059669' }}>Online</p>
+                <p style={{ fontWeight: 600, color: 'var(--slate-900)' }}>{selectedChat.senderName}</p>
+                <p style={{ fontSize: '12px', color: 'var(--emerald)' }}>Online</p>
               </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', background: '#F8FAFC' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'var(--slate-50)' }}>
               {chatMessages.map((msg) => (
                 <div key={msg.id} style={{ display: 'flex', justifyContent: msg.sender === 'me' ? 'flex-end' : 'flex-start' }}>
                   <div style={{
@@ -94,9 +94,9 @@ export default function Messages() {
                     borderRadius: '16px',
                     borderBottomRightRadius: msg.sender === 'me' ? '4px' : '16px',
                     borderBottomLeftRadius: msg.sender === 'me' ? '16px' : '4px',
-                    background: msg.sender === 'me' ? '#0D9488' : 'white',
-                    color: msg.sender === 'me' ? 'white' : '#0F172A',
-                    border: msg.sender === 'me' ? 'none' : '1px solid #E2E8F0',
+                    background: msg.sender === 'me' ? 'var(--primary)' : 'white',
+                    color: msg.sender === 'me' ? 'white' : 'var(--slate-900)',
+                    border: msg.sender === 'me' ? 'none' : '1px solid var(--slate-200)',
                   }}>
                     <p style={{ fontSize: '14px' }}>{msg.text}</p>
                     <p style={{ fontSize: '11px', marginTop: '4px', opacity: msg.sender === 'me' ? 0.7 : 0.6 }}>{msg.time}</p>
@@ -105,7 +105,7 @@ export default function Messages() {
               ))}
             </div>
 
-            <div style={{ padding: '16px', borderTop: '1px solid #E2E8F0', display: 'flex', gap: '12px' }}>
+            <div style={{ padding: '16px', borderTop: '1px solid var(--slate-200)', display: 'flex', gap: '12px' }}>
               <input
                 type="text"
                 value={newMessage}
@@ -114,7 +114,7 @@ export default function Messages() {
                 style={{
                   flex: 1,
                   padding: '12px 16px',
-                  background: '#F1F5F9',
+                  background: 'var(--slate-100)',
                   borderRadius: '12px',
                   fontSize: '14px',
                   border: 'none',
@@ -127,10 +127,10 @@ export default function Messages() {
             </div>
           </div>
         ) : (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--slate-50)' }}>
             <div style={{ textAlign: 'center' }}>
-              <Send size={48} color="#E2E8F0" style={{ margin: '0 auto 16px' }} />
-              <p style={{ color: '#64748B' }}>Select a conversation</p>
+              <Send size={48} color="var(--slate-200)" style={{ margin: '0 auto 16px' }} />
+              <p style={{ color: 'var(--slate-500)' }}>Select a conversation</p>
             </div>
           </div>
         )}

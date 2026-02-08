@@ -9,26 +9,26 @@ export default function Dashboard() {
   const enrolledCourses = getEnrolledCourses();
 
   return (
-    <div className="animate-in" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div className="animate-in flex flex-col gap-8">
       {/* Welcome */}
       <div>
-        <h1 style={{ fontSize: '30px', fontWeight: 700, color: '#0F172A' }}>
-          Welcome back, {user.name.split(' ')[0]} 👋
+        <h1 className="text-3xl font-bold text-slate-900">
+          Dashboard
         </h1>
-        <p style={{ color: '#64748B', marginTop: '4px' }}>Here's what's happening with your learning journey</p>
+        <p className="text-slate-500 mt-1">Overview of your learning progress and recommendations</p>
       </div>
 
       {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+      <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Courses Enrolled', value: enrolledCourses.length, color: '#0D9488' },
-          { label: 'Hours Learned', value: '47', color: '#059669' },
-          { label: 'Skills Gained', value: '12', color: '#D97706' },
-          { label: 'Certificates', value: '3', color: '#0284C7' },
+          { label: 'Courses Enrolled', value: enrolledCourses.length, color: 'text-primary' },
+          { label: 'Hours Learned', value: '47', color: 'text-emerald-600' },
+          { label: 'Skills Gained', value: '12', color: 'text-amber-500' },
+          { label: 'Certificates', value: '3', color: 'text-blue-600' },
         ].map((stat) => (
-          <div key={stat.label} className="card" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '30px', fontWeight: 700, color: stat.color }}>{stat.value}</p>
-            <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>{stat.label}</p>
+          <div key={stat.label} className="card text-center">
+            <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
+            <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -36,60 +36,40 @@ export default function Dashboard() {
       {/* Continue Learning */}
       {enrolledCourses.length > 0 && (
         <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Continue Learning</h2>
-            <Link to="/courses" style={{ fontSize: '14px', color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-slate-900">Continue Learning</h2>
+            <Link to="/courses" className="text-sm text-primary flex items-center gap-1 hover:underline">
               View all <ArrowRight size={14} />
             </Link>
           </div>
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="flex flex-col gap-4">
             {enrolledCourses.slice(0, 2).map((course) => (
               <Link 
                 key={course._id} 
                 to={`/courses/${course._id}`}
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '16px', 
-                  padding: '16px', 
-                  borderRadius: '12px', 
-                  background: '#F8FAFC',
-                  textDecoration: 'none',
-                }}
+                className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
               >
-                <div style={{ position: 'relative', flexShrink: 0 }}>
+                <div className="relative flex-shrink-0">
                   <img
                     src={course.thumbnail}
                     alt={course.title}
-                    style={{ width: '80px', height: '56px', borderRadius: '8px', objectFit: 'cover' }}
+                    className="w-20 h-14 rounded-lg object-cover"
                   />
-                  <div style={{ 
-                    position: 'absolute', 
-                    inset: 0, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    background: 'rgba(0,0,0,0.3)', 
-                    borderRadius: '8px' 
-                  }}>
-                    <Play size={20} color="white" fill="white" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg">
+                    <Play size={20} className="text-white fill-white" />
                   </div>
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{ fontWeight: 500, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{course.title}</h3>
-                  <p style={{ fontSize: '14px', color: '#64748B' }}>{course.provider}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-slate-900 truncate">{course.title}</h3>
+                  <p className="text-sm text-slate-500">{course.provider}</p>
                 </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#0D9488' }}>{user.progress[course._id] || 0}%</p>
-                  <div style={{ width: '96px', height: '8px', background: '#E2E8F0', borderRadius: '4px', marginTop: '4px' }}>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-sm font-semibold text-primary">{user.progress[course._id] || 0}%</p>
+                  <div className="w-24 h-2 bg-slate-200 rounded-full mt-1">
                     <div 
-                      style={{ 
-                        height: '100%', 
-                        background: '#0D9488', 
-                        borderRadius: '4px',
-                        width: `${user.progress[course._id] || 0}%`
-                      }}
+                      className="h-full bg-primary rounded-full transition-all duration-500"
+                      style={{ width: `${user.progress[course._id] || 0}%` }}
                     />
                   </div>
                 </div>
@@ -100,16 +80,16 @@ export default function Dashboard() {
       )}
 
       {/* Two columns */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
-        {/* Featured Courses */}
+      <div className="grid grid-cols-2 gap-6">
+        {/* Recommended Courses */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Recommended Courses</h2>
-            <Link to="/courses" style={{ fontSize: '14px', color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-900">Recommended Courses</h2>
+            <Link to="/courses" className="text-sm text-primary flex items-center gap-1 hover:underline">
               Browse all <ArrowRight size={14} />
             </Link>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+          <div className="grid grid-cols-2 gap-4">
             {courses.slice(0, 4).map((course) => (
               <CourseCard key={course._id} course={course} />
             ))}
@@ -118,30 +98,24 @@ export default function Dashboard() {
 
         {/* Trending Skills */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <TrendingUp size={18} color="#0D9488" />
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Trending Skills</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp size={18} className="text-primary" />
+            <h2 className="text-lg font-semibold text-slate-900">Trending Skills</h2>
           </div>
-          <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="card flex flex-col gap-4">
             {trends.slice(0, 5).map((trend, i) => (
-              <div key={trend._id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ 
-                  width: '24px', 
-                  height: '24px', 
-                  borderRadius: '50%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  fontSize: '12px', 
-                  fontWeight: 700,
-                  background: i === 0 ? '#0D9488' : i === 1 ? '#14B8A6' : i === 2 ? '#2DD4BF' : '#F1F5F9',
-                  color: i < 3 ? 'white' : '#64748B',
-                }}>
+              <div key={trend._id} className="flex items-center gap-3">
+                <span className={`
+                  w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold
+                  ${i === 0 ? 'bg-primary text-white' : 
+                    i === 1 ? 'bg-primary/80 text-white' : 
+                    i === 2 ? 'bg-primary/60 text-white' : 'bg-slate-100 text-slate-500'}
+                `}>
                   {i + 1}
                 </span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A' }}>{trend.skill}</p>
-                  <p style={{ fontSize: '12px', color: '#0D9488' }}>{trend.growth} growth</p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-900">{trend.skill}</p>
+                  <p className="text-xs text-primary">{trend.growth} <span className="text-slate-400">growth</span></p>
                 </div>
               </div>
             ))}
@@ -151,16 +125,16 @@ export default function Dashboard() {
 
       {/* Jobs */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Briefcase size={18} color="#0D9488" />
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0F172A' }}>Jobs For You</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Briefcase size={18} className="text-primary" />
+            <h2 className="text-lg font-semibold text-slate-900">Jobs For You</h2>
           </div>
-          <Link to="/jobs" style={{ fontSize: '14px', color: '#0D9488', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <Link to="/jobs" className="text-sm text-primary flex items-center gap-1 hover:underline">
             View all jobs <ArrowRight size={14} />
           </Link>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+        <div className="grid grid-cols-2 gap-4">
           {jobs.slice(0, 4).map((job) => (
             <JobCard key={job._id} job={job} />
           ))}
@@ -169,3 +143,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
