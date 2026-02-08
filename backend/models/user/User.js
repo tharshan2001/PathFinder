@@ -2,14 +2,16 @@
 import mongoose from "mongoose";
 
 // Import all sub-schemas
-import { experienceSchema } from "./schemas/experience.js";
-import { educationSchema } from "./schemas/education.js";
-import { projectSchema } from "./schemas/project.js";
-import { certificationSchema } from "./schemas/certification.js";
-import { socialLinksSchema } from "./schemas/socialLinks.js";
-import { connectionRefSchema } from "./schemas/connectionRef.js";
-import { profileMediaSchema } from "./schemas/profileMedia.js";
-import { careerPreferencesSchema } from "./schemas/careerPreferences.js";
+import { experienceSchema } from "../user/experience.js";
+import { educationSchema } from "../user/education.js";
+import { projectSchema } from "../user/project.js";
+import { certificationSchema } from "../user/certification.js";
+import { socialLinksSchema } from "../user/socialLinks.js";
+import { connectionRefSchema } from "../user/connectionRef.js";
+import { profileMediaSchema } from "../user/profileMedia.js";
+import { careerPreferencesSchema } from "../user/careerPreferences.js";
+import { skillEndorsementSchema } from "../user/skillEndorsement.js";
+
 
 const userSchema = new mongoose.Schema(
   {
