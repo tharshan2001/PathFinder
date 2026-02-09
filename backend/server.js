@@ -5,6 +5,9 @@ import connectDB from "./config/mongodb.js";
 
 // Routes
 import userRoutes from "./routes/userRoutes.js";
+import connectionRoutes from "./routes/connectionRoutes.js";
+
+
 
 dotenv.config();
 
@@ -20,6 +23,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/connections", connectionRoutes);
+
 
 // ---------------- Error Handling ----------------
 app.use((err, req, res, next) => {
@@ -28,7 +33,7 @@ app.use((err, req, res, next) => {
 });
 
 // ---------------- Start Server ----------------
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 connectDB().then(() => {
   app.listen(PORT, () => {
