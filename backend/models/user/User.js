@@ -1,17 +1,15 @@
 // models/User.js
 import mongoose from "mongoose";
 
-// Import all sub-schemas
+// Import sub-schemas
 import { experienceSchema } from "../user/experience.js";
 import { educationSchema } from "../user/education.js";
 import { projectSchema } from "../user/project.js";
 import { certificationSchema } from "../user/certification.js";
 import { socialLinksSchema } from "../user/socialLinks.js";
-import { connectionRefSchema } from "../user/connectionRef.js";
 import { profileMediaSchema } from "../user/profileMedia.js";
 import { careerPreferencesSchema } from "../user/careerPreferences.js";
 import { skillEndorsementSchema } from "../user/skillEndorsement.js";
-
 
 const userSchema = new mongoose.Schema(
   {
@@ -43,10 +41,9 @@ const userSchema = new mongoose.Schema(
     // Social Links
     socialLinks: socialLinksSchema,
 
-    // Connections (lightweight)
+    // Connection counters (source of truth = Connection collection)
     connectionsCount: { type: Number, default: 0 },
     followersCount: { type: Number, default: 0 },
-    connections: [connectionRefSchema], // optional snapshot
 
     // Career Preferences
     careerPreferences: careerPreferencesSchema,
@@ -63,7 +60,7 @@ const userSchema = new mongoose.Schema(
     isActive: { type: Boolean, default: true }
   },
   {
-    timestamps: true // createdAt & updatedAt
+    timestamps: true
   }
 );
 

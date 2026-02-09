@@ -1,10 +1,24 @@
-// models/schemas/connectionRef.js
 import mongoose from "mongoose";
 
-export const connectionRefSchema = new mongoose.Schema(
+const connectionSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    connectedAt: { type: Date, default: Date.now }
+    requester: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    recipient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted"],
+      default: "pending"
+    }
   },
-  { _id: false }
+  { timestamps: true }
 );
+
+export default mongoose.model("Connection", connectionSchema);

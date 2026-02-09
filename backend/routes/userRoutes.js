@@ -17,7 +17,7 @@ import {
   addCertification,
   updateCertification,
   deleteCertification
-} from "../controllers/userController.js";
+} from "../controllers/user/userController.js";
 
 const router = express.Router();
 
