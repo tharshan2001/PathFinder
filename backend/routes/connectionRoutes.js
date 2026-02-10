@@ -1,3 +1,4 @@
+
 import express from "express";
 import {
   sendConnectionRequest,
@@ -7,8 +8,12 @@ import {
   getPendingRequests,
   rejectConnectionRequest
 } from "../controllers/user/connectionController.js";
+import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
+
+// All routes below require authentication
+router.use(authenticateJWT);
 
 // Send request
 router.post("/request", sendConnectionRequest);
@@ -24,7 +29,6 @@ router.get("/user/:userId", getUserConnections);
 
 // Get pending requests
 router.get("/pending/:userId", getPendingRequests);
-
 
 // Reject request
 router.put("/:connectionId/reject", rejectConnectionRequest);

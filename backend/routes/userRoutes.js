@@ -1,3 +1,4 @@
+
 import express from "express";
 import {
   createUser,
@@ -18,11 +19,14 @@ import {
   updateCertification,
   deleteCertification
 } from "../controllers/user/userController.js";
+import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// All routes below require authentication
+router.use(authenticateJWT);
+
 // ---------------- User CRUD ----------------
-router.post("/", createUser);
 router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.put("/:id", updateProfile);
