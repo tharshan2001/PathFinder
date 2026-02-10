@@ -1,3 +1,50 @@
+// Get all experience for a user (by id in body, fallback to token)
+export const getAllExperience = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ experience: user.experience });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all education for a user (by id in body, fallback to token)
+export const getAllEducation = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ education: user.education });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all projects for a user (by id in body, fallback to token)
+export const getAllProjects = async (req, res) => {
+  try {
+   const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ projects: user.projects });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all certifications for a user (by id in body, fallback to token)
+export const getAllCertifications = async (req, res) => {
+  try {
+   const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json({ certifications: user.certifications });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 import User from "../../models/user/User.js";
 
 // ---------------------- User CRUD ----------------------
@@ -18,10 +65,10 @@ export const createUser = async (req, res) => {
   }
 };
 
-// Get user by ID
+// Get user by ID (from token)
 export const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id)
+    const user = await User.findById(req.user.id)
       .populate("savedCourses savedJobs");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
@@ -30,11 +77,11 @@ export const getUserById = async (req, res) => {
   }
 };
 
-// Update basic profile
+// Update basic profile (from token)
 export const updateProfile = async (req, res) => {
   try {
     const updates = req.body;
-    const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true });
+    const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true });
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ message: "Profile updated", user });
   } catch (error) {
@@ -42,11 +89,11 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// Deactivate user (instead of delete)
+// Deactivate user (from token)
 export const deactivateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
-      req.params.id,
+      req.user.id,
       { isActive: false },
       { new: true }
     );
@@ -57,15 +104,7 @@ export const deactivateUser = async (req, res) => {
   }
 };
 
-// Get all users
-export const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
+
 
 // ---------------------- Sub-document CRUD ----------------------
 
@@ -95,13 +134,14 @@ const deleteSubDoc = async (userId, subDocArray, subDocId) => {
   return;
 };
 
+
 // ---------------------- Experience ----------------------
+// expects { ...experience }
 export const addExperience = async (req, res) => {
   try {
     const experience = req.body;
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-
     user.experience.push(experience);
     await user.save();
     res.json({ message: "Experience added", experience });
@@ -110,13 +150,15 @@ export const addExperience = async (req, res) => {
   }
 };
 
+// expects { expId, ...fields }
 export const updateExperience = async (req, res) => {
   try {
+    const { expId, ...fields } = req.body;
     const experience = await updateSubDoc(
-      req.params.id,
+      req.user.id,
       "experience",
-      req.params.expId,
-      req.body
+      expId,
+      fields
     );
     res.json({ message: "Experience updated", experience });
   } catch (error) {
@@ -124,22 +166,25 @@ export const updateExperience = async (req, res) => {
   }
 };
 
+// expects { expId }
 export const deleteExperience = async (req, res) => {
   try {
-    await deleteSubDoc(req.params.id, "experience", req.params.expId);
+    const { expId } = req.body;
+    await deleteSubDoc(req.user.id, "experience", expId);
     res.json({ message: "Experience deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+
 // ---------------------- Education ----------------------
+// expects { ...education }
 export const addEducation = async (req, res) => {
   try {
     const education = req.body;
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-
     user.education.push(education);
     await user.save();
     res.json({ message: "Education added", education });
@@ -148,13 +193,15 @@ export const addEducation = async (req, res) => {
   }
 };
 
+// expects { eduId, ...fields }
 export const updateEducation = async (req, res) => {
   try {
+    const { eduId, ...fields } = req.body;
     const education = await updateSubDoc(
-      req.params.id,
+      req.user.id,
       "education",
-      req.params.eduId,
-      req.body
+      eduId,
+      fields
     );
     res.json({ message: "Education updated", education });
   } catch (error) {
@@ -162,22 +209,25 @@ export const updateEducation = async (req, res) => {
   }
 };
 
+// expects { eduId }
 export const deleteEducation = async (req, res) => {
   try {
-    await deleteSubDoc(req.params.id, "education", req.params.eduId);
+    const { eduId } = req.body;
+    await deleteSubDoc(req.user.id, "education", eduId);
     res.json({ message: "Education deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+
 // ---------------------- Project ----------------------
+// expects { ...project }
 export const addProject = async (req, res) => {
   try {
     const project = req.body;
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-
     user.projects.push(project);
     await user.save();
     res.json({ message: "Project added", project });
@@ -186,13 +236,15 @@ export const addProject = async (req, res) => {
   }
 };
 
+// expects { projectId, ...fields }
 export const updateProject = async (req, res) => {
   try {
+    const { projectId, ...fields } = req.body;
     const project = await updateSubDoc(
-      req.params.id,
+      req.user.id,
       "projects",
-      req.params.projectId,
-      req.body
+      projectId,
+      fields
     );
     res.json({ message: "Project updated", project });
   } catch (error) {
@@ -200,22 +252,25 @@ export const updateProject = async (req, res) => {
   }
 };
 
+// expects { projectId }
 export const deleteProject = async (req, res) => {
   try {
-    await deleteSubDoc(req.params.id, "projects", req.params.projectId);
+    const { projectId } = req.body;
+    await deleteSubDoc(req.user.id, "projects", projectId);
     res.json({ message: "Project deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+
 // ---------------------- Certification ----------------------
+// expects { ...certification }
 export const addCertification = async (req, res) => {
   try {
     const certification = req.body;
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-
     user.certifications.push(certification);
     await user.save();
     res.json({ message: "Certification added", certification });
@@ -224,13 +279,15 @@ export const addCertification = async (req, res) => {
   }
 };
 
+// expects { certId, ...fields }
 export const updateCertification = async (req, res) => {
   try {
+    const { certId, ...fields } = req.body;
     const certification = await updateSubDoc(
-      req.params.id,
+      req.user.id,
       "certifications",
-      req.params.certId,
-      req.body
+      certId,
+      fields
     );
     res.json({ message: "Certification updated", certification });
   } catch (error) {
@@ -238,9 +295,11 @@ export const updateCertification = async (req, res) => {
   }
 };
 
+// expects { certId }
 export const deleteCertification = async (req, res) => {
   try {
-    await deleteSubDoc(req.params.id, "certifications", req.params.certId);
+    const { certId } = req.body;
+    await deleteSubDoc(req.user.id, "certifications", certId);
     res.json({ message: "Certification deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
