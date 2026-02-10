@@ -8,5 +8,5 @@ export const certificationSchema = new mongoose.Schema(
     issueDate: { type: Date },
     credentialUrl: { type: String, default: "" }
   },
-  { _id: false }
+  { _id: true }
 );

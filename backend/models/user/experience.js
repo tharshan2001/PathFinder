@@ -15,6 +15,6 @@ export const experienceSchema = new mongoose.Schema(
     isCurrent: { type: Boolean, default: false },
     description: { type: String, default: "" }
   },
-  { _id: false }
+  { _id: true }
 );
 

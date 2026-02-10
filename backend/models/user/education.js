@@ -11,5 +11,5 @@ export const educationSchema = new mongoose.Schema(
     grade: { type: String, default: "" },
     description: { type: String, default: "" }
   },
-  { _id: false }
+  { _id: true }
 );

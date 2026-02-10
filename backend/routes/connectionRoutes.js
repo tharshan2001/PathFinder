@@ -1,36 +1,34 @@
-
 import express from "express";
 import {
   sendConnectionRequest,
   acceptConnectionRequest,
+  rejectConnectionRequest,
   removeConnection,
   getUserConnections,
-  getPendingRequests,
-  rejectConnectionRequest
+  getPendingRequests
 } from "../controllers/user/connectionController.js";
 import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// All routes below require authentication
 router.use(authenticateJWT);
 
-// Send request
+// Send connection request
 router.post("/request", sendConnectionRequest);
 
-// Accept request
-router.put("/:connectionId/accept", acceptConnectionRequest);
+// Accept connection request
+router.post("/accept", acceptConnectionRequest);
+
+// Reject connection request
+router.post("/reject", rejectConnectionRequest);
 
 // Remove connection
-router.delete("/:connectionId", removeConnection);
+router.post("/remove", removeConnection);
 
-// Get connections
-router.get("/user/:userId", getUserConnections);
+// Get all connections for logged-in user
+router.get("/connections", getUserConnections);
 
-// Get pending requests
-router.get("/pending/:userId", getPendingRequests);
-
-// Reject request
-router.put("/:connectionId/reject", rejectConnectionRequest);
+// Get pending requests for logged-in user
+router.get("/pending", getPendingRequests);
 
 export default router;
