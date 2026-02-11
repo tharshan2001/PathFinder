@@ -1,6 +1,6 @@
 import express from "express";
 import { createOrGetChat, sendMessage, getInbox, getMessages } from "../controllers/message/chatController.js";
-import { authenticateJWT, requireAuth } from "../middleware/auth.js";
+import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
 

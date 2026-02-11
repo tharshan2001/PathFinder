@@ -2,15 +2,11 @@ import Chat from "../../models/message/Chat.js";
 import Message from "../../models/message/Message.js";
 import { Server } from "socket.io";
 
-// Initialize Socket.IO instance
 let io;
+
 export const initSocket = (server) => {
   io = new Server(server, {
-    cors: {
-      origin: true,
-      methods: ["GET", "POST"],
-      credentials: true
-    }
+    cors: { origin: true, methods: ["GET", "POST"], credentials: true }
   });
 
   io.on("connection", (socket) => {
@@ -21,13 +17,14 @@ export const initSocket = (server) => {
       console.log(`User ${userId} joined their room.`);
     });
 
-    socket.on("disconnect", () => {
-      console.log(`User disconnected: ${socket.id}`);
-    });
+    socket.on("disconnect", () => console.log(`User disconnected: ${socket.id}`));
   });
 };
 
-// Create or get a chat between two users
+
+
+// -------------------- Chat/Message Controllers --------------------
+
 export const createOrGetChat = async (req, res) => {
   const { receiverId } = req.body;
   const senderId = req.user.id;
@@ -35,9 +32,7 @@ export const createOrGetChat = async (req, res) => {
   try {
     let chat = await Chat.findOne({ participants: { $all: [senderId, receiverId] } });
 
-    if (!chat) {
-      chat = await Chat.create({ participants: [senderId, receiverId] });
-    }
+    if (!chat) chat = await Chat.create({ participants: [senderId, receiverId] });
 
     res.status(200).json(chat);
   } catch (error) {
@@ -45,7 +40,6 @@ export const createOrGetChat = async (req, res) => {
   }
 };
 
-// Update sendMessage to include Socket.IO
 export const sendMessage = async (req, res) => {
   const { chatId, text } = req.body;
   const senderId = req.user.id;
@@ -62,15 +56,17 @@ export const sendMessage = async (req, res) => {
       chatId,
       { lastMessage: message._id },
       { new: true }
-    ).populate("participants", "name profileMedia").populate("lastMessage");
+    )
+      .populate("participants", "name profileMedia")
+      .populate("lastMessage");
 
-    // Emit the message to both sender and receiver rooms
-    const receiverId = updatedChat.participants.find(
-      (participant) => participant.id !== senderId
+    // Emit message to sender and receiver
+    const receiver = updatedChat.participants.find(
+      (participant) => participant._id.toString() !== senderId
     );
 
     io.to(senderId).emit("newMessage", { chat: updatedChat, message });
-    io.to(receiverId).emit("newMessage", { chat: updatedChat, message });
+    if (receiver) io.to(receiver._id.toString()).emit("newMessage", { chat: updatedChat, message });
 
     res.status(201).json(message);
   } catch (error) {
@@ -78,10 +74,8 @@ export const sendMessage = async (req, res) => {
   }
 };
 
-// Fetch inbox/chat list
 export const getInbox = async (req, res) => {
   const userId = req.params.userId;
-
   try {
     const chats = await Chat.find({ participants: userId })
       .populate("participants", "name profileMedia")
@@ -94,13 +88,10 @@ export const getInbox = async (req, res) => {
   }
 };
 
-// Fetch messages for a specific chat
 export const getMessages = async (req, res) => {
   const { chatId } = req.params;
-
   try {
     const messages = await Message.find({ chat: chatId }).sort({ createdAt: 1 });
-
     res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ message: "Error fetching messages", error: error.message });
