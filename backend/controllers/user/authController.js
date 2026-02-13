@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const COOKIE_NAME = "token";
 
+// ------------------ Register ------------------
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -24,6 +25,7 @@ export const register = async (req, res) => {
   }
 };
 
+// ------------------ Login ------------------
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -38,19 +40,25 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
+
+    const token = jwt.sign({ id: user._id, role: user.role, name: user.name, email: user.email }, JWT_SECRET, {
+      expiresIn: "7d"
+    });
+
     res.cookie(COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
-    res.json({ message: "Login successful" });
+
+    res.json({ message: "Login successful", user: { id: user._id, name: user.name, email: user.email } });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
+// ------------------ Logout ------------------
 export const logout = (req, res) => {
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
@@ -58,4 +66,17 @@ export const logout = (req, res) => {
     sameSite: "strict"
   });
   res.json({ message: "Logged out successfully" });
+};
+
+// ------------------ Auth Me ------------------
+export const authMe = (req, res) => {
+  try {
+    const token = req.cookies?.[COOKIE_NAME];
+    if (!token) return res.status(401).json({ message: "Not authenticated" });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    res.json({ user: { id: decoded.id, name: decoded.name, email: decoded.email, role: decoded.role } });
+  } catch (err) {
+    res.status(401).json({ message: "Invalid or expired token" });
+  }
 };
