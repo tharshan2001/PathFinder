@@ -1,62 +1,57 @@
-
 import express from "express";
-import {
-  getUserById,
-  updateProfile,
-  deactivateUser,
-  addExperience,
-  updateExperience,
-  deleteExperience,
-  addEducation,
-  updateEducation,
-  deleteEducation,
-  addProject,
-  updateProject,
-  deleteProject,
-  addCertification,
-  updateCertification,
-  deleteCertification,
-  getAllExperience,
-  getAllEducation,
-  getAllProjects,
-  getAllCertifications
-} from "../controllers/user/userController.js";
 import { authenticateJWT } from "../middleware/auth.js";
+
+// Controllers
+import * as userCtrl from "../controllers/user/userController.js";
+import * as experienceCtrl from "../controllers/user/experienceController.js";
+import * as educationCtrl from "../controllers/user/educationController.js";
+import * as projectCtrl from "../controllers/user/projectController.js";
+import * as certificationCtrl from "../controllers/user/certificationController.js";
+import * as resumeCtrl from "../controllers/user/resumeController.js";
+import { singleResumeUpload } from "../middleware/uploadMiddleware.js";
+
 
 const router = express.Router();
 
-
-// All routes below require authentication
+// ------------------ All routes require authentication ------------------
 router.use(authenticateJWT);
 
+// ------------------ User CRUD ------------------
+router.post("/get", userCtrl.getUserById); // userId from token
+router.put("/update", userCtrl.updateProfile); // userId from token
+router.put("/deactivate", userCtrl.deactivateUser); // userId from token
 
-// ---------------- User CRUD ----------------
-router.post("/get", getUserById); // userId from token
-router.put("/update", updateProfile); // userId from token
-router.put("/deactivate", deactivateUser); // userId from token
+// ------------------ Experience CRUD ------------------
+router.get("/experience/all", experienceCtrl.getAllExperience);
+router.post("/experience/add", experienceCtrl.addExperience);
+router.put("/experience/update", experienceCtrl.updateExperience);
+router.delete("/experience/delete", experienceCtrl.deleteExperience);
 
-// ---------------- Experience CRUD ----------------
-router.get("/experience/all", getAllExperience);
-router.post("/experience/add", addExperience); // userId from token
-router.put("/experience/update", updateExperience); // userId from token
-router.delete("/experience/delete", deleteExperience); // userId from token
+// ------------------ Education CRUD ------------------
+router.get("/education/all", educationCtrl.getAllEducation);
+router.post("/education/add", educationCtrl.addEducation);
+router.put("/education/update", educationCtrl.updateEducation);
+router.delete("/education/delete", educationCtrl.deleteEducation);
 
-// ---------------- Education CRUD ----------------
-router.get("/education/all", getAllEducation);
-router.post("/education/add", addEducation); // userId from token
-router.put("/education/update", updateEducation); // userId from token
-router.delete("/education/delete", deleteEducation); // userId from token
+// ------------------ Project CRUD ------------------
+router.get("/project/all", projectCtrl.getAllProjects);
+router.post("/project/add", projectCtrl.addProject);
+router.put("/project/update", projectCtrl.updateProject);
+router.delete("/project/delete", projectCtrl.deleteProject);
 
-// ---------------- Project CRUD ----------------
-router.get("/project/all", getAllProjects);
-router.post("/project/add", addProject); // userId from token
-router.put("/project/update", updateProject); // userId from token
-router.delete("/project/delete", deleteProject); // userId from token
+// ------------------ Certification CRUD ------------------
+router.get("/certification/all", certificationCtrl.getAllCertifications);
+router.post("/certification/add", certificationCtrl.addCertification);
+router.put("/certification/update", certificationCtrl.updateCertification);
+router.delete("/certification/delete", certificationCtrl.deleteCertification);
 
-// ---------------- Certification CRUD ----------------
-router.get("/certification/all", getAllCertifications);
-router.post("/certification/add", addCertification); // userId from token
-router.put("/certification/update", updateCertification); // userId from token
-router.delete("/certification/delete", deleteCertification); // userId from token
+// ------------------ Resume / CV CRUD ------------------
+router.post("/resume/upload", singleResumeUpload("resume"), resumeCtrl.uploadResume);
+
+// Get all resumes
+router.get("/resume/all", resumeCtrl.getAllResumes);
+
+// Delete resume
+router.delete("/resume/delete", resumeCtrl.deleteResume);
 
 export default router;
