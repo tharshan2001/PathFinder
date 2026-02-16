@@ -10,13 +10,14 @@ import { socialLinksSchema } from "../user/socialLinks.js";
 import { profileMediaSchema } from "../user/profileMedia.js";
 import { careerPreferencesSchema } from "../user/careerPreferences.js";
 import { skillEndorsementSchema } from "../user/skillEndorsement.js";
+import { resumeSchema } from "../user/resume.js";
 
 const userSchema = new mongoose.Schema(
   {
     // Basic Identity
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
     role: { type: String, enum: ["user", "admin", "mentor"], default: "user" },
 
     // Professional Profile
@@ -55,13 +56,16 @@ const userSchema = new mongoose.Schema(
     // Saved Items
     savedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
+      
+    //resume or cv
+    resumes: [resumeSchema],
 
     // Account State
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
   },
   {
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
 export default mongoose.model("User", userSchema);

@@ -9,5 +9,5 @@ export const projectSchema = new mongoose.Schema(
     projectUrl: { type: String, default: "" },
     githubUrl: { type: String, default: "" }
   },
-  { _id: false }
+  { _id: true }
 );

@@ -1,51 +1,57 @@
 import express from "express";
-import {
-  createUser,
-  getUserById,
-  updateProfile,
-  deactivateUser,
-  getAllUsers,
-  addExperience,
-  updateExperience,
-  deleteExperience,
-  addEducation,
-  updateEducation,
-  deleteEducation,
-  addProject,
-  updateProject,
-  deleteProject,
-  addCertification,
-  updateCertification,
-  deleteCertification
-} from "../controllers/user/userController.js";
+import { authenticateJWT } from "../middleware/auth.js";
+
+// Controllers
+import * as userCtrl from "../controllers/user/userController.js";
+import * as experienceCtrl from "../controllers/user/experienceController.js";
+import * as educationCtrl from "../controllers/user/educationController.js";
+import * as projectCtrl from "../controllers/user/projectController.js";
+import * as certificationCtrl from "../controllers/user/certificationController.js";
+import * as resumeCtrl from "../controllers/user/resumeController.js";
+import { singleResumeUpload } from "../middleware/uploadMiddleware.js";
+
 
 const router = express.Router();
 
-// ---------------- User CRUD ----------------
-router.post("/", createUser);
-router.get("/", getAllUsers);
-router.get("/:id", getUserById);
-router.put("/:id", updateProfile);
-router.put("/:id/deactivate", deactivateUser); // deactivate instead of delete
+// ------------------ All routes require authentication ------------------
+router.use(authenticateJWT);
 
-// ---------------- Experience CRUD ----------------
-router.post("/:id/experience", addExperience);
-router.put("/:id/experience/:expId", updateExperience);
-router.delete("/:id/experience/:expId", deleteExperience);
+// ------------------ User CRUD ------------------
+router.post("/get", userCtrl.getUserById); // userId from token
+router.put("/update", userCtrl.updateProfile); // userId from token
+router.put("/deactivate", userCtrl.deactivateUser); // userId from token
 
-// ---------------- Education CRUD ----------------
-router.post("/:id/education", addEducation);
-router.put("/:id/education/:eduId", updateEducation);
-router.delete("/:id/education/:eduId", deleteEducation);
+// ------------------ Experience CRUD ------------------
+router.get("/experience/all", experienceCtrl.getAllExperience);
+router.post("/experience/add", experienceCtrl.addExperience);
+router.put("/experience/update", experienceCtrl.updateExperience);
+router.delete("/experience/delete", experienceCtrl.deleteExperience);
 
-// ---------------- Project CRUD ----------------
-router.post("/:id/project", addProject);
-router.put("/:id/project/:projectId", updateProject);
-router.delete("/:id/project/:projectId", deleteProject);
+// ------------------ Education CRUD ------------------
+router.get("/education/all", educationCtrl.getAllEducation);
+router.post("/education/add", educationCtrl.addEducation);
+router.put("/education/update", educationCtrl.updateEducation);
+router.delete("/education/delete", educationCtrl.deleteEducation);
 
-// ---------------- Certification CRUD ----------------
-router.post("/:id/certification", addCertification);
-router.put("/:id/certification/:certId", updateCertification);
-router.delete("/:id/certification/:certId", deleteCertification);
+// ------------------ Project CRUD ------------------
+router.get("/project/all", projectCtrl.getAllProjects);
+router.post("/project/add", projectCtrl.addProject);
+router.put("/project/update", projectCtrl.updateProject);
+router.delete("/project/delete", projectCtrl.deleteProject);
+
+// ------------------ Certification CRUD ------------------
+router.get("/certification/all", certificationCtrl.getAllCertifications);
+router.post("/certification/add", certificationCtrl.addCertification);
+router.put("/certification/update", certificationCtrl.updateCertification);
+router.delete("/certification/delete", certificationCtrl.deleteCertification);
+
+// ------------------ Resume / CV CRUD ------------------
+router.post("/resume/upload", singleResumeUpload("resume"), resumeCtrl.uploadResume);
+
+// Get all resumes
+router.get("/resume/all", resumeCtrl.getAllResumes);
+
+// Delete resume
+router.delete("/resume/delete", resumeCtrl.deleteResume);
 
 export default router;
