@@ -32,16 +32,7 @@ const jobSchema = new mongoose.Schema(
     },
     
     // Skills & Requirements
-      skillsRequired: [
-          {
-              name: { type: String, required: true },
-              level: {
-                  type: String,
-                  enum: ["Beginner", "Intermediate", "Advanced"],
-                  default: "Beginner"
-              }
-          }
-      ],
+    skillsRequired: [{ type: String, required: true }],
     experienceRequired: { type: String, default: "" },
     educationRequired: { type: String, default: "" },
     
