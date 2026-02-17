@@ -20,6 +20,8 @@ import trendingSkillsRoutes from "./routes/trendingSkillsRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 
+import recommendationRoutes from "./routes/recommendation.routes.js";
+
 dotenv.config();
 
 const app = express();
@@ -42,9 +44,8 @@ app.use("/api/applications", jobApplicationRoutes);
 app.use("/api/alerts", jobAlertRoutes);
 app.use("/api/categories", jobCategoryRoutes);
 app.use("/api/trending-skills", trendingSkillsRoutes);
-
 app.use("/api/chat", chatRoutes);
-
+app.use("/api/recommendations", recommendationRoutes);
 // ---------------- Error Handling ----------------
 app.use((err, req, res, next) => {
   console.error(err.stack);
