@@ -1,4 +1,4 @@
-import { recommendJobsForUser } from "../../services/recommendation/recommendation.service.js";
+import { recommendJobsForUser } from "../../services/recommendation/recommendation.js";
 
 /**
  * @desc    Get recommended jobs for logged-in user
