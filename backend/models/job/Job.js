@@ -69,7 +69,7 @@ const jobSchema = new mongoose.Schema(
     remotePolicy: {
       type: String,
       enum: ["On-site", "Hybrid", "Remote", "Remote-friendly"],
-      default: ""
+      default: "On-site"
     }
   },
   {
