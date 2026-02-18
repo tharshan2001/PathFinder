@@ -11,12 +11,6 @@ import { initSocket } from "./controllers/message/chatController.js";
 import userRoutes from "./routes/userRoutes.js";
 import connectionRoutes from "./routes/connectionRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
-import jobApplicationRoutes from "./routes/jobApplicationRoutes.js";
-import jobAlertRoutes from "./routes/jobAlertRoutes.js";
-import jobCategoryRoutes from "./routes/jobCategoryRoutes.js";
-import trendingSkillsRoutes from "./routes/trendingSkillsRoutes.js";
-
-
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 
@@ -38,10 +32,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
-app.use("/api/applications", jobApplicationRoutes);
-app.use("/api/alerts", jobAlertRoutes);
-app.use("/api/categories", jobCategoryRoutes);
-app.use("/api/trending-skills", trendingSkillsRoutes);
 
 app.use("/api/chat", chatRoutes);
 
