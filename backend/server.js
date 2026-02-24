@@ -14,6 +14,7 @@ import jobRoutes from "./routes/jobRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -32,6 +33,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
+
+app.use("/api/courses", courseRoutes);
 
 app.use("/api/chat", chatRoutes);
 app.use("/api/recommendations", recommendationRoutes);
