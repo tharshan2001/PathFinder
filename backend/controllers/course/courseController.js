@@ -38,9 +38,9 @@ export const getCourseById = async (req, res, next) => {
 // POST /api/courses
 export const createCourse = async (req, res, next) => {
   try {
-    const { title, category, description, provider, level, location } = req.body;
+    const { title, category, description, provider, skillsCovered, level, location } = req.body;
 
-    if (!title || !category || !description || !provider || !level) {
+    if (!title || !category || !description || !provider || !skillsCovered || !level) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -49,6 +49,7 @@ export const createCourse = async (req, res, next) => {
       category,
       description,
       provider,
+      skillsCovered,
       level,
       location,
     });
