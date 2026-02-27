@@ -15,6 +15,7 @@ import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/api/courses", courseRoutes);
 
 app.use("/api/chat", chatRoutes);
 app.use("/api/recommendations", recommendationRoutes);
+app.use("/api/analytics", analyticsRoutes);
 // ---------------- Error Handling ----------------
 app.use((err, req, res, next) => {
   console.error(err.stack);
