@@ -1,13 +1,8 @@
 import { recommendJobsForUser } from "../../services/recommendation/recommendation.js";
 
-/**
- * @desc    Get recommended jobs for logged-in user
- * @route   GET /api/recommendations/jobs
- * @access  Private
- */
 export const getRecommendedJobs = async (req, res) => {
     try {
-        const userId = req.user.id; // extracted from JWT middleware
+        const userId = req.user.id;
 
         const jobs = await recommendJobsForUser(userId);
 
