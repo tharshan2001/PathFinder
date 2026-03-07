@@ -13,6 +13,7 @@ import connectionRoutes from "./routes/connectionRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import skillProfileRoutes from "./routes/userSkillProfileRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
@@ -33,6 +34,7 @@ app.get("/", (req, res) => res.send("API is running..."));
 // ---------------- Routes ----------------
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/skill-profile", skillProfileRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
 

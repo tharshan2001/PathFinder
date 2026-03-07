@@ -3,29 +3,30 @@ import { getSkillGapAnalysis } from "../../services/analytics/analytics.service.
 
 export const recommendCoursesForMissingSkills = async (userId) => {
 
-    //  Get skill gap data
     const gapData = await getSkillGapAnalysis(userId);
+    const missingSkills = gapData?.missingSkills || [];
 
-    const missingSkills = gapData.missingSkills;
-
-    if (!missingSkills.length) {
+    if (!Array.isArray(missingSkills) || !missingSkills.length) {
         return [];
     }
 
     const recommendedCourses = [];
 
+
     for (const skill of missingSkills) {
+        const skillName = typeof skill === "string" ? skill : skill?.name;
+        if (!skillName) continue;
 
         const courses = await Course.find({
-            "skillsCovered.name": { $regex: new RegExp(`^${skill.name}$`, "i") }
+            skillsCovered: { $regex: new RegExp(`^${skillName}$`, "i") },
         })
             .sort({ ratingAvg: -1, ratingCount: -1 })
             .limit(3);
 
         if (courses.length > 0) {
             recommendedCourses.push({
-                skill: skill.name,
-                courses
+                skill: skillName,
+                courses,
             });
         }
     }
