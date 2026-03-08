@@ -32,7 +32,16 @@ const jobSchema = new mongoose.Schema(
     },
     
     // Skills & Requirements
-    skillsRequired: [{ type: String, required: true }],
+      skillsRequired: [
+          {
+              name: { type: String, required: true },
+              level: {
+                  type: String,
+                  enum: ["Beginner", "Intermediate", "Advanced"],
+                  default: "Beginner"
+              }
+          }
+      ],
     experienceRequired: { type: String, default: "" },
     educationRequired: { type: String, default: "" },
     
@@ -69,7 +78,7 @@ const jobSchema = new mongoose.Schema(
     remotePolicy: {
       type: String,
       enum: ["On-site", "Hybrid", "Remote", "Remote-friendly"],
-      default: ""
+      default: "On-site"
     }
   },
   {
@@ -98,7 +107,7 @@ jobSchema.virtual("salaryRange").get(function() {
 jobSchema.index({ title: "text", description: "text", company: "text" });
 jobSchema.index({ "category.industry": 1, "category.role": 1 });
 jobSchema.index({ location: 1 });
-jobSchema.index({ skillsRequired: 1 });
+jobSchema.index({ "skillsRequired.name": 1 });
 jobSchema.index({ postedDate: -1 });
 jobSchema.index({ isActive: 1, isFeatured: 1 });
 
