@@ -45,13 +45,18 @@ export const sendMessage = async (req, res) => {
   const senderId = req.user.id;
 
   try {
+    // Create message
     const message = await Message.create({
       chat: chatId,
       sender: senderId,
       text,
-      readBy: [senderId]
+      readBy: [senderId],
     });
 
+    // Populate sender to avoid undefined in frontend
+    await message.populate("sender", "name");
+
+    // Update last message in chat
     const updatedChat = await Chat.findByIdAndUpdate(
       chatId,
       { lastMessage: message._id },
@@ -60,11 +65,12 @@ export const sendMessage = async (req, res) => {
       .populate("participants", "name profileMedia")
       .populate("lastMessage");
 
-    // Emit message to sender and receiver
+    // Find receiver
     const receiver = updatedChat.participants.find(
-      (participant) => participant._id.toString() !== senderId
+      (p) => p._id.toString() !== senderId
     );
 
+    // Emit message to both sender and receiver
     io.to(senderId).emit("newMessage", { chat: updatedChat, message });
     if (receiver) io.to(receiver._id.toString()).emit("newMessage", { chat: updatedChat, message });
 

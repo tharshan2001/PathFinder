@@ -1,61 +1,126 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import Connections from "../components/Connections";
-import ChatWindow from "../components/ChatWindow";
-import ChatList from "../components/ChatList";
 import { fetchWithAuth, API_URL } from "../utils/api";
 
 export default function Chat({ user }) {
   const [socket, setSocket] = useState(null);
-  const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [inbox, setInbox] = useState([]);
+  const [text, setText] = useState("");
+  const [chatId, setChatId] = useState(null);
 
-  // Load inbox
-  const loadInbox = async () => {
-    const { data } = await fetchWithAuth(`${API_URL}/chat/chats/${user.id}`);
-    setInbox(data || []);
-  };
+  // Replace this with the ID of the user you want to chat with
+  const OTHER_USER_ID = "69ad353db75ebed9e8362938";
 
-  const loadMessages = async (chatId) => {
-    if (!chatId) return;
-    const { data } = await fetchWithAuth(`${API_URL}/chat/messages/${chatId}`);
-    setMessages(Array.isArray(data) ? data : []);
-  };
-
+  // ------------------- Initialize Socket -------------------
   useEffect(() => {
-    const newSocket = io("http://localhost:5080", { withCredentials: true });
-    setSocket(newSocket);
-
-    newSocket.on("connect", () => newSocket.emit("joinRoom", user.id));
-
-    newSocket.on("newMessage", ({ chat, message }) => {
-      if (currentChat?._id === chat._id) setMessages((prev) => [...prev, message]);
-      setInbox((prevInbox) =>
-        prevInbox.map((c) => (c._id === chat._id ? { ...c, lastMessage: message } : c))
-      );
+    const newSocket = io("http://localhost:5080", {
+      transports: ["websocket"],
+      withCredentials: true,
     });
 
-    loadInbox();
+    setSocket(newSocket);
+
+    newSocket.on("connect", () => console.log("Connected to Socket.io:", newSocket.id));
+
+    newSocket.on("newMessage", ({ message }) => {
+      setMessages(prev => [...prev, message]);
+    });
+
     return () => newSocket.disconnect();
   }, []);
 
-  // Open chat with a user
-  const openChatWithUser = async (otherUser) => {
-    if (!otherUser?._id) return;
-    const { data: chat } = await fetchWithAuth(`${API_URL}/chat/chat-with/${otherUser._id}`);
-    if (!chat?._id) return;
-    setCurrentChat(chat);
-    loadMessages(chat._id);
+  // ------------------- Create or get chat -------------------
+  useEffect(() => {
+    const initChat = async () => {
+      if (!socket) return;
+
+      const { data, ok } = await fetchWithAuth(`${API_URL}/chat/chats`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ receiverId: OTHER_USER_ID }),
+      });
+
+      if (ok && data?._id) {
+        setChatId(data._id);
+        loadMessages(data._id);
+        socket.emit("joinRoom", data._id);
+      }
+    };
+
+    initChat();
+  }, [socket]);
+
+  // ------------------- Load messages -------------------
+  const loadMessages = async (chatId) => {
+    const { data } = await fetchWithAuth(`${API_URL}/chat/messages/${chatId}`);
+    // Ensure messages is an array
+    setMessages(Array.isArray(data) ? data : data.messages || []);
+  };
+
+  // ------------------- Send message -------------------
+  const sendMessage = async () => {
+    if (!text.trim() || !chatId) return;
+
+    await fetchWithAuth(`${API_URL}/chat/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId, text }),
+    });
+
+    setText("");
+    loadMessages(chatId); // reload after sending
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "Arial, sans-serif" }}>
-      <Connections currentUserId={user.id} openChatWithUser={openChatWithUser} />
-      <ChatList inbox={inbox} setCurrentChat={setCurrentChat} currentChat={currentChat} currentUserId={user.id} />
-      {currentChat && (
-        <ChatWindow chat={currentChat} messages={messages} socket={socket} user={user} loadMessages={loadMessages} />
-      )}
+    <div style={{ padding: 20 }}>
+      <h2>Chat with User</h2>
+
+      <div
+        style={{
+          border: "1px solid #ccc",
+          padding: 10,
+          height: 400,
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {Array.isArray(messages) && messages.length > 0 ? (
+          messages.map((msg) => (
+            <div
+              key={msg._id}
+              style={{
+                alignSelf: msg.sender === user.id ? "flex-end" : "flex-start",
+                backgroundColor: msg.sender === user.id ? "#dcf8c6" : "#f1f0f0",
+                padding: 8,
+                borderRadius: 5,
+                marginBottom: 5,
+                maxWidth: "70%",
+              }}
+            >
+              {msg.text}
+            </div>
+          ))
+        ) : (
+          <p style={{ color: "#888" }}>No messages yet</p>
+        )}
+      </div>
+
+      <div style={{ marginTop: 10, display: "flex" }}>
+        <input
+          style={{ flex: 1, padding: 10, fontSize: 14 }}
+          placeholder="Type a message..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+        />
+        <button
+          style={{ padding: "10px 20px", marginLeft: 5, cursor: "pointer" }}
+          onClick={sendMessage}
+        >
+          Send
+        </button>
+      </div>
     </div>
   );
 }

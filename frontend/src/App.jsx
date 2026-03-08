@@ -1,26 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import Login from "./pages/Login";
-import Chat from "./pages/Chat";
+import ConnectionsList from "./components/ConnectionsList";
+import ChatWindow from "./components/ChatWindow";
 import { fetchWithAuth, API_URL } from "./utils/api";
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [selectedConnection, setSelectedConnection] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // ---------------- Persist login ----------------
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data, ok } = await fetchWithAuth(`${API_URL}/auth/me`);
-      if (ok) setUser(data.user);
+    const checkLogin = async () => {
+      try {
+        const { ok, data } = await fetchWithAuth(`${API_URL}/auth/me`);
+        if (ok && data.user) setUser(data.user);
+      } catch (err) {
+        console.error("Error checking login:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    checkAuth();
+    checkLogin();
   }, []);
 
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Login setUser={setUser} />;
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={user ? <Navigate to="/chat" /> : <Login setUser={setUser} />} />
-        <Route path="/chat" element={user ? <Chat user={user} /> : <Navigate to="/" />} />
-      </Routes>
-    </Router>
+    <div style={{ display: "flex", height: "100vh" }}>
+      <ConnectionsList user={user} onSelectConnection={setSelectedConnection} />
+      {selectedConnection ? (
+        <ChatWindow user={user} receiver={selectedConnection} />
+      ) : (
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <h3>Select a connection to start chat</h3>
+        </div>
+      )}
+    </div>
   );
 }
