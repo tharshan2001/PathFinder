@@ -11,12 +11,6 @@ import { initSocket } from "./controllers/message/chatController.js";
 import userRoutes from "./routes/userRoutes.js";
 import connectionRoutes from "./routes/connectionRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
-import jobApplicationRoutes from "./routes/jobApplicationRoutes.js";
-import jobAlertRoutes from "./routes/jobAlertRoutes.js";
-import jobCategoryRoutes from "./routes/jobCategoryRoutes.js";
-import trendingSkillsRoutes from "./routes/trendingSkillsRoutes.js";
-
-
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 
@@ -45,14 +39,11 @@ app.get("/", (req, res) => res.send("API is running..."));
 // ---------------- Routes ----------------
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/skill-profile", skillProfileRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
-app.use("/api/applications", jobApplicationRoutes);
-app.use("/api/alerts", jobAlertRoutes);
-app.use("/api/categories", jobCategoryRoutes);
-app.use("/api/trending-skills", trendingSkillsRoutes);
 
-app.use("/api/chat", chatRoutes);
+app.use("/api/courses", courseRoutes);
 
 app.use("/api/job-applications", jobApplicationRoutes);
 app.use("/api/job-categories", jobCategoryRoutes);
@@ -64,6 +55,9 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/recommendations", recommendationRoutes);
 app.use("/api/course-recommendations", courseRecommendationRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/recommendations", recommendationRoutes);
+app.use("/api/recommendations", courseRecommendationRoutes);
 app.use("/api/analytics", analyticsRoutes);
 // ---------------- Error Handling ----------------
 app.use((err, req, res, next) => {
