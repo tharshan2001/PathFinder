@@ -13,11 +13,16 @@ import connectionRoutes from "./routes/connectionRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+
 import skillProfileRoutes from "./routes/userSkillProfileRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import courseRecommendationRoutes from "./routes/courseRecommendationRoutes.js";
+import jobApplicationRoutes from "./routes/jobApplicationRoutes.js";
+import jobCategoryRoutes from "./routes/jobCategoryRoutes.js";
+import jobAlertRoutes from "./routes/jobAlertRoutes.js";
+import trendingSkillsRoutes from "./routes/trendingSkillsRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -40,6 +45,16 @@ app.use("/api/jobs", jobRoutes);
 
 app.use("/api/courses", courseRoutes);
 
+app.use("/api/job-applications", jobApplicationRoutes);
+app.use("/api/job-categories", jobCategoryRoutes);
+app.use("/api/job-alerts", jobAlertRoutes);
+app.use("/api/trending-skills", trendingSkillsRoutes);
+
+app.use("/api/courses", courseRoutes);
+
+app.use("/api/chat", chatRoutes);
+app.use("/api/recommendations", recommendationRoutes);
+app.use("/api/course-recommendations", courseRecommendationRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/recommendations", recommendationRoutes);
 app.use("/api/recommendations", courseRecommendationRoutes);

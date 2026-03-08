@@ -107,7 +107,7 @@ jobSchema.virtual("salaryRange").get(function() {
 jobSchema.index({ title: "text", description: "text", company: "text" });
 jobSchema.index({ "category.industry": 1, "category.role": 1 });
 jobSchema.index({ location: 1 });
-jobSchema.index({ skillsRequired: 1 });
+jobSchema.index({ "skillsRequired.name": 1 });
 jobSchema.index({ postedDate: -1 });
 jobSchema.index({ isActive: 1, isFeatured: 1 });
 

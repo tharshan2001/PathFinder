@@ -181,7 +181,7 @@ export const findMatchingJobs = async (req, res) => {
 
     // Skills filter
     if (alert.skills && alert.skills.length > 0) {
-      jobQuery.skillsRequired = { $in: alert.skills };
+      jobQuery["skillsRequired.name"] = { $in: alert.skills };
     }
 
     // Companies filter
@@ -258,7 +258,7 @@ export const processAllAlerts = async (req, res) => {
           jobQuery.location = { $regex: alert.location, $options: "i" };
         }
         if (alert.skills && alert.skills.length > 0) {
-          jobQuery.skillsRequired = { $in: alert.skills };
+          jobQuery["skillsRequired.name"] = { $in: alert.skills };
         }
 
         const matchingJobs = await Job.find(jobQuery)
