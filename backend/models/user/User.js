@@ -56,6 +56,15 @@ const userSchema = new mongoose.Schema(
     // Saved Items
     savedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
+    
+    // Learning Paths
+    enrolledPaths: [{
+      pathId: { type: mongoose.Schema.Types.ObjectId, ref: "LearningPath" },
+      progress: { type: Number, default: 0 },
+      completedLessons: [{ type: Number }], // lesson indices
+      startedAt: { type: Date, default: Date.now },
+      lastAccessedAt: { type: Date }
+    }],
       
     //resume or cv
     resumes: [resumeSchema],
