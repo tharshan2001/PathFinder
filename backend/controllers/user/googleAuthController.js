@@ -35,15 +35,17 @@ passport.use(
 export const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] });
 
 export const googleAuthCallback = (req, res) => {
-  // User is attached to req.user by passport
   const user = req.user;
   const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
+  
+  // Set cookie (httpOnly: false so frontend can read it)
   res.cookie("token", token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
-  // Redirect or respond as needed
-  res.redirect("/"); // Or send a JSON response for SPA
+  
+  // Also pass token in URL for redundancy
+  res.redirect(`http://localhost:5173/auth/google/callback?token=${token}`);
 };
