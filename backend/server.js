@@ -23,6 +23,9 @@ import jobApplicationRoutes from "./routes/jobApplicationRoutes.js";
 import jobCategoryRoutes from "./routes/jobCategoryRoutes.js";
 import jobAlertRoutes from "./routes/jobAlertRoutes.js";
 import trendingSkillsRoutes from "./routes/trendingSkillsRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import learningPathRoutes from "./routes/learningPathRoutes.js";
+import forumRoutes from "./routes/forumRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -42,23 +45,19 @@ app.use("/api/users", userRoutes);
 app.use("/api/skill-profile", skillProfileRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
-
 app.use("/api/courses", courseRoutes);
-
 app.use("/api/job-applications", jobApplicationRoutes);
 app.use("/api/job-categories", jobCategoryRoutes);
 app.use("/api/job-alerts", jobAlertRoutes);
 app.use("/api/trending-skills", trendingSkillsRoutes);
-
-app.use("/api/courses", courseRoutes);
-
 app.use("/api/chat", chatRoutes);
 app.use("/api/recommendations", recommendationRoutes);
 app.use("/api/course-recommendations", courseRecommendationRoutes);
-app.use("/api/chat", chatRoutes);
-app.use("/api/recommendations", recommendationRoutes);
-app.use("/api/recommendations", courseRecommendationRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/learning-paths", learningPathRoutes);
+app.use("/api/forums", forumRoutes);
+
 // ---------------- Error Handling ----------------
 app.use((err, req, res, next) => {
   console.error(err.stack);
