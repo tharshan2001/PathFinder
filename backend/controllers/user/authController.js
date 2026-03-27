@@ -50,14 +50,15 @@ export const register = async (req, res) => {
     // Generate JWT and set cookie
     const token = generateToken(newUser);
     res.cookie(COOKIE_NAME, token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({
       message: "User registered successfully",
+      token, // Also return token in body
     });
   } catch (err) {
     console.error(err);
@@ -92,14 +93,15 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
     res.cookie(COOKIE_NAME, token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.json({
       message: "Login successful",
+      token, // Return token in body
     });
   } catch (err) {
     console.error(err);
@@ -110,18 +112,27 @@ export const login = async (req, res) => {
 // LOGOUT
 export const logout = (req, res) => {
   res.clearCookie(COOKIE_NAME, {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
   res.json({ message: "Logged out successfully" });
 };
 
-
 // GET CURRENT USER
 export const getMe = async (req, res) => {
   try {
-    const token = req.cookies?.[COOKIE_NAME];
+    // Check both cookie and Authorization header
+    let token = req.cookies?.[COOKIE_NAME];
+    
+    // If no cookie, check Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+    
     if (!token) {
       return res.status(401).json({ message: "Not authenticated" });
     }

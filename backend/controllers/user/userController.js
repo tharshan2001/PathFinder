@@ -197,3 +197,36 @@ export const getEnrolledPaths = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+// Get user suggestions (people you may know)
+export const getUserSuggestions = async (req, res) => {
+  try {
+    const currentUserId = req.user.id;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Get all connection IDs (both as requester and recipient)
+    const Connection = (await import("../../models/user/connectionRef.js")).default;
+    
+    const connections = await Connection.find({
+      $or: [{ requester: currentUserId }, { recipient: currentUserId }]
+    });
+
+    // Extract user IDs that are already connected (or have pending requests)
+    const connectedUserIds = connections.map(c => 
+      c.requester.toString() === currentUserId ? c.recipient : c.requester
+    );
+    // Add current user to exclude list
+    connectedUserIds.push(currentUserId);
+
+    // Find users who are not connected
+    const suggestions = await User.find({
+      _id: { $nin: connectedUserIds }
+    })
+    .select("name headline profileMedia skills location")
+    .limit(limit);
+
+    res.json(suggestions);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

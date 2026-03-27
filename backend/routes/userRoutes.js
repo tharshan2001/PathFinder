@@ -70,4 +70,7 @@ router.get("/enrolled/paths", userCtrl.getEnrolledPaths);
 // ------------------ Public Profile (no auth) ------------------
 router.get("/public/:userId", userCtrl.getPublicProfile);
 
+// ------------------ User Suggestions ------------------
+router.get("/suggestions", userCtrl.getUserSuggestions);
+
 export default router;

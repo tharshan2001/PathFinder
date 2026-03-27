@@ -1,54 +1,107 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AppProvider } from './context/AppContext';
-import Layout from './components/layout/Layout';
-import Landing from './pages/Landing';
-
-import Dashboard from './pages/Dashboard';
-import Courses from './pages/Courses';
-import CourseDetail from './pages/CourseDetail';
-import Jobs from './pages/Jobs';
-import JobDetail from './pages/JobDetail';
-import Recommendations from './pages/Recommendations';
-import LearningPath from './pages/LearningPath';
-import Analytics from './pages/Analytics';
+import { useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuthStore } from './stores/authStore';
+import Home from './pages/Home';
+import Feed from './pages/Feed';
 import Profile from './pages/Profile';
-import SavedItems from './pages/SavedItems';
-import Notifications from './pages/Notifications';
-import Messages from './pages/Messages';
-import Connections from './pages/Connections';
-import Forums from './pages/Forums';
+import Network from './pages/Network';
+import UserProfile from './pages/UserProfile';
+import Messaging from './pages/Messaging';
 
-import FeedPage from './pages/FeedPage';
+const ProtectedRoute = ({ children }) => {
+  const { user, loading, hasFetchedUser } = useAuthStore();
 
-import './index.css';
+  if (!hasFetchedUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+const GoogleCallback = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { fetchUser } = useAuthStore();
+
+  useEffect(() => {
+    const handleCallback = async () => {
+      const token = searchParams.get('token');
+      if (token) {
+        await fetchUser();
+      }
+      navigate('/feed', { replace: true });
+    };
+    handleCallback();
+  }, [navigate, fetchUser, searchParams]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <span className="ml-3 text-gray-600">Completing sign in...</span>
+    </div>
+  );
+};
 
 function App() {
+  const { fetchUser, user } = useAuthStore();
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   return (
-    <AppProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route element={<Layout />}>
-            <Route path="/feed" element={<FeedPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/courses/:id" element={<CourseDetail />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/jobs/:id" element={<JobDetail />} />
-            <Route path="/recommendations" element={<Recommendations />} />
-            <Route path="/learning-path" element={<LearningPath />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/saved" element={<SavedItems />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/connections" element={<Connections />} />
-            <Route path="/forums" element={<Forums />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
-    </AppProvider>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/auth/google/callback" element={<GoogleCallback />} />
+      <Route 
+        path="/feed" 
+        element={
+          <ProtectedRoute>
+            <Feed />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/network" 
+        element={
+          <ProtectedRoute>
+            <Network />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile/:userId" 
+        element={
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/messaging" 
+        element={
+          <ProtectedRoute>
+            <Messaging />
+          </ProtectedRoute>
+        } 
+      />
+    </Routes>
   );
 }
 
