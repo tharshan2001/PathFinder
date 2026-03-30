@@ -18,19 +18,30 @@ const Messaging = () => {
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
+  const selectedChatRef = useRef(null);
 
   const currentUserId = user?._id || user?.id;
-  const initialChatId = location.state?.chatId;
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    selectedChatRef.current = selectedChat;
+  }, [selectedChat]);
 
   useEffect(() => {
     fetchChats();
     socketService.connect(currentUserId);
     
-    socketService.on('newMessage', (data) => {
+    const handleNewMessage = (data) => {
       const { chat, message } = data;
       
-      if (selectedChat?._id === chat._id) {
-        setMessages(prev => [...prev, message]);
+      if (selectedChatRef.current?._id === chat._id) {
+        // Prevent duplicate messages by ID
+        setMessages(prev => {
+          if (!message._id) return prev;
+          const exists = prev.some(m => m._id === message._id);
+          if (exists) return prev;
+          return [...prev, message];
+        });
         scrollToBottom();
       }
       
@@ -41,12 +52,38 @@ const Messaging = () => {
         }
         return [chat, ...prev];
       });
-    });
+    };
+
+    socketService.on('newMessage', handleNewMessage);
 
     return () => {
       socketService.off('newMessage');
     };
-  }, [currentUserId, selectedChat]);
+  }, []);
+
+  // Handle navigation to specific chat
+  useEffect(() => {
+    const chatIdFromState = location.state?.chatId;
+    const chatFromState = location.state?.chatData;
+    
+    if (chatIdFromState) {
+      // First try to find in existing chats
+      const existingChat = chats.find(c => c._id === chatIdFromState);
+      if (existingChat) {
+        setSelectedChat(existingChat);
+      } else if (chatFromState) {
+        // Use chat data from navigation state
+        setSelectedChat(chatFromState);
+        // Add to chats list
+        setChats(prev => [...prev, chatFromState]);
+      } else {
+        // Chat might be new, set selected with minimal data
+        setSelectedChat({ _id: chatIdFromState, participants: [] });
+      }
+      // Clear the state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, chats, navigate]);
 
   useEffect(() => {
     if (selectedChat) {
@@ -59,8 +96,10 @@ const Messaging = () => {
       const res = await chatApi.getInbox(currentUserId);
       setChats(res.data);
       
-      if (initialChatId) {
-        const chat = res.data.find(c => c._id === initialChatId);
+      // Handle initial chat from navigation
+      const chatIdFromState = location.state?.chatId;
+      if (chatIdFromState) {
+        const chat = res.data.find(c => c._id === chatIdFromState);
         if (chat) {
           setSelectedChat(chat);
         }

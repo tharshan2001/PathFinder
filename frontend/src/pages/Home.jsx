@@ -26,7 +26,7 @@ const Home = () => {
       success = await register(formData)
     }
     if (success) {
-      navigate('/feed')
+      navigate('/home')
     }
   }
 

@@ -8,7 +8,6 @@ import { MapPin, Briefcase, GraduationCap, Award, FolderGit2, Edit2, Plus, Trash
 const Profile = () => {
   const navigate = useNavigate();
   const { user: authUser } = useAuthStore();
-  const [activeTab, setActiveTab] = useState('about');
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -46,15 +45,6 @@ const Profile = () => {
     }
   };
 
-  const tabs = [
-    { id: 'about', label: 'About' },
-    { id: 'experience', label: 'Experience' },
-    { id: 'education', label: 'Education' },
-    { id: 'skills', label: 'Skills' },
-    { id: 'projects', label: 'Projects' },
-    { id: 'certifications', label: 'Certifications' },
-  ];
-
   if (loading || !profile) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -67,96 +57,37 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Main Content */}
-      <main className="max-w-[1128px] mx-auto px-4 py-6 mt-2">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Left Column */}
-          <div className="md:col-span-3 space-y-4">
-            {/* Profile Card */}
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              {/* Banner */}
-              <div className="h-24 bg-gradient-to-r from-teal-500 to-teal-700"></div>
-              
-              <div className="px-4 pb-4">
-                <div className="relative -mt-10 mb-2">
-                  <div className="w-20 h-20 bg-white rounded-full p-1">
-                    <div className="w-full h-full bg-teal-600 rounded-full flex items-center justify-center text-white text-2xl font-semibold">
-                      {profile?.name?.charAt(0).toUpperCase()}
-                    </div>
+      <main className="max-w-5xl mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          <div className="w-64 flex-shrink-0">
+            <div className="sticky top-20">
+              <div className="bg-white rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold">
+                    {profile?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{profile?.name}</h3>
+                    <p className="text-xs text-gray-500">{profile?.headline || 'Add headline'}</p>
                   </div>
                 </div>
-                
-                <h3 className="font-semibold text-gray-900 text-lg">{profile?.name}</h3>
-                <p className="text-sm text-gray-500">{profile?.headline || 'Add a headline'}</p>
-                
-                <div className="mt-2">
-                  <span className="text-sm text-gray-500">{profile?.location || 'Add location'}</span>
-                </div>
-                
-                <div className="mt-3">
-                  <span className="text-teal-600 font-semibold text-sm">Open to work</span>
-                </div>
-                
                 <button
                   onClick={() => setEditing(true)}
-                  className="w-full mt-4 py-1.5 bg-teal-600 text-white rounded-full font-semibold text-sm hover:bg-teal-700 transition"
+                  className="w-full py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
                 >
-                  Edit profile
+                  Edit Profile
                 </button>
-
-                <div className="border-t mt-4 pt-3">
-                  <div className="flex justify-between text-sm py-1">
-                    <span className="text-gray-500">Connections</span>
-                    <span className="font-semibold text-teal-600">{profile?.connectionsCount || 0}</span>
-                  </div>
-                  <div className="flex justify-between text-sm py-1">
-                    <span className="text-gray-500">Profile views</span>
-                    <span className="font-semibold text-teal-600">{profile?.profileViews || 0}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Analytics */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h4 className="font-semibold text-gray-900 mb-2">Analytics</h4>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <span>👁️</span>
-                <span>Private to you</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Tabs Content */}
-          <div className="md:col-span-9">
-            {/* Tabs */}
-            <div className="bg-white rounded-lg shadow-sm mb-4">
-              <div className="flex overflow-x-auto">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-3 text-sm font-semibold border-b-2 whitespace-nowrap transition ${
-                      activeTab === tab.id
-                        ? 'border-teal-600 text-teal-600'
-                        : 'border-transparent text-gray-500 hover:text-teal-600'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              {activeTab === 'about' && <AboutTab profile={profile} setProfile={setProfile} fetchProfile={fetchProfile} />}
-              {activeTab === 'experience' && <ExperienceTab experience={profile?.experience || []} refresh={fetchProfile} />}
-              {activeTab === 'education' && <EducationTab education={profile?.education || []} refresh={fetchProfile} />}
-              {activeTab === 'skills' && <SkillsTab skills={profile?.skills || []} refresh={fetchProfile} />}
-              {activeTab === 'projects' && <ProjectsTab projects={profile?.projects || []} refresh={fetchProfile} />}
-              {activeTab === 'certifications' && <CertificationsTab certifications={profile?.certifications || []} refresh={fetchProfile} />}
-            </div>
+          <div className="flex-1 space-y-4">
+            <AboutTab profile={profile} setProfile={setProfile} fetchProfile={fetchProfile} />
+            <ExperienceTab experience={profile?.experience || []} refresh={fetchProfile} />
+            <EducationTab education={profile?.education || []} refresh={fetchProfile} />
+            <SkillsTab skills={profile?.skills || []} refresh={fetchProfile} />
+            <ProjectsTab projects={profile?.projects || []} refresh={fetchProfile} />
+            <CertificationsTab certifications={profile?.certifications || []} refresh={fetchProfile} />
           </div>
         </div>
       </main>
@@ -165,7 +96,7 @@ const Profile = () => {
       {editing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Edit intro</h3>
+            <h3 className="text-lg font-semibold mb-4">Edit Profile</h3>
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -242,7 +173,7 @@ const AboutTab = ({ profile, setProfile, fetchProfile }) => {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">About</h3>
         {!editing && (
@@ -276,6 +207,8 @@ const AboutTab = ({ profile, setProfile, fetchProfile }) => {
 };
 
 // Experience Tab
+
+// Experience Tab
 const ExperienceTab = ({ experience, refresh }) => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ title: '', company: '', location: '', startDate: '', endDate: '', description: '' });
@@ -303,7 +236,7 @@ const ExperienceTab = ({ experience, refresh }) => {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Experience</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1 text-teal-600 font-semibold hover:underline">
@@ -367,7 +300,15 @@ const EducationTab = ({ education, refresh }) => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      await userApi.addEducation(formData);
+      const educationData = {
+        school: formData.institution,
+        degree: formData.degree,
+        fieldOfStudy: formData.field,
+        startYear: formData.startDate ? parseInt(formData.startDate.split('-')[0]) : null,
+        endYear: formData.endDate ? parseInt(formData.endDate.split('-')[0]) : null,
+        grade: formData.grade,
+      };
+      await userApi.addEducation(educationData);
       setShowForm(false);
       setFormData({ institution: '', degree: '', field: '', startDate: '', endDate: '', grade: '' });
       refresh();
@@ -387,7 +328,7 @@ const EducationTab = ({ education, refresh }) => {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Education</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1 text-teal-600 font-semibold hover:underline">
@@ -423,9 +364,9 @@ const EducationTab = ({ education, refresh }) => {
               <div className="flex-1">
                 <div className="flex justify-between">
                   <div>
-                    <h4 className="font-semibold text-gray-900">{edu.institution}</h4>
-                    <p className="text-sm text-gray-600">{edu.degree} {edu.field && `in ${edu.field}`}</p>
-                    <p className="text-sm text-gray-500">{edu.startDate?.slice(0, 7)} - {edu.endDate?.slice(0, 7) || 'Present'}</p>
+                    <h4 className="font-semibold text-gray-900">{edu.school}</h4>
+                    <p className="text-sm text-gray-600">{edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}</p>
+                    <p className="text-sm text-gray-500">{edu.startYear} - {edu.endYear || 'Present'}</p>
                   </div>
                   <button onClick={() => handleDelete(edu._id)} className="text-gray-400 hover:text-red-500 self-start">
                     <Trash2 size={16} />
@@ -453,7 +394,7 @@ const SkillsTab = ({ skills, refresh }) => {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Skills</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1 text-teal-600 font-semibold hover:underline">
@@ -520,7 +461,7 @@ const ProjectsTab = ({ projects, refresh }) => {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Projects</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1 text-teal-600 font-semibold hover:underline">
@@ -604,7 +545,7 @@ const CertificationsTab = ({ certifications, refresh }) => {
   };
 
   return (
-    <div>
+    <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Certifications</h3>
         <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1 text-teal-600 font-semibold hover:underline">
