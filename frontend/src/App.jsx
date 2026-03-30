@@ -7,14 +7,15 @@ import Profile from './pages/Profile';
 import Network from './pages/Network';
 import UserProfile from './pages/UserProfile';
 import Messaging from './pages/Messaging';
+import Forums from './pages/Forums';
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading, hasFetchedUser } = useAuthStore();
+  const { user, hasFetchedUser } = useAuthStore();
 
   if (!hasFetchedUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
     );
   }
@@ -37,7 +38,7 @@ const GoogleCallback = () => {
       if (token) {
         await fetchUser();
       }
-      navigate('/feed', { replace: true });
+      navigate('/home', { replace: true });
     };
     handleCallback();
   }, [navigate, fetchUser, searchParams]);
@@ -62,7 +63,39 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
       <Route 
-        path="/feed" 
+        path="/home" 
+        element={
+          <ProtectedRoute>
+            <Feed />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/forums" 
+        element={
+          <ProtectedRoute>
+            <Forums />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/courses" 
+        element={
+          <ProtectedRoute>
+            <Feed />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/jobs" 
+        element={
+          <ProtectedRoute>
+            <Feed />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/learning" 
         element={
           <ProtectedRoute>
             <Feed />
@@ -101,6 +134,7 @@ function App() {
           </ProtectedRoute>
         } 
       />
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 }

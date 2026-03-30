@@ -1,39 +1,50 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import chatApi from '../services/chatApi';
 import socketService from '../services/socket';
-import { Home, Bell, Briefcase, MessageSquare, User, Search, LogOut, Send, ArrowLeft } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { Search, Send, ArrowLeft, Phone, Video, MoreVertical, Smile, MessageSquare } from 'lucide-react';
 
 const Messaging = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
+  const selectedChatRef = useRef(null);
 
   const currentUserId = user?._id || user?.id;
-  const initialChatId = location.state?.chatId;
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    selectedChatRef.current = selectedChat;
+  }, [selectedChat]);
 
   useEffect(() => {
     fetchChats();
     socketService.connect(currentUserId);
     
-    socketService.on('newMessage', (data) => {
+    const handleNewMessage = (data) => {
       const { chat, message } = data;
       
-      // Update messages if this is the selected chat
-      if (selectedChat?._id === chat._id) {
-        setMessages(prev => [...prev, message]);
+      if (selectedChatRef.current?._id === chat._id) {
+        // Prevent duplicate messages by ID
+        setMessages(prev => {
+          if (!message._id) return prev;
+          const exists = prev.some(m => m._id === message._id);
+          if (exists) return prev;
+          return [...prev, message];
+        });
         scrollToBottom();
       }
       
-      // Update chat list
       setChats(prev => {
         const existing = prev.find(c => c._id === chat._id);
         if (existing) {
@@ -41,12 +52,38 @@ const Messaging = () => {
         }
         return [chat, ...prev];
       });
-    });
+    };
+
+    socketService.on('newMessage', handleNewMessage);
 
     return () => {
       socketService.off('newMessage');
     };
-  }, [currentUserId, selectedChat]);
+  }, []);
+
+  // Handle navigation to specific chat
+  useEffect(() => {
+    const chatIdFromState = location.state?.chatId;
+    const chatFromState = location.state?.chatData;
+    
+    if (chatIdFromState) {
+      // First try to find in existing chats
+      const existingChat = chats.find(c => c._id === chatIdFromState);
+      if (existingChat) {
+        setSelectedChat(existingChat);
+      } else if (chatFromState) {
+        // Use chat data from navigation state
+        setSelectedChat(chatFromState);
+        // Add to chats list
+        setChats(prev => [...prev, chatFromState]);
+      } else {
+        // Chat might be new, set selected with minimal data
+        setSelectedChat({ _id: chatIdFromState, participants: [] });
+      }
+      // Clear the state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, chats, navigate]);
 
   useEffect(() => {
     if (selectedChat) {
@@ -59,9 +96,10 @@ const Messaging = () => {
       const res = await chatApi.getInbox(currentUserId);
       setChats(res.data);
       
-      // If there's an initial chat ID, select it
-      if (initialChatId) {
-        const chat = res.data.find(c => c._id === initialChatId);
+      // Handle initial chat from navigation
+      const chatIdFromState = location.state?.chatId;
+      if (chatIdFromState) {
+        const chat = res.data.find(c => c._id === chatIdFromState);
         if (chat) {
           setSelectedChat(chat);
         }
@@ -112,112 +150,90 @@ const Messaging = () => {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const formatDate = (date) => {
+  const formatChatTime = (date) => {
     if (!date) return '';
     const d = new Date(date);
-    const today = new Date();
-    if (d.toDateString() === today.toDateString()) return 'Today';
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
-    return d.toLocaleDateString();
+    const now = new Date();
+    const diffDays = Math.floor((now - d) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return d.toLocaleDateString([], { weekday: 'short' });
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  const navItems = [
-    { id: 'home', icon: Home, label: 'Home', path: '/feed' },
-    { id: 'network', icon: User, label: 'Network', path: '/network' },
-    { id: 'jobs', icon: Briefcase, label: 'Jobs', path: '/feed' },
-    { id: 'messaging', icon: MessageSquare, label: 'Messaging', path: '/messaging' },
-    { id: 'notifications', icon: Bell, label: 'Notifications', path: '/feed' },
-    { id: 'profile', icon: User, label: 'Me', path: '/profile' },
-  ];
+  const filteredChats = chats.filter(chat => {
+    const otherUser = getOtherUser(chat);
+    return otherUser?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   return (
-    <div className="min-h-screen bg-[#f3f2ef]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-[1128px] mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-4">
-              <div 
-                className="text-3xl font-extrabold text-[#0a66c2] cursor-pointer"
-                onClick={() => navigate('/feed')}
-              >
-                in
-              </div>
-              <div className="hidden md:flex items-center bg-[#eef3f8] px-3 py-2 rounded-md">
-                <Search size={18} className="text-[#666]" />
-                <input 
-                  type="text" 
-                  placeholder="Search" 
-                  className="bg-transparent border-none outline-none ml-2 w-48 text-sm"
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+
+      {/* Main Content */}
+      <main className="max-w-[1400px] mx-auto px-4 py-6 h-[calc(100vh-64px)]">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-full">
+          {/* Left - Chat List */}
+          <div className={`${selectedChat ? 'hidden md:block' : ''} md:col-span-4 bg-white rounded-2xl overflow-hidden shadow-sm ${selectedChat ? 'md:w-full' : ''}`}>
+            {/* Search Header */}
+            <div className="p-4">
+              <h2 className="text-xl font-bold text-gray-900 mb-3">Messages</h2>
+              <div className="relative">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search conversations..."
+                  className="w-full bg-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                 />
               </div>
             </div>
-            <nav className="flex items-center gap-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center px-3 py-1 rounded-md transition ${
-                    item.id === 'messaging' ? 'text-[#0a66c2]' : 'text-[#666] hover:bg-gray-100'
-                  }`}
-                >
-                  <item.icon size={20} />
-                  <span className="text-xs mt-1">{item.label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-[1128px] mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Left - Chat List */}
-          <div className={`${selectedChat ? 'hidden md:block' : ''} md:col-span-4 bg-white rounded-lg shadow-sm overflow-hidden ${selectedChat ? 'md:w-full' : ''}`}>
-            <div className="p-4 border-b">
-              <h2 className="font-semibold text-[#000000e6]">Messaging</h2>
-            </div>
             
+            {/* Chat List */}
             <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 220px)' }}>
               {loading ? (
-                <div className="p-4 text-center text-[#666666]">Loading...</div>
-              ) : chats.length === 0 ? (
-                <div className="p-8 text-center text-[#666666]">
-                  <MessageSquare size={48} className="mx-auto mb-4 text-gray-300" />
-                  <p>No messages yet</p>
-                  <p className="text-sm mt-1">Start a conversation from your network</p>
+                <div className="p-8 text-center text-gray-500">Loading...</div>
+              ) : filteredChats.length === 0 ? (
+                <div className="p-8 text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare size={32} className="text-gray-400" />
+                  </div>
+                  <p className="text-gray-500">No conversations yet</p>
+                  <p className="text-gray-400 text-sm mt-1">Start chatting with your network</p>
                 </div>
               ) : (
-                chats.map((chat) => {
+                filteredChats.map((chat) => {
                   const otherUser = getOtherUser(chat);
                   return (
                     <div
                       key={chat._id}
                       onClick={() => setSelectedChat(chat)}
-                      className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
-                        selectedChat?._id === chat._id ? 'bg-blue-50' : ''
-                      }`}
+                      className={`p-4 cursor-pointer transition ${
+                          selectedChat?._id === chat._id 
+                              ? 'bg-teal-50' 
+                              : 'hover:bg-gray-50'
+                          }`}
                     >
                       <div className="flex gap-3">
-                        <div className="w-12 h-12 bg-[#0a66c2] rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                          {otherUser?.name?.charAt(0).toUpperCase() || '?'}
+                        <div className="relative">
+                          <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-white font-bold">
+                            {otherUser?.name?.charAt(0).toUpperCase() || '?'}
+                          </div>
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
-                            <h4 className="font-semibold text-[#000000e6] truncate">
+                            <h4 className="font-semibold text-gray-900 truncate">
                               {otherUser?.name || 'Unknown User'}
                             </h4>
-                            {chat.lastMessage?.createdAt && (
-                              <span className="text-xs text-[#666666]">
-                                {formatDate(chat.lastMessage.createdAt)}
-                              </span>
-                            )}
+                            <span className="text-xs text-gray-400">
+                              {formatChatTime(chat.lastMessage?.createdAt)}
+                            </span>
                           </div>
-                          <p className="text-sm text-[#666666] truncate">
-                            {chat.lastMessage?.text || 'No messages yet'}
+                          <p className="text-sm text-gray-500 truncate mt-0.5">
+                            {chat.lastMessage?.text || 'Start a conversation'}
                           </p>
                         </div>
                       </div>
@@ -229,79 +245,89 @@ const Messaging = () => {
           </div>
 
           {/* Right - Chat Window */}
-          <div className={`${!selectedChat ? 'hidden md:block' : ''} md:col-span-8 bg-white rounded-lg shadow-sm overflow-hidden`}>
+          <div className={`${!selectedChat ? 'hidden md:flex' : ''} md:col-span-8 bg-white rounded-2xl overflow-hidden shadow-sm flex-col`}>
             {selectedChat ? (
               <>
                 {/* Chat Header */}
-                <div className="p-4 border-b flex items-center gap-3">
-                  <button 
-                    onClick={() => setSelectedChat(null)}
-                    className="md:hidden p-1 hover:bg-gray-100 rounded"
-                  >
-                    <ArrowLeft size={20} />
-                  </button>
-                  <div 
-                    onClick={() => navigate(`/profile/${getOtherUser(selectedChat)?._id}`)}
-                    className="flex items-center gap-3 cursor-pointer"
-                  >
-                    <div className="w-10 h-10 bg-[#0a66c2] rounded-full flex items-center justify-center text-white font-semibold">
-                      {getOtherUser(selectedChat)?.name?.charAt(0).toUpperCase()}
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => setSelectedChat(null)}
+                      className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition"
+                    >
+                      <ArrowLeft size={20} className="text-gray-600" />
+                    </button>
+                    <div 
+                      onClick={() => navigate(`/profile/${getOtherUser(selectedChat)?._id}`)}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
+                      <div className="relative">
+                        <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-white font-bold">
+                          {getOtherUser(selectedChat)?.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900">
+                          {getOtherUser(selectedChat)?.name}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          {getOtherUser(selectedChat)?.headline || 'Online'}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-[#000000e6]">
-                        {getOtherUser(selectedChat)?.name}
-                      </h3>
-                      <p className="text-xs text-[#666666]">
-                        {getOtherUser(selectedChat)?.headline || 'View Profile'}
-                      </p>
-                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button className="p-2 hover:bg-gray-100 rounded-lg transition">
+                      <Phone size={20} className="text-gray-500" />
+                    </button>
+                    <button className="p-2 hover:bg-gray-100 rounded-lg transition">
+                      <Video size={20} className="text-gray-500" />
+                    </button>
+                    <button className="p-2 hover:bg-gray-100 rounded-lg transition">
+                      <MoreVertical size={20} className="text-gray-500" />
+                    </button>
                   </div>
                 </div>
 
                 {/* Messages */}
                 <div 
-                  className="overflow-y-auto p-4" 
-                  style={{ maxHeight: 'calc(100vh - 340px)' }}
+                  className="flex-1 overflow-y-auto p-4 space-y-4"
+                  style={{ maxHeight: 'calc(100vh - 280px)' }}
                 >
                   {messages.length === 0 ? (
-                    <div className="text-center text-[#666666] py-8">
-                      <p>No messages yet</p>
-                      <p className="text-sm">Send a message to start the conversation</p>
+                    <div className="text-center py-12">
+                      <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare size={40} className="text-teal-600" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900">Start the conversation</h3>
+                      <p className="text-gray-500 text-sm mt-1">Send a message to {getOtherUser(selectedChat)?.name}</p>
                     </div>
                   ) : (
                     messages.map((msg, idx) => {
                       const isMe = msg.sender === currentUserId;
-                      const showDate = idx === 0 || 
-                        new Date(msg.createdAt).toDateString() !== 
-                        new Date(messages[idx-1].createdAt).toDateString();
                       
                       return (
-                        <div key={msg._id || idx}>
-                          {showDate && (
-                            <div className="text-center my-4">
-                              <span className="text-xs text-[#666666] bg-gray-100 px-2 py-1 rounded-full">
-                                {formatDate(msg.createdAt)}
-                              </span>
+                        <div 
+                          key={msg._id || idx} 
+                          className={`flex gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}
+                        >
+                          {!isMe && (
+                            <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-auto">
+                              {getOtherUser(selectedChat)?.name?.charAt(0).toUpperCase()}
                             </div>
                           )}
-                          <div className={`flex gap-2 mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                            {!isMe && (
-                              <div className="w-8 h-8 bg-[#0a66c2] rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                                {getOtherUser(selectedChat)?.name?.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                            <div 
-                              className={`max-w-[70%] px-4 py-2 rounded-lg ${
-                                isMe 
-                                  ? 'bg-[#0a66c2] text-white rounded-tr-none' 
-                                  : 'bg-gray-100 text-[#000000e6] rounded-tl-none'
-                              }`}
-                            >
-                              <p className="text-sm">{msg.text}</p>
-                              <p className={`text-xs mt-1 ${isMe ? 'text-blue-100' : 'text-[#666666]'}`}>
-                                {formatTime(msg.createdAt)}
-                              </p>
-                            </div>
+                          <div 
+                            className={`max-w-[70%] px-4 py-3 rounded-2xl ${
+                              isMe 
+                                ? 'bg-teal-600 text-white rounded-br-md' 
+                                : 'bg-gray-100 text-gray-900 rounded-bl-md'
+                            }`}
+                          >
+                            <p className="text-sm">{msg.text}</p>
+                            <p className={`text-xs mt-1 ${isMe ? 'text-teal-100' : 'text-gray-400'}`}>
+                              {formatTime(msg.createdAt)}
+                            </p>
                           </div>
                         </div>
                       );
@@ -311,19 +337,22 @@ const Messaging = () => {
                 </div>
 
                 {/* Message Input */}
-                <form onSubmit={handleSendMessage} className="p-4 border-t">
-                  <div className="flex gap-2">
+                <form onSubmit={handleSendMessage} className="p-4">
+                  <div className="flex items-center gap-3 bg-gray-100 rounded-2xl px-4 py-2">
+                    <button type="button" className="text-gray-400 hover:text-gray-600 transition">
+                      <Smile size={24} />
+                    </button>
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Write a message..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-[#0a66c2]"
+                      placeholder="Type a message..."
+                      className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-400"
                     />
                     <button
                       type="submit"
                       disabled={!newMessage.trim() || sending}
-                      className="p-2 bg-[#0a66c2] text-white rounded-full hover:bg-[#004182] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 bg-teal-600 text-white rounded-xl hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
                       <Send size={20} />
                     </button>
@@ -331,11 +360,21 @@ const Messaging = () => {
                 </form>
               </>
             ) : (
-              <div className="h-[calc(100vh-220px)] flex items-center justify-center text-[#666666]">
+              <div className="h-full flex items-center justify-center">
                 <div className="text-center">
-                  <MessageSquare size={64} className="mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-lg font-semibold">Select a conversation</h3>
-                  <p className="text-sm mt-1">Choose from your existing conversations or start a new one</p>
+                  <div className="w-24 h-24 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <MessageSquare size={48} className="text-teal-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Your Messages</h3>
+                  <p className="text-gray-500 max-w-md">
+                    Select a conversation from the list or start a new one by connecting with someone in your network
+                  </p>
+                  <button 
+                    onClick={() => navigate('/network')}
+                    className="mt-6 px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition"
+                  >
+                    Explore Network
+                  </button>
                 </div>
               </div>
             )}

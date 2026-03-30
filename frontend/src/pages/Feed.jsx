@@ -1,267 +1,158 @@
-import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../stores/authStore'
-import { Home, User, Bell, Briefcase, MessageSquare, Search, Menu, Users } from 'lucide-react'
-import { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../stores/authStore';
+import Navbar from '../components/Navbar';
+import { BookOpen, Briefcase, TrendingUp, ArrowRight } from 'lucide-react';
 
 const Feed = () => {
-  const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
-  const [activeNav, setActiveNav] = useState('home')
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/')
-  }
+  const courses = [
+    { id: 1, title: 'React Fundamentals', category: 'Web Development', level: 'Beginner', duration: '8 hours', rating: 4.8 },
+    { id: 2, title: 'Node.js Backend Mastery', category: 'Backend', level: 'Intermediate', duration: '12 hours', rating: 4.7 },
+    { id: 3, title: 'Python for Data Science', category: 'Data Science', level: 'Beginner', duration: '15 hours', rating: 4.9 },
+  ];
 
-  const navItems = [
-    { id: 'home', icon: Home, label: 'Home', path: '/feed' },
-    { id: 'network', icon: Users, label: 'Network', path: '/network' },
-    { id: 'jobs', icon: Briefcase, label: 'Jobs', path: '/feed' },
-    { id: 'messaging', icon: MessageSquare, label: 'Messaging', path: '/messaging' },
-    { id: 'notifications', icon: Bell, label: 'Notifications', path: '/feed' },
-    { id: 'profile', icon: User, label: 'Me', path: '/profile' },
-  ]
+  const jobs = [
+    { id: 1, title: 'Frontend Developer', company: 'TechCorp', location: 'Remote', type: 'Full-time', posted: '2 days ago' },
+    { id: 2, title: 'Full Stack Engineer', company: 'StartupXYZ', location: 'Colombo, Sri Lanka', type: 'Full-time', posted: '1 day ago' },
+    { id: 3, title: 'Junior React Developer', company: 'WebAgency', location: 'Remote', type: 'Part-time', posted: '3 days ago' },
+  ];
+
+  const learningPaths = [
+    { id: 1, title: 'Become a Full Stack Developer', courses: 8, duration: '40 hours' },
+    { id: 2, title: 'Start Your Data Science Career', courses: 6, duration: '35 hours' },
+  ];
 
   return (
-    <div className="min-h-screen bg-[#f3f2ef]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-[1128px] mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            {/* Left - Logo */}
-            <div className="flex items-center gap-4">
-              <div 
-                className="text-3xl font-extrabold text-[#0a66c2] cursor-pointer"
-                onClick={() => navigate('/feed')}
-              >
-                in
-              </div>
-              <div className="hidden md:flex items-center bg-[#eef3f8] px-3 py-2 rounded-md">
-                <Search size={18} className="text-[#666]" />
-                <input 
-                  type="text" 
-                  placeholder="Search" 
-                  className="bg-transparent border-none outline-none ml-2 w-48 text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Right - Nav */}
-            <nav className="flex items-center gap-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveNav(item.id)
-                    navigate(item.path)
-                  }}
-                  className={`flex flex-col items-center px-3 py-1 rounded-md transition ${
-                    activeNav === item.id ? 'text-[#0a66c2]' : 'text-[#666] hover:bg-gray-100'
-                  }`}
-                >
-                  <item.icon size={20} />
-                  <span className="text-xs mt-1">{item.label}</span>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="max-w-5xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Left - Main Content */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Welcome Banner */}
+            <div className="bg-gradient-to-r from-teal-500 to-teal-700 rounded-xl p-6 text-white">
+              <h1 className="text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0]}!</h1>
+              <p className="mt-1 opacity-90">Continue your learning journey</p>
+              <div className="mt-4 flex gap-3">
+                <button onClick={() => navigate('/courses')} className="px-4 py-2 bg-white text-teal-600 rounded-lg font-medium text-sm">
+                  Browse Courses
                 </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-[1128px] mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Left Sidebar - Profile Card */}
-          <div className="md:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              {/* Banner */}
-              <div className="h-14 bg-gradient-to-r from-[#0a66c2] to-[#057642]"></div>
-              
-              <div className="px-4 pb-4">
-                <div className="relative -mt-8 mb-3">
-                  <div className="w-20 h-20 bg-white rounded-full p-1">
-                    <div className="w-full h-full bg-[#0a66c2] rounded-full flex items-center justify-center text-white text-2xl font-semibold">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                  </div>
-                </div>
-                
-                <h3 className="font-semibold text-[#000000e6]">{user?.name}</h3>
-                <p className="text-sm text-[#666666]">{user?.headline || 'Add a headline'}</p>
-                
-                <div className="border-t mt-4 pt-3 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#666666]">Connections</span>
-                    <span className="font-semibold text-[#0a66c2]">0</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#666666]">Profile views</span>
-                    <span className="font-semibold text-[#0a66c2]">0</span>
-                  </div>
-                </div>
-                
-                <button
-                  onClick={() => navigate('/profile')}
-                  className="w-full mt-4 py-2 bg-[#0a66c2] text-white rounded-full font-semibold text-sm hover:bg-[#004182] transition"
-                >
-                  View Profile
+                <button onClick={() => navigate('/jobs')} className="px-4 py-2 bg-white/20 text-white rounded-lg font-medium text-sm">
+                  Find Jobs
                 </button>
               </div>
             </div>
 
-            {/* Groups Card */}
-            <div className="bg-white rounded-lg shadow-sm mt-4 p-4">
-              <h4 className="font-semibold text-[#000000e6] mb-3">Recent</h4>
+            {/* Recommended Courses */}
+            <div className="bg-white rounded-xl shadow-sm p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <BookOpen size={20} className="text-teal-600" />
+                  Recommended Courses
+                </h2>
+                <button onClick={() => navigate('/courses')} className="text-teal-600 text-sm font-medium flex items-center gap-1">
+                  View all <ArrowRight size={14} />
+                </button>
+              </div>
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-[#666666]">
-                  <Users size={16} />
-                  <span>Software Engineers</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-[#666666]">
-                  <Users size={16} />
-                  <span>React Developers</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Feed */}
-          <div className="md:col-span-6">
-            {/* Create Post */}
-            <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-              <div className="flex gap-3">
-                <div className="w-12 h-12 bg-[#0a66c2] rounded-full flex items-center justify-center text-white font-semibold">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </div>
-                <button 
-                  onClick={() => navigate('/profile')}
-                  className="flex-1 text-left px-4 py-3 border border-gray-300 rounded-full text-[#666] hover:bg-gray-50 transition"
-                >
-                  Start a post
-                </button>
-              </div>
-              <div className="flex justify-between mt-3 pt-3 border-t">
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span className="text-xl">📷</span>
-                  <span className="text-sm font-semibold">Photo</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span className="text-xl">🎥</span>
-                  <span className="text-sm font-semibold">Video</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span className="text-xl">📅</span>
-                  <span className="text-sm font-semibold">Event</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span className="text-xl">📝</span>
-                  <span className="text-sm font-semibold">Write article</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Sort */}
-            <div className="flex items-center justify-between px-2 py-2 mb-2">
-              <div className="h-[1px] flex-1 bg-gray-300"></div>
-              <span className="px-2 text-sm text-[#666]">Sort by: Top</span>
-            </div>
-
-            {/* Feed Post */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <div className="flex gap-3 mb-3">
-                <div className="w-10 h-10 bg-[#0a66c2] rounded-full flex items-center justify-center text-white font-semibold">
-                  P
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm">PathFinder Team</h4>
-                  <p className="text-xs text-[#666666]">1,234 followers</p>
-                  <p className="text-xs text-[#666666]">2h • 🌐</p>
-                </div>
-              </div>
-              <p className="text-sm text-[#000000e6] mb-3">
-                Welcome to PathFinder! Your career journey starts here. Connect with professionals, find your dream job, and grow your skills.
-              </p>
-              <div className="bg-gray-100 h-64 rounded-lg flex items-center justify-center mb-3">
-                <span className="text-gray-400">Post image</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t">
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span>👍</span>
-                  <span className="text-sm font-semibold">Like</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span>💬</span>
-                  <span className="text-sm font-semibold">Comment</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span>🔁</span>
-                  <span className="text-sm font-semibold">Repost</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 text-[#666] hover:bg-gray-100 rounded-lg">
-                  <span>✈️</span>
-                  <span className="text-sm font-semibold">Send</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Sidebar */}
-          <div className="md:col-span-3 space-y-4">
-            {/* Recommendations */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h4 className="font-semibold text-[#000000e6] mb-3">Add to your feed</h4>
-              <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex gap-3">
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"></div>
+                {courses.map((course) => (
+                  <div key={course.id} className="flex gap-4 p-3 border rounded-lg hover:border-teal-300 cursor-pointer transition">
+                    <div className="w-16 h-16 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BookOpen size={24} className="text-teal-600" />
+                    </div>
                     <div className="flex-1">
-                      <h5 className="font-semibold text-sm">Tech Professional</h5>
-                      <p className="text-xs text-[#666666]">Software Engineer at Tech Co</p>
-                      <button className="mt-2 px-3 py-1 border border-[#0a66c2] text-[#0a66c2] rounded-full text-sm font-semibold hover:bg-[#ebf4fe] transition">
-                        + Follow
-                      </button>
+                      <h3 className="font-medium text-gray-900">{course.title}</h3>
+                      <p className="text-sm text-gray-500">{course.category} • {course.level}</p>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        <span>{course.duration}</span>
+                        <span className="text-teal-600 font-medium">★ {course.rating}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Jobs Card */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h4 className="font-semibold text-[#000000e6] mb-3">Recommended Jobs</h4>
+            {/* Job Opportunities */}
+            <div className="bg-white rounded-xl shadow-sm p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <Briefcase size={20} className="text-teal-600" />
+                  Latest Jobs
+                </h2>
+                <button onClick={() => navigate('/jobs')} className="text-teal-600 text-sm font-medium flex items-center gap-1">
+                  View all <ArrowRight size={14} />
+                </button>
+              </div>
               <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex gap-2">
-                    <div className="w-8 h-8 bg-gray-200 rounded flex-shrink-0"></div>
-                    <div>
-                      <h5 className="text-sm font-semibold">Software Engineer</h5>
-                      <p className="text-xs text-[#666666]">Company Name</p>
-                      <p className="text-xs text-[#666666]">Remote</p>
+                {jobs.map((job) => (
+                  <div key={job.id} className="flex gap-4 p-3 border rounded-lg hover:border-teal-300 cursor-pointer transition">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Briefcase size={20} className="text-gray-500" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">{job.title}</h3>
+                      <p className="text-sm text-gray-500">{job.company} • {job.location}</p>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        <span className="bg-teal-50 text-teal-600 px-2 py-0.5 rounded">{job.type}</span>
+                        <span>Posted {job.posted}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-3 py-2 text-[#666666] font-semibold text-sm hover:bg-gray-100 rounded-lg">
-                View all jobs
+            </div>
+          </div>
+
+          {/* Right - Sidebar */}
+          <div className="space-y-4">
+            {/* Learning Paths */}
+            <div className="bg-white rounded-xl shadow-sm p-4">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <TrendingUp size={18} className="text-teal-600" />
+                Learning Paths
+              </h3>
+              <div className="space-y-3">
+                {learningPaths.map((path) => (
+                  <div key={path.id} className="p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition">
+                    <h4 className="font-medium text-sm text-gray-900">{path.title}</h4>
+                    <p className="text-xs text-gray-500 mt-1">{path.courses} courses • {path.duration}</p>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => navigate('/learning')} className="w-full mt-3 py-2 text-sm text-teal-600 font-medium hover:underline">
+                View all paths
               </button>
             </div>
 
-            {/* Footer */}
-            <div className="text-center px-4">
-              <p className="text-xs text-[#666666]">
-                PathFinder © 2026
-              </p>
-              <div className="flex flex-wrap justify-center gap-2 mt-2">
-                <a href="#" className="text-xs text-[#666666] hover:text-[#0a66c2]">Accessibility</a>
-                <a href="#" className="text-xs text-[#666666] hover:text-[#0a66c2]">Help Center</a>
-                <button onClick={handleLogout} className="text-xs text-[#666666] hover:text-[#0a66c2]">Sign Out</button>
+            {/* Quick Stats */}
+            <div className="bg-white rounded-xl shadow-sm p-4">
+              <h3 className="font-semibold text-gray-900 mb-3">Your Progress</h3>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Courses completed</span>
+                    <span className="font-medium">2/5</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full">
+                    <div className="h-2 bg-teal-500 rounded-full" style={{ width: '40%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Jobs applied</span>
+                    <span className="font-medium">3</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Feed
+export default Feed;

@@ -26,7 +26,7 @@ const Home = () => {
       success = await register(formData)
     }
     if (success) {
-      navigate('/feed')
+      navigate('/home')
     }
   }
 
@@ -35,10 +35,10 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-indigo-600">PathFinder</h1>
+          <h1 className="text-3xl font-bold text-teal-600">PathFinder</h1>
           <p className="text-gray-500 mt-2">
             {isLogin ? 'Welcome back!' : 'Create your account'}
           </p>
@@ -52,7 +52,7 @@ const Home = () => {
               placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
               required
             />
           )}
@@ -62,7 +62,7 @@ const Home = () => {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
             required
           />
           <input
@@ -71,7 +71,7 @@ const Home = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
             required
           />
 
@@ -82,7 +82,7 @@ const Home = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition disabled:opacity-50"
+            className="w-full bg-teal-600 text-white py-3 rounded-lg font-medium hover:bg-teal-700 transition disabled:opacity-50"
           >
             {isLoading ? 'Loading...' : isLogin ? 'Sign In' : 'Sign Up'}
           </button>
@@ -116,7 +116,7 @@ const Home = () => {
           {isLogin ? "Don't have an account?" : 'Already have an account?'}
           <button
             onClick={() => { setIsLogin(!isLogin); clearError() }}
-            className="ml-1 text-indigo-600 hover:underline font-medium"
+            className="ml-1 text-teal-600 hover:underline font-medium"
           >
             {isLogin ? 'Sign Up' : 'Sign In'}
           </button>

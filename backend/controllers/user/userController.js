@@ -204,23 +204,26 @@ export const getUserSuggestions = async (req, res) => {
     const currentUserId = req.user.id;
     const limit = parseInt(req.query.limit) || 10;
 
-    // Get all connection IDs (both as requester and recipient)
     const Connection = (await import("../../models/user/connectionRef.js")).default;
     
+    // Get ALL connections (pending or accepted) - exclude these users
     const connections = await Connection.find({
-      $or: [{ requester: currentUserId }, { recipient: currentUserId }]
+      $or: [
+        { requester: currentUserId },
+        { recipient: currentUserId }
+      ]
     });
 
-    // Extract user IDs that are already connected (or have pending requests)
-    const connectedUserIds = connections.map(c => 
-      c.requester.toString() === currentUserId ? c.recipient : c.requester
+    // Extract user IDs that are already connected OR have pending requests
+    const excludedUserIds = connections.map(c => 
+      c.requester.toString() === currentUserId ? c.recipient.toString() : c.requester.toString()
     );
     // Add current user to exclude list
-    connectedUserIds.push(currentUserId);
+    excludedUserIds.push(currentUserId);
 
-    // Find users who are not connected
+    // Find users who are not connected and not have pending requests
     const suggestions = await User.find({
-      _id: { $nin: connectedUserIds }
+      _id: { $nin: excludedUserIds }
     })
     .select("name headline profileMedia skills location")
     .limit(limit);

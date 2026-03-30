@@ -48,14 +48,11 @@ export const userApi = {
   // Enrolled paths
   getEnrolledPaths: () => api.get('/users/enrolled/paths'),
   
-  // Public profile
+  // Public profile (view other user)
   getPublicProfile: (userId) => api.get(`/users/public/${userId}`),
 
   // User suggestions (people you may know)
   getSuggestions: (limit = 10) => api.get(`/users/suggestions?limit=${limit}`),
-
-  // Get public profile (view other user)
-  getPublicProfile: (userId) => api.get(`/users/public/${userId}`),
 };
 
 export default userApi;
