@@ -4,7 +4,8 @@ import { useAuthStore } from '../stores/authStore';
 import userApi from '../services/userApi';
 import connectionApi from '../services/connectionApi';
 import chatApi from '../services/chatApi';
-import { Home, Bell, Briefcase, MessageSquare, User, Search, LogOut, UserPlus, Check, X, MapPin, MoreHorizontal } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { UserPlus, Check, X, MapPin, MoreHorizontal } from 'lucide-react';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -114,31 +115,22 @@ const UserProfile = () => {
     }
   };
 
-  const navItems = [
-    { id: 'home', icon: Home, label: 'Home', path: '/feed' },
-    { id: 'network', icon: User, label: 'Network', path: '/network' },
-    { id: 'jobs', icon: Briefcase, label: 'Jobs', path: '/feed' },
-    { id: 'messaging', icon: MessageSquare, label: 'Messaging', path: '/feed' },
-    { id: 'notifications', icon: Bell, label: 'Notifications', path: '/feed' },
-    { id: 'profile', icon: User, label: 'Me', path: '/profile' },
-  ];
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f3f2ef] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0a66c2]"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#f3f2ef] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-600">User not found</h2>
           <button 
             onClick={() => navigate('/network')}
-            className="mt-4 px-4 py-2 bg-[#0a66c2] text-white rounded-full font-semibold"
+            className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-full font-semibold"
           >
             Go to Network
           </button>
@@ -148,65 +140,23 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f2ef]">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-[1128px] mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => navigate(-1)}
-                className="p-2 hover:bg-gray-100 rounded-full transition"
-              >
-                ←
-              </button>
-              <div 
-                className="text-3xl font-extrabold text-[#0a66c2] cursor-pointer"
-                onClick={() => navigate('/feed')}
-              >
-                in
-              </div>
-              <div className="hidden md:flex items-center bg-[#eef3f8] px-3 py-2 rounded-md">
-                <Search size={18} className="text-[#666]" />
-                <input 
-                  type="text" 
-                  placeholder="Search" 
-                  className="bg-transparent border-none outline-none ml-2 w-48 text-sm"
-                />
-              </div>
-            </div>
-            <nav className="flex items-center gap-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center px-3 py-1 rounded-md transition ${
-                    item.id === 'profile' ? 'text-[#0a66c2]' : 'text-[#666] hover:bg-gray-100'
-                  }`}
-                >
-                  <item.icon size={20} />
-                  <span className="text-xs mt-1">{item.label}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
 
       {/* Main Content */}
-      <main className="max-w-[1128px] mx-auto px-4 py-6">
+      <main className="max-w-[1128px] mx-auto px-4 py-6 mt-2">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           {/* Left Column */}
           <div className="md:col-span-3 space-y-4">
             {/* Profile Card */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               {/* Banner */}
-              <div className="h-24 bg-gradient-to-r from-[#0a66c2] to-[#057642]"></div>
+              <div className="h-24 bg-gradient-to-r from-teal-500 to-teal-700"></div>
               
               <div className="px-4 pb-4">
                 <div className="relative -mt-10 mb-2">
                   <div className="w-20 h-20 bg-white rounded-full p-1">
-                    <div className="w-full h-full bg-[#0a66c2] rounded-full flex items-center justify-center text-white text-2xl font-semibold">
+                    <div className="w-full h-full bg-teal-600 rounded-full flex items-center justify-center text-white text-2xl font-semibold">
                       {profile.name?.charAt(0).toUpperCase()}
                     </div>
                   </div>
@@ -217,7 +167,7 @@ const UserProfile = () => {
                     onClick={() => setShowMoreMenu(!showMoreMenu)}
                     className="absolute top-0 right-0 p-1 hover:bg-gray-100 rounded-full"
                   >
-                    <MoreHorizontal size={20} className="text-[#666]" />
+                    <MoreHorizontal size={20} className="text-gray-500" />
                   </button>
                   {showMoreMenu && (
                     <div className="absolute right-0 top-8 bg-white shadow-lg rounded-lg py-2 z-10 min-w-[150px]">
@@ -236,18 +186,18 @@ const UserProfile = () => {
                   )}
                 </div>
                 
-                <h3 className="font-semibold text-[#000000e6] text-lg">{profile.name}</h3>
-                <p className="text-sm text-[#666666]">{profile.headline || 'No headline'}</p>
+                <h3 className="font-semibold text-gray-900 text-lg">{profile.name}</h3>
+                <p className="text-sm text-gray-500">{profile.headline || 'No headline'}</p>
                 
                 {profile.location && (
-                  <div className="mt-2 flex items-center gap-1 text-sm text-[#666666]">
+                  <div className="mt-2 flex items-center gap-1 text-sm text-gray-500">
                     <MapPin size={14} />
                     {profile.location}
                   </div>
                 )}
                 
                 <div className="mt-3">
-                  <span className="font-semibold text-[#0a66c2] text-sm">{profile.connectionsCount || 0} connections</span>
+                  <span className="font-semibold text-teal-600 text-sm">{profile.connectionsCount || 0} connections</span>
                 </div>
 
                 {/* Action Buttons */}
@@ -256,7 +206,7 @@ const UserProfile = () => {
                     <>
                       <button 
                         onClick={handleMessage}
-                        className="w-full py-1.5 bg-[#0a66c2] text-white rounded-full font-semibold text-sm hover:bg-[#004182]"
+                        className="w-full py-1.5 bg-teal-600 text-white rounded-full font-semibold text-sm hover:bg-teal-700"
                       >
                         Message
                       </button>
@@ -273,13 +223,13 @@ const UserProfile = () => {
                     <>
                       <button 
                         onClick={handleAccept}
-                        className="w-full py-1.5 bg-[#0a66c2] text-white rounded-full font-semibold text-sm hover:bg-[#004182]"
+                        className="w-full py-1.5 bg-teal-600 text-white rounded-full font-semibold text-sm hover:bg-teal-700"
                       >
                         Accept
                       </button>
                       <button 
                         onClick={handleIgnore}
-                        className="w-full py-1.5 border border-[#666666] text-[#666666] rounded-full font-semibold text-sm hover:bg-gray-100"
+                        className="w-full py-1.5 border border-gray-400 text-gray-600 rounded-full font-semibold text-sm hover:bg-gray-100"
                       >
                         Ignore
                       </button>
@@ -298,7 +248,7 @@ const UserProfile = () => {
                   {connectionStatus === null && (
                     <button 
                       onClick={handleConnect}
-                      className="w-full py-1.5 bg-[#0a66c2] text-white rounded-full font-semibold text-sm hover:bg-[#004182]"
+                      className="w-full py-1.5 bg-teal-600 text-white rounded-full font-semibold text-sm hover:bg-teal-700"
                     >
                       <UserPlus size={16} className="inline mr-1" /> Connect
                     </button>
@@ -310,26 +260,12 @@ const UserProfile = () => {
             {/* Analytics */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex justify-between items-center">
-                <h4 className="font-semibold text-[#000000e6]">Profile viewers</h4>
-                <span className="text-[#0a66c2] font-semibold text-sm">{profile.profileViews || 0}</span>
+                <h4 className="font-semibold text-gray-900">Profile viewers</h4>
+                <span className="text-teal-600 font-semibold text-sm">{profile.profileViews || 0}</span>
               </div>
               <div className="flex justify-between items-center mt-2">
-                <h4 className="font-semibold text-[#000000e6]">Post impressions</h4>
-                <span className="text-[#0a66c2] font-semibold text-sm">0</span>
-              </div>
-            </div>
-
-            {/* Resources */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h4 className="font-semibold text-[#000000e6] mb-2">Resources</h4>
-              <div className="space-y-2 text-sm">
-                <a href="#" className="block text-[#666666] hover:text-[#0a66c2]">About</a>
-                <a href="#" className="block text-[#666666] hover:text-[#0a66c2]">Help Center</a>
-                <a href="#" className="block text-[#666666] hover:text-[#0a66c2]">Privacy & Terms</a>
-                <a href="#" className="block text-[#666666] hover:text-[#0a66c2]">Ad Choices</a>
-                <a href="#" className="block text-[#666666] hover:text-[#0a66c2]">Advertising</a>
-                <a href="#" className="block text-[#666666] hover:text-[#0a66c2]">Business Services</a>
-                <a href="#" className="block text-[#666666] hover:text-[#0a66c2]">Get the PathFinder app</a>
+                <h4 className="font-semibold text-gray-900">Post impressions</h4>
+                <span className="text-teal-600 font-semibold text-sm">0</span>
               </div>
             </div>
           </div>
@@ -339,16 +275,16 @@ const UserProfile = () => {
             {/* About */}
             {profile.about && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-[#000000e6] mb-4">About</h2>
-                <p className="text-[#00000099] whitespace-pre-wrap">{profile.about}</p>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">About</h2>
+                <p className="text-gray-600 whitespace-pre-wrap">{profile.about}</p>
               </div>
             )}
 
             {/* Experience */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-[#000000e6] mb-4">Experience</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Experience</h2>
               {profile.experience?.length === 0 ? (
-                <p className="text-[#666666]">No experience added</p>
+                <p className="text-gray-500">No experience added</p>
               ) : (
                 <div className="space-y-6">
                   {profile.experience.map((exp) => (
@@ -357,11 +293,11 @@ const UserProfile = () => {
                         <span className="text-xl">💼</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-[#000000e6]">{exp.title}</h3>
-                        <p className="text-[#00000099]">{exp.company}</p>
-                        <p className="text-sm text-[#666666]">{exp.startDate?.slice(0, 7)} - {exp.endDate?.slice(0, 7) || 'Present'}</p>
-                        {exp.location && <p className="text-sm text-[#666666]">{exp.location}</p>}
-                        {exp.description && <p className="text-[#00000099] mt-2">{exp.description}</p>}
+                        <h3 className="font-semibold text-gray-900">{exp.title}</h3>
+                        <p className="text-gray-600">{exp.company}</p>
+                        <p className="text-sm text-gray-500">{exp.startDate?.slice(0, 7)} - {exp.endDate?.slice(0, 7) || 'Present'}</p>
+                        {exp.location && <p className="text-sm text-gray-500">{exp.location}</p>}
+                        {exp.description && <p className="text-gray-600 mt-2">{exp.description}</p>}
                       </div>
                     </div>
                   ))}
@@ -371,9 +307,9 @@ const UserProfile = () => {
 
             {/* Education */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-[#000000e6] mb-4">Education</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Education</h2>
               {profile.education?.length === 0 ? (
-                <p className="text-[#666666]">No education added</p>
+                <p className="text-gray-500">No education added</p>
               ) : (
                 <div className="space-y-6">
                   {profile.education.map((edu) => (
@@ -382,9 +318,9 @@ const UserProfile = () => {
                         <span className="text-xl">🎓</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-[#000000e6]">{edu.institution}</h3>
-                        <p className="text-[#00000099]">{edu.degree} {edu.field && `in ${edu.field}`}</p>
-                        <p className="text-sm text-[#666666]">{edu.startDate?.slice(0, 7)} - {edu.endDate?.slice(0, 7) || 'Present'}</p>
+                        <h3 className="font-semibold text-gray-900">{edu.institution}</h3>
+                        <p className="text-gray-600">{edu.degree} {edu.field && `in ${edu.field}`}</p>
+                        <p className="text-sm text-gray-500">{edu.startDate?.slice(0, 7)} - {edu.endDate?.slice(0, 7) || 'Present'}</p>
                       </div>
                     </div>
                   ))}
@@ -396,14 +332,14 @@ const UserProfile = () => {
             {profile.skills?.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-[#000000e6]">Skills</h2>
-                  <span className="text-[#666666] text-sm">{profile.skills.length} skills</span>
+                  <h2 className="text-xl font-semibold text-gray-900">Skills</h2>
+                  <span className="text-gray-500 text-sm">{profile.skills.length} skills</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {profile.skills.map((skill, idx) => (
                     <span 
                       key={idx} 
-                      className="px-3 py-1 bg-[#eef3f8] text-[#0a66c2] rounded-full text-sm font-semibold"
+                      className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold"
                     >
                       {skill.name || skill}
                     </span>
@@ -414,9 +350,9 @@ const UserProfile = () => {
 
             {/* Projects */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-[#000000e6] mb-4">Projects</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Projects</h2>
               {profile.projects?.length === 0 ? (
-                <p className="text-[#666666]">No projects added</p>
+                <p className="text-gray-500">No projects added</p>
               ) : (
                 <div className="space-y-6">
                   {profile.projects.map((project) => (
@@ -425,12 +361,12 @@ const UserProfile = () => {
                         <span className="text-xl">📁</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-[#000000e6]">{project.title}</h3>
-                        <p className="text-[#00000099] mt-1">{project.description}</p>
+                        <h3 className="font-semibold text-gray-900">{project.title}</h3>
+                        <p className="text-gray-600 mt-1">{project.description}</p>
                         {project.technologies?.length > 0 && (
                           <div className="flex gap-1 mt-2">
                             {project.technologies.map((tech, i) => (
-                              <span key={i} className="px-2 py-0.5 bg-[#eef3f8] text-[#0a66c2] text-xs rounded-full">{tech}</span>
+                              <span key={i} className="px-2 py-0.5 bg-teal-50 text-teal-700 text-xs rounded-full">{tech}</span>
                             ))}
                           </div>
                         )}
@@ -439,7 +375,7 @@ const UserProfile = () => {
                             href={project.link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="inline-block mt-2 text-[#0a66c2] text-sm hover:underline"
+                            className="inline-block mt-2 text-teal-600 text-sm hover:underline"
                           >
                             View Project →
                           </a>
@@ -454,7 +390,7 @@ const UserProfile = () => {
             {/* Certifications */}
             {profile.certifications?.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-[#000000e6] mb-4">Certifications</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Certifications</h2>
                 <div className="space-y-4">
                   {profile.certifications.map((cert) => (
                     <div key={cert._id} className="flex gap-3">
@@ -462,11 +398,11 @@ const UserProfile = () => {
                         <span className="text-xl">🏆</span>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-[#000000e6]">{cert.name}</h3>
-                        <p className="text-[#00000099]">{cert.issuer}</p>
-                        <p className="text-sm text-[#666666]">{cert.date?.slice(0, 10)}</p>
+                        <h3 className="font-semibold text-gray-900">{cert.name}</h3>
+                        <p className="text-gray-600">{cert.issuer}</p>
+                        <p className="text-sm text-gray-500">{cert.date?.slice(0, 10)}</p>
                         {cert.credentialId && (
-                          <p className="text-sm text-[#666666]">Credential ID: {cert.credentialId}</p>
+                          <p className="text-sm text-gray-500">Credential ID: {cert.credentialId}</p>
                         )}
                       </div>
                     </div>
