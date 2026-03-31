@@ -109,7 +109,9 @@ const UserProfile = () => {
   const handleMessage = async () => {
     try {
       const res = await chatApi.createOrGetChat(userId);
-      navigate('/messaging', { state: { chatId: res.data._id } });
+      if (res.data && res.data._id) {
+        navigate('/messaging', { state: { chatId: res.data._id, chatData: res.data } });
+      }
     } catch (err) {
       console.error('Error creating chat:', err);
     }
@@ -318,9 +320,9 @@ const UserProfile = () => {
                         <span className="text-xl">🎓</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{edu.institution}</h3>
-                        <p className="text-gray-600">{edu.degree} {edu.field && `in ${edu.field}`}</p>
-                        <p className="text-sm text-gray-500">{edu.startDate?.slice(0, 7)} - {edu.endDate?.slice(0, 7) || 'Present'}</p>
+                        <h3 className="font-semibold text-gray-900">{edu.school}</h3>
+                        <p className="text-gray-600">{edu.degree} {edu.fieldOfStudy && `in ${edu.fieldOfStudy}`}</p>
+                        <p className="text-sm text-gray-500">{edu.startYear} - {edu.endYear || 'Present'}</p>
                       </div>
                     </div>
                   ))}
@@ -341,7 +343,7 @@ const UserProfile = () => {
                       key={idx} 
                       className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold"
                     >
-                      {skill.name || skill}
+                      {skill?.skill || skill?.name || skill}
                     </span>
                   ))}
                 </div>

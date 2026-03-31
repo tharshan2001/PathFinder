@@ -424,7 +424,7 @@ const SkillsTab = ({ skills, refresh }) => {
         <div className="flex flex-wrap gap-2">
           {skills.map((skill, idx) => (
             <span key={idx} className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold">
-              {skill.name || skill}
+              {skill?.skill || skill?.name || skill}
             </span>
           ))}
         </div>

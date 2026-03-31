@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import connectionApi from '../services/connectionApi';
 import chatApi from '../services/chatApi';
 import Navbar from '../components/Navbar';
-import { UserPlus, Check, X, User, MessageSquare, Trash2 } from 'lucide-react';
+import { Check, X, MessageSquare, UserPlus, Trash2, Search } from 'lucide-react';
 
 const Network = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ const Network = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -73,20 +74,12 @@ const Network = () => {
   };
 
   const handleMessage = async (recipientId) => {
-    // Ensure we have a valid string ID
     const userId = recipientId?._id || recipientId;
-    if (!userId) {
-      console.error('Recipient ID is missing', recipientId);
-      return;
-    }
+    if (!userId) return;
     try {
-      console.log('Creating chat with userId:', userId);
       const res = await chatApi.createOrGetChat(userId);
-      console.log('Chat API response:', res.data);
       if (res.data && res.data._id) {
         navigate('/messaging', { state: { chatId: res.data._id, chatData: res.data } });
-      } else {
-        console.error('Invalid response:', res.data);
       }
     } catch (err) {
       console.error('Error starting chat:', err);
@@ -99,21 +92,23 @@ const Network = () => {
     const recipientId = connection.recipient?._id || connection.recipient;
     
     if (requesterId === currentUserId) {
-      // Current user is requester, return recipient
       return {
         _id: recipientId,
         name: connection.recipient?.name || 'Unknown',
         headline: connection.recipient?.headline || ''
       };
-    } else {
-      // Current user is recipient, return requester
-      return {
-        _id: requesterId,
-        name: connection.requester?.name || 'Unknown',
-        headline: connection.requester?.headline || ''
-      };
     }
+    return {
+      _id: requesterId,
+      name: connection.requester?.name || 'Unknown',
+      headline: connection.requester?.headline || ''
+    };
   };
+
+  const filteredConnections = connections.filter(conn => {
+    const other = getOtherUser(conn);
+    return other.name?.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   if (loading) {
     return (
@@ -126,41 +121,42 @@ const Network = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="max-w-5xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">My Network</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left - Connections & Requests */}
-          <div className="md:col-span-2 space-y-4">
-            {/* Pending Requests */}
+      <main className="max-w-screen-xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Main Content */}
+          <div className="lg:col-span-9 flex flex-col gap-8">
+            {/* Pending Invitations */}
             {pendingRequests.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <h2 className="font-semibold text-gray-900 mb-3">
-                  Pending Requests ({pendingRequests.length})
-                </h2>
-                <div className="space-y-3">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-gray-900">Pending Invitations</h2>
+                  <button className="text-sm text-teal-600 font-semibold hover:underline">Manage All</button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {pendingRequests.map((request) => (
-                    <div key={request._id} className="flex gap-3 p-3 border rounded-lg">
-                      <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-semibold">
-                        {request.requester?.name?.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900">{request.requester?.name}</h4>
-                        <p className="text-sm text-gray-500 truncate">{request.requester?.headline || 'No headline'}</p>
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={() => handleAccept(request._id)}
-                            className="flex items-center gap-1 px-3 py-1 bg-teal-600 text-white rounded-full text-sm"
-                          >
-                            <Check size={14} /> Accept
-                          </button>
-                          <button
-                            onClick={() => handleReject(request._id)}
-                            className="flex items-center gap-1 px-3 py-1 border border-gray-300 text-gray-600 rounded-full text-sm"
-                          >
-                            <X size={14} /> Ignore
-                          </button>
+                    <div key={request._id} className="bg-white rounded-xl p-5 shadow-sm flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-bold text-lg">
+                          {request.requester?.name?.charAt(0).toUpperCase()}
                         </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">{request.requester?.name}</h4>
+                          <p className="text-sm text-gray-500">{request.requester?.headline || 'No headline'}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => handleReject(request._id)}
+                          className="px-4 py-2 bg-gray-100 text-gray-600 text-sm font-semibold rounded-lg hover:bg-gray-200"
+                        >
+                          Ignore
+                        </button>
+                        <button 
+                          onClick={() => handleAccept(request._id)}
+                          className="px-4 py-2 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700"
+                        >
+                          Accept
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -168,91 +164,127 @@ const Network = () => {
               </div>
             )}
 
+            {/* Search Connections */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <div className="relative">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search your connections..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
+
             {/* My Connections */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h2 className="font-semibold text-gray-900 mb-3">
-                Connections ({connections.length})
-              </h2>
-              {connections.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <User size={32} className="mx-auto mb-2 text-gray-400" />
-                  <p>No connections yet</p>
-                  <p className="text-sm">Start building your network</p>
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">My Connections ({connections.length})</h2>
+              {filteredConnections.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                  <p className="text-gray-500">No connections yet</p>
+                  <p className="text-sm text-gray-400">Start building your network</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {connections.map((connection) => {
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredConnections.map((connection) => {
                     const otherUser = getOtherUser(connection);
                     return (
-                      <div key={connection._id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
+                      <div key={connection._id} className="bg-white rounded-xl p-5 shadow-sm text-center flex flex-col items-center border border-transparent hover:border-teal-200 transition-all group">
                         <div 
                           onClick={() => navigate(`/profile/${otherUser._id}`)}
-                          className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-semibold cursor-pointer flex-shrink-0"
+                          className="w-20 h-20 rounded-full overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                         >
-                          {otherUser?.name?.charAt(0).toUpperCase()}
+                          <div className="w-full h-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold text-2xl">
+                            {otherUser?.name?.charAt(0).toUpperCase()}
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 
-                            onClick={() => navigate(`/profile/${otherUser._id}`)}
-                            className="font-medium text-gray-900 cursor-pointer hover:text-teal-600"
-                          >
-                            {otherUser?.name}
-                          </h4>
-                          <p className="text-sm text-gray-500 truncate">{otherUser?.headline || 'No headline'}</p>
-                        </div>
-                        <div className="flex gap-2 flex-shrink-0">
-                          <button 
-                            onClick={() => handleMessage(otherUser._id)}
-                            className="flex items-center gap-1 px-3 py-1.5 text-teal-600 hover:bg-teal-50 rounded text-sm border border-teal-200"
-                            title="Message"
-                          >
-                            <MessageSquare size={14} /> Message
-                          </button>
-                          <button 
-                            onClick={() => handleRemove(connection._id)}
-                            className="p-1.5 text-gray-400 hover:text-red-500"
-                            title="Remove"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
+                        <h4 
+                          onClick={() => navigate(`/profile/${otherUser._id}`)}
+                          className="font-bold text-gray-900 cursor-pointer hover:text-teal-600"
+                        >
+                          {otherUser?.name}
+                        </h4>
+                        <p className="text-sm text-gray-500 mb-4">{otherUser?.headline || 'No headline'}</p>
+                        <button 
+                          onClick={() => handleMessage(otherUser._id)}
+                          className="mt-auto w-full py-2 border border-teal-600 text-teal-600 text-sm font-semibold rounded-lg hover:bg-teal-50"
+                        >
+                          Message
+                        </button>
                       </div>
                     );
                   })}
                 </div>
               )}
             </div>
+
+            {/* People You May Know */}
+            {suggestions.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-gray-900">People You May Know</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {suggestions.map((person) => (
+                    <div key={person._id} className="bg-white rounded-xl p-5 shadow-sm text-center flex flex-col items-center border border-transparent hover:border-teal-200 transition-all group">
+                      <div className="w-20 h-20 rounded-full overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-2xl">
+                          {person.name?.charAt(0).toUpperCase()}
+                        </div>
+                      </div>
+                      <h4 className="font-bold text-gray-900 text-sm">{person.name}</h4>
+                      <p className="text-xs text-gray-500 mb-4">{person.headline || 'No headline'}</p>
+                      <button 
+                        onClick={() => handleConnect(person._id)}
+                        className="mt-auto w-full py-2 border border-teal-600 text-teal-600 text-sm font-semibold rounded-lg hover:bg-teal-50"
+                      >
+                        Connect
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Right - Suggestions */}
-          <div>
-            <div className="bg-white rounded-lg shadow-sm p-4 sticky top-20">
-              <h2 className="font-semibold text-gray-900 mb-3">People you may know</h2>
-              {suggestions.length === 0 ? (
-                <p className="text-sm text-gray-500">No suggestions available</p>
-              ) : (
-                <div className="space-y-3">
-                  {suggestions.map((person) => (
-                    <div key={person._id} className="flex gap-3">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-medium">
-                        {person.name?.charAt(0).toUpperCase()}
+          {/* Right Sidebar */}
+          <aside className="lg:col-span-3 flex flex-col gap-6">
+            {/* Similar Profiles */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-gray-900 text-sm mb-6">Similar Profiles</h3>
+              <div className="space-y-6">
+                {connections.slice(0, 3).map((connection) => {
+                  const otherUser = getOtherUser(connection);
+                  return (
+                    <div key={connection._id} className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold flex-shrink-0">
+                        {otherUser?.name?.charAt(0).toUpperCase()}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h5 className="font-medium text-sm text-gray-900 truncate">{person.name}</h5>
-                        <p className="text-xs text-gray-500 truncate">{person.headline || 'No headline'}</p>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-900">{otherUser?.name}</h4>
+                        <p className="text-[11px] text-gray-500 leading-tight">{otherUser?.headline || 'No headline'}</p>
                         <button 
-                          onClick={() => handleConnect(person._id)}
-                          className="mt-2 flex items-center gap-1 px-3 py-1 border border-teal-600 text-teal-600 rounded-full text-xs font-medium hover:bg-teal-50"
+                          onClick={() => handleMessage(otherUser._id)}
+                          className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-teal-600 hover:text-teal-700"
                         >
                           <UserPlus size={12} /> Connect
                         </button>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+
+            {/* Footer */}
+            <div className="px-4 flex flex-wrap gap-x-4 gap-y-2 opacity-50 text-xs">
+              <a className="font-medium hover:text-teal-600" href="#">About</a>
+              <a className="font-medium hover:text-teal-600" href="#">Privacy</a>
+              <a className="font-medium hover:text-teal-600" href="#">Accessibility</a>
+              <a className="font-medium hover:text-teal-600" href="#">Help Center</a>
+              <p className="w-full mt-2">© 2026 PathFinder</p>
+            </div>
+          </aside>
         </div>
       </main>
     </div>
