@@ -112,7 +112,6 @@ trendingSkillsSchema.virtual("salaryRange").get(function() {
 });
 
 // Indexes for performance
-trendingSkillsSchema.index({ skill: 1 }, { unique: true });
 trendingSkillsSchema.index({ demandScore: -1 });
 trendingSkillsSchema.index({ growthRate: -1 });
 trendingSkillsSchema.index({ category: 1, demandScore: -1 });

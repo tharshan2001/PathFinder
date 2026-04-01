@@ -14,27 +14,37 @@ export const createJob = async (req, res) => {
     await job.save();
 
     // Update job count in category if provided
-    if (job.category.industry) {
+    if (job.category?.industry) {
       await JobCategory.findOneAndUpdate(
-        { name: job.category.industry, type: "industry" },
-        { $inc: { jobCount: 1 } },
-        { upsert: true }
+          { name: job.category.industry, type: "industry" },
+          { $inc: { jobCount: 1 } },
+          { upsert: true }
       );
     }
 
     // Update trending skills for required skills
     if (job.skillsRequired && job.skillsRequired.length > 0) {
       for (const skill of job.skillsRequired) {
+        // Normalize to a string skill name
+        const skillName =
+            typeof skill === "string"
+                ? skill
+                : typeof skill === "object"
+                    ? skill.name
+                    : null;
+
+        if (!skillName) continue;
+
         await TrendingSkills.findOneAndUpdate(
-          { skill },
-          { 
-            $inc: { jobCount: 1 },
-            $setOnInsert: { 
-              skill,
-              demandScore: Math.min(100, (job.skillsRequired.length * 5))
-            }
-          },
-          { upsert: true }
+            { skill: skillName },
+            {
+              $inc: { jobCount: 1 },
+              $setOnInsert: {
+                skill: skillName,
+                demandScore: Math.min(100, job.skillsRequired.length * 5)
+              }
+            },
+            { upsert: true }
         );
       }
     }
@@ -70,44 +80,45 @@ export const getJobs = async (req, res) => {
     // Build query
     const isActiveBool = isActive === "true" || isActive === true;
     const query = { isActive: isActiveBool };
-    
+
     if (search) {
       query.$text = { $search: search };
     }
-    
+
     if (location) {
       query.location = { $regex: location, $options: "i" };
     }
-    
+
     if (industry) {
       query["category.industry"] = industry;
     }
-    
+
     if (role) {
       query["category.role"] = role;
     }
-    
+
     if (level) {
       query["category.level"] = level;
     }
-    
+
     if (employmentType) {
       query.employmentType = employmentType;
     }
-    
+
     if (remotePolicy) {
       query.remotePolicy = remotePolicy;
     }
-    
+
+    // Skills filter; if `skillsRequired` is an array of objects { name, level, ... }
     if (skills) {
       const skillsArray = Array.isArray(skills) ? skills : skills.split(",");
-      query.skillsRequired = { $in: skillsArray };
+      query["skillsRequired.name"] = { $in: skillsArray };
     }
-    
+
     if (salaryMin || salaryMax) {
       query["salary.min"] = {};
-      if (salaryMin) query["salary.min"].$gte = parseInt(salaryMin);
-      if (salaryMax) query["salary.max"] = { $lte: parseInt(salaryMax) };
+      if (salaryMin) query["salary.min"].$gte = parseInt(salaryMin, 10);
+      if (salaryMax) query["salary.max"] = { $lte: parseInt(salaryMax, 10) };
     }
 
     // Sort options
@@ -116,18 +127,18 @@ export const getJobs = async (req, res) => {
 
     // Execute query with pagination
     const jobs = await Job.find(query)
-      .populate("postedBy", "name headline profileMedia")
-      .sort(sort)
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+        .populate("postedBy", "name headline profileMedia")
+        .sort(sort)
+        .limit(Number(limit))
+        .skip((Number(page) - 1) * Number(limit));
 
     const total = await Job.countDocuments(query);
 
     res.json({
       jobs,
       pagination: {
-        current: parseInt(page),
-        pages: Math.ceil(total / limit),
+        current: Number(page),
+        pages: Math.ceil(total / Number(limit)),
         total
       }
     });
@@ -139,8 +150,10 @@ export const getJobs = async (req, res) => {
 // Get job by ID
 export const getJobById = async (req, res) => {
   try {
-    const job = await Job.findById(req.params.id)
-      .populate("postedBy", "name headline profileMedia companySize");
+    const job = await Job.findById(req.params.id).populate(
+        "postedBy",
+        "name headline profileMedia companySize"
+    );
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
@@ -159,11 +172,10 @@ export const getJobById = async (req, res) => {
 // Update job
 export const updateJob = async (req, res) => {
   try {
-    const job = await Job.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).populate("postedBy", "name headline profileMedia");
+    const job = await Job.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    }).populate("postedBy", "name headline profileMedia");
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
@@ -179,9 +191,9 @@ export const updateJob = async (req, res) => {
 export const deleteJob = async (req, res) => {
   try {
     const job = await Job.findByIdAndUpdate(
-      req.params.id,
-      { isActive: false },
-      { new: true }
+        req.params.id,
+        { isActive: false },
+        { new: true }
     );
 
     if (!job) {
@@ -189,10 +201,10 @@ export const deleteJob = async (req, res) => {
     }
 
     // Update job count in category
-    if (job.category.industry) {
+    if (job.category?.industry) {
       await JobCategory.findOneAndUpdate(
-        { name: job.category.industry, type: "industry" },
-        { $inc: { jobCount: -1 } }
+          { name: job.category.industry, type: "industry" },
+          { $inc: { jobCount: -1 } }
       );
     }
 
@@ -210,9 +222,9 @@ export const getFeaturedJobs = async (req, res) => {
     const { limit = 6 } = req.query;
 
     const jobs = await Job.find({ isActive: true, isFeatured: true })
-      .populate("postedBy", "name headline profileMedia")
-      .sort({ postedDate: -1 })
-      .limit(parseInt(limit));
+        .populate("postedBy", "name headline profileMedia")
+        .sort({ postedDate: -1 })
+        .limit(parseInt(limit, 10));
 
     res.json(jobs);
   } catch (error) {
@@ -228,9 +240,9 @@ export const getRecentJobs = async (req, res) => {
     const { limit = 10 } = req.query;
 
     const jobs = await Job.find({ isActive: true })
-      .populate("postedBy", "name headline profileMedia")
-      .sort({ postedDate: -1 })
-      .limit(parseInt(limit));
+        .populate("postedBy", "name headline profileMedia")
+        .sort({ postedDate: -1 })
+        .limit(parseInt(limit, 10));
 
     res.json(jobs);
   } catch (error) {
@@ -293,12 +305,7 @@ export const getJobStatistics = async (req, res) => {
 // Advanced job search
 export const searchJobs = async (req, res) => {
   try {
-    const {
-      q: searchQuery,
-      filters = {},
-      page = 1,
-      limit = 10
-    } = req.query;
+    const { q: searchQuery, filters = {}, page = 1, limit = 10 } = req.query;
 
     const query = { isActive: true };
 
@@ -308,7 +315,7 @@ export const searchJobs = async (req, res) => {
     }
 
     // Apply filters
-    Object.keys(filters).forEach(key => {
+    Object.keys(filters).forEach((key) => {
       if (filters[key]) {
         if (key.includes(".")) {
           const [parent, child] = key.split(".");
@@ -321,18 +328,22 @@ export const searchJobs = async (req, res) => {
     });
 
     const jobs = await Job.find(query)
-      .populate("postedBy", "name headline profileMedia")
-      .sort(searchQuery ? { score: { $meta: "textScore" } } : { postedDate: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
+        .populate("postedBy", "name headline profileMedia")
+        .sort(
+            searchQuery
+                ? { score: { $meta: "textScore" } }
+                : { postedDate: -1 }
+        )
+        .limit(Number(limit))
+        .skip((Number(page) - 1) * Number(limit));
 
     const total = await Job.countDocuments(query);
 
     res.json({
       jobs,
       pagination: {
-        current: parseInt(page),
-        pages: Math.ceil(total / limit),
+        current: Number(page),
+        pages: Math.ceil(total / Number(limit)),
         total
       }
     });
