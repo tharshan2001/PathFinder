@@ -16,6 +16,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import skillProfileRoutes from "./routes/userSkillProfileRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import courseRecommendationRoutes from "./routes/courseRecommendationRoutes.js";
 import jobApplicationRoutes from "./routes/jobApplicationRoutes.js";
@@ -45,6 +46,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/skill-profile", skillProfileRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/job-applications", jobApplicationRoutes);
 app.use("/api/job-categories", jobCategoryRoutes);
@@ -61,7 +63,10 @@ app.use("/api/forums", forumRoutes);
 // ---------------- Error Handling ----------------
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: "Server error", error: err.message });
+  res.status(500).json({
+    message: "Server error",
+    error: err.message,
+  });
 });
 
 // ---------------- Start Server ----------------
