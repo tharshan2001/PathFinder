@@ -8,6 +8,7 @@ import * as educationCtrl from "../controllers/user/educationController.js";
 import * as projectCtrl from "../controllers/user/projectController.js";
 import * as certificationCtrl from "../controllers/user/certificationController.js";
 import * as resumeCtrl from "../controllers/user/resumeController.js";
+import * as skillCtrl from "../controllers/user/skillController.js";
 import { singleResumeUpload } from "../middleware/uploadMiddleware.js";
 
 
@@ -44,6 +45,11 @@ router.get("/certification/all", certificationCtrl.getAllCertifications);
 router.post("/certification/add", certificationCtrl.addCertification);
 router.put("/certification/update", certificationCtrl.updateCertification);
 router.delete("/certification/delete", certificationCtrl.deleteCertification);
+
+// ------------------ Skills CRUD ------------------
+router.get("/skill/all", skillCtrl.getAllSkills);
+router.post("/skill/add", skillCtrl.addSkill);
+router.delete("/skill/delete", skillCtrl.deleteSkill);
 
 // ------------------ Resume / CV CRUD ------------------
 router.post("/resume/upload", singleResumeUpload("resume"), resumeCtrl.uploadResume);

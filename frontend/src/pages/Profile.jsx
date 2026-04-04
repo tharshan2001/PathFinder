@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import userApi from '../services/userApi';
 import Navbar from '../components/Navbar';
-import { MapPin, Briefcase, GraduationCap, Award, FolderGit2, Edit2, Plus, Trash2 } from 'lucide-react';
+import { MapPin, Briefcase, GraduationCap, Award, FolderGit2, Edit2, Plus, Trash2, FileText, Download, Upload } from 'lucide-react';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -58,37 +58,55 @@ const Profile = () => {
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          <div className="w-64 flex-shrink-0">
-            <div className="sticky top-20">
-              <div className="bg-white rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold">
-                    {profile?.name?.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{profile?.name}</h3>
-                    <p className="text-xs text-gray-500">{profile?.headline || 'Add headline'}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setEditing(true)}
-                  className="w-full py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
-                >
-                  Edit Profile
-                </button>
+        {/* Profile Header Card */}
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          {/* Banner */}
+          <div className="h-32 bg-gradient-to-r from-teal-500 to-teal-700 rounded-t-lg"></div>
+          
+          <div className="px-6 pb-6">
+            <div className="relative flex items-end -mt-12 mb-4">
+              <div className="w-24 h-24 bg-teal-600 rounded-full flex items-center justify-center text-white text-3xl font-semibold border-4 border-white">
+                {profile?.name?.charAt(0).toUpperCase()}
               </div>
+              <button
+                onClick={() => setEditing(true)}
+                className="ml-4 mb-2 px-4 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                Edit Profile
+              </button>
             </div>
+            
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">{profile?.name}</h1>
+              <p className="text-lg text-gray-600">{profile?.headline || 'Add headline'}</p>
+              
+              {profile?.location && (
+                <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                  <MapPin size={14} /> {profile.location}
+                </p>
+              )}
+              
+              <p className="text-sm text-teal-600 mt-1 font-medium">
+                {profile?.connectionsCount || 0} connections
+              </p>
+            </div>
+            
+            {profile?.about && (
+              <div className="mt-4 pt-4 border-t">
+                <h3 className="font-semibold text-gray-900 mb-2">About</h3>
+                <p className="text-gray-600 whitespace-pre-wrap">{profile.about}</p>
+              </div>
+            )}
           </div>
+        </div>
 
-          <div className="flex-1 space-y-4">
-            <AboutTab profile={profile} setProfile={setProfile} fetchProfile={fetchProfile} />
-            <ExperienceTab experience={profile?.experience || []} refresh={fetchProfile} />
-            <EducationTab education={profile?.education || []} refresh={fetchProfile} />
-            <SkillsTab skills={profile?.skills || []} refresh={fetchProfile} />
-            <ProjectsTab projects={profile?.projects || []} refresh={fetchProfile} />
-            <CertificationsTab certifications={profile?.certifications || []} refresh={fetchProfile} />
-          </div>
+        <div className="space-y-4">
+          <ExperienceTab experience={profile?.experience || []} refresh={fetchProfile} />
+          <EducationTab education={profile?.education || []} refresh={fetchProfile} />
+          <SkillsTab skills={profile?.skills || []} refresh={fetchProfile} />
+          <ProjectsTab projects={profile?.projects || []} refresh={fetchProfile} />
+          <CertificationsTab certifications={profile?.certifications || []} refresh={fetchProfile} />
+          <ResumesTab refresh={fetchProfile} />
         </div>
       </main>
 
@@ -156,57 +174,6 @@ const Profile = () => {
     </div>
   );
 };
-
-// About Tab
-const AboutTab = ({ profile, setProfile, fetchProfile }) => {
-  const [editing, setEditing] = useState(false);
-  const [about, setAbout] = useState(profile?.about || '');
-
-  const handleSave = async () => {
-    try {
-      await userApi.updateProfile({ about });
-      setProfile({ ...profile, about });
-      setEditing(false);
-    } catch (err) {
-      console.error('Error updating about:', err);
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-gray-900">About</h3>
-        {!editing && (
-          <button onClick={() => setEditing(true)} className="text-teal-600 font-semibold text-sm hover:underline">
-            Edit
-          </button>
-        )}
-      </div>
-      {editing ? (
-        <div>
-          <textarea
-            value={about}
-            onChange={(e) => setAbout(e.target.value)}
-            rows={6}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-500 outline-none"
-          />
-          <div className="flex gap-2 mt-2">
-            <button onClick={handleSave} className="px-4 py-1 bg-teal-600 text-white rounded-full font-semibold text-sm">
-              Save
-            </button>
-            <button onClick={() => setEditing(false)} className="px-4 py-1 border border-gray-300 rounded-full font-semibold text-sm">
-              Cancel
-            </button>
-          </div>
-        </div>
-      ) : (
-        <p className="text-gray-600 whitespace-pre-wrap">{profile?.about || 'Write a summary to highlight your professional background.'}</p>
-      )}
-    </div>
-  );
-};
-
-// Experience Tab
 
 // Experience Tab
 const ExperienceTab = ({ experience, refresh }) => {
@@ -388,9 +355,24 @@ const SkillsTab = ({ skills, refresh }) => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    console.log('Add skill API not implemented');
-    setShowForm(false);
-    refresh();
+    try {
+      await userApi.addSkill({ skill: formData.name, level: formData.level });
+      setShowForm(false);
+      setFormData({ name: '', level: 'Intermediate' });
+      refresh();
+    } catch (err) {
+      console.error('Error adding skill:', err);
+    }
+  };
+
+  const handleDelete = async (skillName) => {
+    if (!confirm(`Delete skill "${skillName}"?`)) return;
+    try {
+      await userApi.deleteSkill(skillName);
+      refresh();
+    } catch (err) {
+      console.error('Error deleting skill:', err);
+    }
   };
 
   return (
@@ -423,8 +405,11 @@ const SkillsTab = ({ skills, refresh }) => {
       ) : (
         <div className="flex flex-wrap gap-2">
           {skills.map((skill, idx) => (
-            <span key={idx} className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold">
+            <span key={idx} className="flex items-center gap-1 px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold">
               {skill?.skill || skill?.name || skill}
+              <button onClick={() => handleDelete(skill?.skill || skill?.name || skill)} className="ml-1 text-teal-400 hover:text-red-500">
+                <Trash2 size={12} />
+              </button>
             </span>
           ))}
         </div>
@@ -587,6 +572,109 @@ const CertificationsTab = ({ certifications, refresh }) => {
                     <Trash2 size={16} />
                   </button>
                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Resumes Tab
+const ResumesTab = ({ refresh }) => {
+  const [resumes, setResumes] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    fetchResumes();
+  }, []);
+
+  const fetchResumes = async () => {
+    try {
+      const res = await userApi.getResumes();
+      setResumes(res.data.resumes || []);
+    } catch (err) {
+      console.error('Error fetching resumes:', err);
+    }
+  };
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('resume', file);
+    
+    setUploading(true);
+    try {
+      await userApi.uploadResume(formData);
+      setShowForm(false);
+      fetchResumes();
+      refresh();
+    } catch (err) {
+      console.error('Error uploading resume:', err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this resume?')) return;
+    try {
+      await userApi.deleteResume(id);
+      fetchResumes();
+      refresh();
+    } catch (err) {
+      console.error('Error deleting resume:', err);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-gray-900">Resumes</h3>
+        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1 text-teal-600 font-semibold hover:underline">
+          <Plus size={16} /> Add
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 transition">
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <Upload className="w-8 h-8 text-gray-400 mb-2" />
+              <p className="text-sm text-gray-500">Click to upload PDF, DOC, or DOCX</p>
+            </div>
+            <input type="file" className="hidden" accept=".pdf,.doc,.docx" onChange={handleUpload} disabled={uploading} />
+          </label>
+          {uploading && <p className="text-center text-sm text-teal-600 mt-2">Uploading...</p>}
+        </div>
+      )}
+
+      {resumes.length === 0 ? (
+        <p className="text-gray-500">No resumes uploaded yet.</p>
+      ) : (
+        <div className="space-y-3">
+          {resumes.map((resume) => (
+            <div key={resume._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <FileText size={20} className="text-gray-500" />
+                  <div>
+                  <p className="font-medium text-gray-900">{resume.fileName}</p>
+                  <p className="text-xs text-gray-500">{new Date(resume.uploadedAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                {resume.fileUrl && (
+                  <a href={resume.fileUrl} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:text-teal-700">
+                    <Download size={18} />
+                  </a>
+                )}
+                <button onClick={() => handleDelete(resume._id)} className="text-gray-400 hover:text-red-500">
+                  <Trash2 size={18} />
+                </button>
               </div>
             </div>
           ))}

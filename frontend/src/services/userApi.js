@@ -33,7 +33,12 @@ export const userApi = {
   addCertification: (data) => api.post('/users/certification/add', data),
   updateCertification: (id, data) => api.put('/users/certification/update', { certificationId: id, ...data }),
   deleteCertification: (id) => api.delete(`/users/certification/delete?certificationId=${id}`),
-  
+
+  // Skills
+  getSkills: () => api.get('/users/skill/all'),
+  addSkill: (data) => api.post('/users/skill/add', data),
+  deleteSkill: (skillName) => api.delete(`/users/skill/delete?skillName=${encodeURIComponent(skillName)}`),
+
   // Resume
   getResumes: () => api.get('/users/resume/all'),
   uploadResume: (formData) => api.post('/users/resume/upload', formData, {

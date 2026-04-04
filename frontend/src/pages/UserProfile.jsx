@@ -5,7 +5,7 @@ import userApi from '../services/userApi';
 import connectionApi from '../services/connectionApi';
 import chatApi from '../services/chatApi';
 import Navbar from '../components/Navbar';
-import { UserPlus, Check, X, MapPin, MoreHorizontal } from 'lucide-react';
+import { UserPlus, Check, X, MapPin, MoreHorizontal, FileText, Download } from 'lucide-react';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -407,6 +407,36 @@ const UserProfile = () => {
                           <p className="text-sm text-gray-500">Credential ID: {cert.credentialId}</p>
                         )}
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Resumes */}
+            {profile.resumes?.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Resumes</h2>
+                <div className="space-y-3">
+                  {profile.resumes.map((resume) => (
+                    <div key={resume._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText size={20} className="text-gray-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">{resume.fileName}</p>
+                          <p className="text-xs text-gray-500">{new Date(resume.uploadedAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      {resume.fileUrl && (
+                        <a 
+                          href={resume.fileUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-teal-600 hover:text-teal-700"
+                        >
+                          <Download size={18} />
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
