@@ -9,10 +9,20 @@ export const uploadResume = async (req, res) => {
     // Upload to S3 (folder: resumes/)
     const url = await uploadToS3(req.file, "resumes/");
 
-    // Save resume URL to user's resumes array
+    // Save resume info to user's resumes array
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { $push: { resumes: { fileUrl: url, uploadedAt: new Date() } } },
+      { 
+        $push: { 
+          resumes: { 
+            fileName: req.file.originalname,
+            fileUrl: url,
+            fileType: req.file.mimetype,
+            fileSize: req.file.size,
+            uploadedAt: new Date() 
+          } 
+        } 
+      },
       { new: true },
     );
 

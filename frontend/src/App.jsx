@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import { useAuthStore } from './stores/authStore';
 import Home from './pages/Home';
 import Feed from './pages/Feed';
@@ -36,6 +37,8 @@ const GoogleCallback = () => {
     const handleCallback = async () => {
       const token = searchParams.get('token');
       if (token) {
+        // Save token to cookie for authStore to use
+        Cookies.set('token', token, { expires: 7 });
         await fetchUser();
       }
       navigate('/home', { replace: true });

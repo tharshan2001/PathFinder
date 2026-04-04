@@ -7,6 +7,9 @@ import connectDB from "./config/mongodb.js";
 import http from "http";
 import { initSocket } from "./controllers/message/chatController.js";
 
+// Import controllers to initialize passport strategies
+import "./controllers/user/googleAuthController.js";
+
 // Routes
 import userRoutes from "./routes/userRoutes.js";
 import connectionRoutes from "./routes/connectionRoutes.js";

@@ -55,7 +55,7 @@ export const getPublicProfile = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findById(userId).select(
-      "name headline about location profileMedia skills experience education certifications projects socialLinks connectionsCount profileViews"
+      "name headline about location profileMedia skills experience education certifications projects socialLinks connectionsCount profileViews resumes"
     );
     if (!user) return res.status(404).json({ message: "User not found" });
     
