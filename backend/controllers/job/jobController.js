@@ -198,7 +198,7 @@ export const deleteJob = async (req, res) => {
         { new: true }
     );
 
-    if (!job) {
+    if (!job) { // If job not found, return 404
       return res.status(404).json({ message: "Job not found" });
     }
 

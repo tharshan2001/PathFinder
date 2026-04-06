@@ -50,10 +50,6 @@ app.use("/api/job-categories", jobCategoryRoutes);
 app.use("/api/job-alerts", jobAlertRoutes);
 app.use("/api/trending-skills", trendingSkillsRoutes);
 
-app.use("/api/courses", courseRoutes);
-
-app.use("/api/chat", chatRoutes);
-app.use("/api/recommendations", recommendationRoutes);
 app.use("/api/course-recommendations", courseRecommendationRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/recommendations", recommendationRoutes);
