@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import JobAlert from "../../models/job/JobAlert.js";
 import Job from "../../models/job/Job.js";
 
+const isAdmin = (req) => String(req.user?.role || "").toLowerCase() === "admin";
+const isSelf = (req, userId) => String(req.user?.id) === String(userId);
+
 // ---------------------- Job Alert CRUD ----------------------
 
 // Create a new job alert
@@ -30,6 +33,10 @@ export const getUserJobAlerts = async (req, res) => {
     const { userId } = req.params;
     const { isActive = "true" } = req.query;
 
+    if (!isAdmin(req) && !isSelf(req, userId)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     const isActiveBool = isActive === "true" || isActive === true;
 
     const alerts = await JobAlert.find({ 
@@ -54,6 +61,11 @@ export const getJobAlertById = async (req, res) => {
       return res.status(404).json({ message: "Job alert not found" });
     }
 
+    const alertUserId = alert.user?._id || alert.user;
+    if (!isAdmin(req) && !isSelf(req, alertUserId)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     res.json(alert);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -63,15 +75,20 @@ export const getJobAlertById = async (req, res) => {
 // Update job alert
 export const updateJobAlert = async (req, res) => {
   try {
+    const existing = await JobAlert.findById(req.params.id).select("user");
+    if (!existing) {
+      return res.status(404).json({ message: "Job alert not found" });
+    }
+
+    if (!isAdmin(req) && !isSelf(req, existing.user)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     const alert = await JobAlert.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
     ).populate("user", "name email");
-
-    if (!alert) {
-      return res.status(404).json({ message: "Job alert not found" });
-    }
 
     res.json({ message: "Job alert updated successfully", alert });
   } catch (error) {
@@ -82,11 +99,17 @@ export const updateJobAlert = async (req, res) => {
 // Delete job alert
 export const deleteJobAlert = async (req, res) => {
   try {
-    const alert = await JobAlert.findByIdAndDelete(req.params.id);
+    const alert = await JobAlert.findById(req.params.id);
 
     if (!alert) {
       return res.status(404).json({ message: "Job alert not found" });
     }
+
+    if (!isAdmin(req) && !isSelf(req, alert.user)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    await JobAlert.findByIdAndDelete(req.params.id);
 
     res.json({ message: "Job alert deleted successfully" });
   } catch (error) {
@@ -97,15 +120,20 @@ export const deleteJobAlert = async (req, res) => {
 // Toggle job alert active status
 export const toggleJobAlert = async (req, res) => {
   try {
+    const existing = await JobAlert.findById(req.params.id).select("user");
+    if (!existing) {
+      return res.status(404).json({ message: "Job alert not found" });
+    }
+
+    if (!isAdmin(req) && !isSelf(req, existing.user)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     const alert = await JobAlert.findByIdAndUpdate(
       req.params.id,
       { isActive: req.body.isActive },
       { new: true }
     ).populate("user", "name email");
-
-    if (!alert) {
-      return res.status(404).json({ message: "Job alert not found" });
-    }
 
     res.json({ message: `Job alert ${alert.isActive ? "activated" : "deactivated"}`, alert });
   } catch (error) {
@@ -118,12 +146,16 @@ export const toggleJobAlert = async (req, res) => {
 // Find matching jobs for an alert
 export const findMatchingJobs = async (req, res) => {
   try {
-    const { alertId } = req.params;
+    const { id: alertId } = req.params;
     const { limit = 10 } = req.query;
 
     const alert = await JobAlert.findById(alertId);
     if (!alert) {
       return res.status(404).json({ message: "Job alert not found" });
+    }
+
+    if (!isAdmin(req) && !isSelf(req, alert.user)) {
+      return res.status(403).json({ message: "Access denied" });
     }
 
     // Build job query based on alert criteria
@@ -184,9 +216,20 @@ export const findMatchingJobs = async (req, res) => {
       jobQuery["skillsRequired.name"] = { $in: alert.skills };
     }
 
-    // Companies filter
-    if (alert.companies && alert.companies.length > 0) {
-      jobQuery.company = { $in: alert.companies };
+    // Companies include/exclude filters
+    if (
+      (alert.companies && alert.companies.length > 0) ||
+      (alert.excludeCompanies && alert.excludeCompanies.length > 0)
+    ) {
+      jobQuery.company = {};
+
+      if (alert.companies && alert.companies.length > 0) {
+        jobQuery.company.$in = alert.companies;
+      }
+
+      if (alert.excludeCompanies && alert.excludeCompanies.length > 0) {
+        jobQuery.company.$nin = alert.excludeCompanies;
+      }
     }
 
     // Exclude keywords
@@ -200,11 +243,6 @@ export const findMatchingJobs = async (req, res) => {
           ]
         });
       });
-    }
-
-    // Exclude companies
-    if (alert.excludeCompanies && alert.excludeCompanies.length > 0) {
-      jobQuery.company = { $nin: alert.excludeCompanies };
     }
 
     const matchingJobs = await Job.find(jobQuery)
@@ -233,6 +271,10 @@ export const findMatchingJobs = async (req, res) => {
 // Process all active alerts (for cron job)
 export const processAllAlerts = async (req, res) => {
   try {
+    if (req.user?.role !== "admin") {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
     const { frequency } = req.query; // instant, daily, weekly
     
     const query = { isActive: true };
@@ -309,7 +351,17 @@ export const getAlertStatistics = async (req, res) => {
 
     const matchStage = {};
     if (userId) {
+      if (!mongoose.isValidObjectId(userId)) {
+        return res.status(400).json({ message: "Invalid userId" });
+      }
+
+      if (!isAdmin(req) && !isSelf(req, userId)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
       matchStage.user = new mongoose.Types.ObjectId(userId);
+    } else if (!isAdmin(req)) {
+      matchStage.user = new mongoose.Types.ObjectId(req.user.id);
     }
 
     const stats = await JobAlert.aggregate([
