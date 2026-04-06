@@ -1,4 +1,6 @@
 import Job from "../../models/job/Job.js";
+import JobCategory from "../../models/job/JobCategory.js";
+import TrendingSkills from "../../models/job/TrendingSkills.js";
 
 // ---------------------- Job CRUD ----------------------
 
