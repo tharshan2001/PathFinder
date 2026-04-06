@@ -19,7 +19,7 @@ const chatSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Ensure one chat per user pair
+// Ensure one chat per user pair (both orderings)
 chatSchema.index({ participants: 1 }, { unique: true });
 
 export default mongoose.model("Chat", chatSchema);

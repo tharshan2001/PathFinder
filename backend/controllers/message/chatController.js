@@ -26,17 +26,61 @@ export const initSocket = (server) => {
 // -------------------- Chat/Message Controllers --------------------
 
 export const createOrGetChat = async (req, res) => {
-  const { receiverId } = req.body;
-  const senderId = req.user.id;
+  let { receiverId } = req.body;
+  let senderId = req.user.id;
+
+  // Convert to strings and handle objects
+  if (typeof receiverId === 'object' && receiverId !== null) {
+    receiverId = String(receiverId._id || receiverId.id || receiverId);
+  }
+  senderId = String(senderId);
+
+  // Remove any non-ObjectId characters
+  receiverId = receiverId.replace(/[^0-9a-f]/gi, '');
+  senderId = senderId.replace(/[^0-9a-f]/gi, '');
+
+  console.log('Creating chat - sender:', senderId, 'receiver:', receiverId);
+
+  if (!receiverId || receiverId.length !== 24) {
+    return res.status(400).json({ message: "Invalid Receiver ID" });
+  }
 
   try {
-    let chat = await Chat.findOne({ participants: { $all: [senderId, receiverId] } });
+    // Find existing chat
+    let chat = await Chat.findOne({
+      $or: [
+        { participants: [senderId, receiverId] },
+        { participants: [receiverId, senderId] }
+      ]
+    });
 
-    if (!chat) chat = await Chat.create({ participants: [senderId, receiverId] });
+    if (chat) {
+      console.log('Found existing chat:', chat._id);
+      return res.status(200).json(chat);
+    }
 
-    res.status(200).json(chat);
-  } catch (error) {
-    res.status(500).json({ message: "Error creating or fetching chat", error: error.message });
+    // Try to create new chat
+    chat = await Chat.create({ participants: [senderId, receiverId] });
+    console.log('Created new chat:', chat._id);
+    return res.status(200).json(chat);
+
+  } catch (createError) {
+    console.log('Create error:', createError.message);
+    if (createError.code === 11000) {
+      // Chat exists, find it
+      const chat = await Chat.findOne({
+        $or: [
+          { participants: [senderId, receiverId] },
+          { participants: [receiverId, senderId] }
+        ]
+      });
+      console.log('Found chat after duplicate:', chat?._id);
+      if (chat) {
+        return res.status(200).json(chat);
+      }
+    }
+    console.error('Chat error:', createError);
+    res.status(500).json({ message: "Error creating or fetching chat", error: createError.message });
   }
 };
 

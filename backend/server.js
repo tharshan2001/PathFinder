@@ -7,22 +7,29 @@ import connectDB from "./config/mongodb.js";
 import http from "http";
 import { initSocket } from "./controllers/message/chatController.js";
 
+// Import controllers to initialize passport strategies
+import "./controllers/user/googleAuthController.js";
+
 // Routes
 import userRoutes from "./routes/userRoutes.js";
 import connectionRoutes from "./routes/connectionRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
-
 import skillProfileRoutes from "./routes/userSkillProfileRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
+import enrollmentRoutes from "./routes/enrollmentRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import courseRecommendationRoutes from "./routes/courseRecommendationRoutes.js";
 import jobApplicationRoutes from "./routes/jobApplicationRoutes.js";
 import jobCategoryRoutes from "./routes/jobCategoryRoutes.js";
 import jobAlertRoutes from "./routes/jobAlertRoutes.js";
 import trendingSkillsRoutes from "./routes/trendingSkillsRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import learningPathRoutes from "./routes/learningPathRoutes.js";
+import forumRoutes from "./routes/forumRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -42,23 +49,28 @@ app.use("/api/users", userRoutes);
 app.use("/api/skill-profile", skillProfileRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/jobs", jobRoutes);
-
+app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/courses", courseRoutes);
-
 app.use("/api/job-applications", jobApplicationRoutes);
 app.use("/api/job-categories", jobCategoryRoutes);
 app.use("/api/job-alerts", jobAlertRoutes);
 app.use("/api/trending-skills", trendingSkillsRoutes);
 
-app.use("/api/course-recommendations", courseRecommendationRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/recommendations", recommendationRoutes);
-app.use("/api/recommendations", courseRecommendationRoutes);
+app.use("/api/course-recommendations", courseRecommendationRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/learning-paths", learningPathRoutes);
+app.use("/api/forums", forumRoutes);
+
 // ---------------- Error Handling ----------------
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: "Server error", error: err.message });
+  res.status(500).json({
+    message: "Server error",
+    error: err.message,
+  });
 });
 
 // ---------------- Start Server ----------------

@@ -8,6 +8,7 @@ import * as educationCtrl from "../controllers/user/educationController.js";
 import * as projectCtrl from "../controllers/user/projectController.js";
 import * as certificationCtrl from "../controllers/user/certificationController.js";
 import * as resumeCtrl from "../controllers/user/resumeController.js";
+import * as skillCtrl from "../controllers/user/skillController.js";
 import { singleResumeUpload } from "../middleware/uploadMiddleware.js";
 
 
@@ -45,6 +46,11 @@ router.post("/certification/add", certificationCtrl.addCertification);
 router.put("/certification/update", certificationCtrl.updateCertification);
 router.delete("/certification/delete", certificationCtrl.deleteCertification);
 
+// ------------------ Skills CRUD ------------------
+router.get("/skill/all", skillCtrl.getAllSkills);
+router.post("/skill/add", skillCtrl.addSkill);
+router.delete("/skill/delete", skillCtrl.deleteSkill);
+
 // ------------------ Resume / CV CRUD ------------------
 router.post("/resume/upload", singleResumeUpload("resume"), resumeCtrl.uploadResume);
 
@@ -53,5 +59,24 @@ router.get("/resume/all", resumeCtrl.getAllResumes);
 
 // Delete resume
 router.delete("/resume/delete", resumeCtrl.deleteResume);
+
+// ------------------ Save/Bookmark Routes ------------------
+router.post("/save/course/:courseId", userCtrl.saveCourse);
+router.delete("/save/course/:courseId", userCtrl.unsaveCourse);
+router.post("/save/job/:jobId", userCtrl.saveJob);
+router.delete("/save/job/:jobId", userCtrl.unsaveJob);
+router.get("/saved/courses", userCtrl.getSavedCourses);
+router.get("/saved/jobs", userCtrl.getSavedJobs);
+
+// ------------------ Learning Path Routes ------------------
+router.post("/enroll/path/:pathId", userCtrl.enrollInPath);
+router.put("/progress/path/:pathId", userCtrl.updatePathProgress);
+router.get("/enrolled/paths", userCtrl.getEnrolledPaths);
+
+// ------------------ Public Profile (no auth) ------------------
+router.get("/public/:userId", userCtrl.getPublicProfile);
+
+// ------------------ User Suggestions ------------------
+router.get("/suggestions", userCtrl.getUserSuggestions);
 
 export default router;
