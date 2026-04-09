@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { isAdminUser } from "../utils/adminAuth.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const COOKIE_NAME = "token";
@@ -49,6 +50,18 @@ export const authorizeRoles = (...roles) => (req, res, next) => {
 
   if (!hasRole(req, roles)) {
     return res.status(403).json({ message: "Access denied" });
+  }
+
+  next();
+};
+
+export const authorizeAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "Authentication required" });
+  }
+
+  if (!isAdminUser(req.user)) {
+    return res.status(403).json({ message: "Admin access required" });
   }
 
   next();

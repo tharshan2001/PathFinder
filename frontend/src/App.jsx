@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './stores/authStore';
 
 // Pages
 import Home from './pages/Home';
@@ -15,11 +16,35 @@ import RecommendedJobs from './pages/RecommendedJobs';
 import SkillGapAnalysis from './pages/SkillGapAnalysis';
 import RecommendedCourses from './pages/RecommendedCourses';
 import Notifications from './pages/Notifications';
+import CourseAdmin from './pages/CourseAdmin';
+import { isAdminUser } from './utils/adminAuth';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
 import GoogleCallback from './components/GoogleCallback';
 import AppLayout from './components/AppLayout';
+
+const AdminRoute = ({ children }) => {
+  const { user, hasFetchedUser } = useAuthStore();
+
+  if (!hasFetchedUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!isAdminUser(user)) {
+    return <Navigate to="/courses" replace />;
+  }
+
+  return children;
+};
 
 function App() {
   return (
@@ -27,11 +52,12 @@ function App() {
       {/* Landing page - no sidebar */}
       <Route path="/" element={<Home />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
-      
+
       {/* All protected routes with sidebar layout */}
       <Route path="/home" element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>}/>
       <Route path="/forums" element={<ProtectedRoute><AppLayout><Forums /></AppLayout></ProtectedRoute>}/>
       <Route path="/courses" element={<ProtectedRoute><AppLayout><Courses /></AppLayout></ProtectedRoute>}/>
+      <Route path="/courses/admin" element={<AdminRoute><AppLayout><CourseAdmin /></AppLayout></AdminRoute>}/>
       <Route path="/jobs" element={<ProtectedRoute><AppLayout><JobMarket /></AppLayout></ProtectedRoute>}/>
       <Route path="/skill-profile" element={<ProtectedRoute><AppLayout><SkillProfile /></AppLayout></ProtectedRoute>}/>
       <Route path="/recommended-jobs" element={<ProtectedRoute><AppLayout><RecommendedJobs /></AppLayout></ProtectedRoute>}/>
@@ -43,7 +69,6 @@ function App() {
       <Route path="/profile/:userId" element={<ProtectedRoute><AppLayout><UserProfile /></AppLayout></ProtectedRoute>}/>
       <Route path="/messaging" element={<ProtectedRoute><AppLayout><Messaging /></AppLayout></ProtectedRoute>}/>
       <Route path="/notifications" element={<ProtectedRoute><AppLayout><Notifications /></AppLayout></ProtectedRoute>}/>
-      
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );

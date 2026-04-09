@@ -6,6 +6,7 @@ const courseSchema = new mongoose.Schema(
     category: { type: String, required: true, trim: true },
     description: { type: String, required: true },
     provider: { type: String, required: true, trim: true },
+    courseUrl: { type: String, required: true, trim: true },
     level: {
       type: String,
       required: true,

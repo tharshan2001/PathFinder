@@ -13,6 +13,7 @@ router.post("/enroll/:courseId", authenticateJWT, enrollInCourse);
 
 // get enrollments by userId (temporary)
 router.get("/user/:userId", authenticateJWT, getMyEnrollments);
+router.get("/my", authenticateJWT, getMyEnrollments);
 
 // update progress
 router.put("/progress/:enrollmentId", authenticateJWT, updateProgress);
