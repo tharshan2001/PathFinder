@@ -4,16 +4,17 @@ import {
   getMyEnrollments,
   updateProgress,
 } from "../controllers/course/enrollmentController.js";
+import { authenticateJWT } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // enroll in a course
-router.post("/enroll/:courseId", enrollInCourse);
+router.post("/enroll/:courseId", authenticateJWT, enrollInCourse);
 
 // get enrollments by userId (temporary)
-router.get("/user/:userId", getMyEnrollments);
+router.get("/user/:userId", authenticateJWT, getMyEnrollments);
 
 // update progress
-router.put("/progress/:enrollmentId", updateProgress);
+router.put("/progress/:enrollmentId", authenticateJWT, updateProgress);
 
 export default router;

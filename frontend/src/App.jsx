@@ -10,6 +10,7 @@ import Network from './pages/Network';
 import UserProfile from './pages/UserProfile';
 import Messaging from './pages/Messaging';
 import Forums from './pages/Forums';
+import Courses from './pages/Courses';
 
 const ProtectedRoute = ({ children }) => {
   const { user, hasFetchedUser } = useAuthStore();
@@ -108,7 +109,7 @@ function App() {
         path="/courses" 
         element={
           <ProtectedRoute>
-            <Feed />
+            <Courses />
           </ProtectedRoute>
         } 
       />
