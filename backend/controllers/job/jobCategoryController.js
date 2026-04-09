@@ -16,7 +16,7 @@ export const createJobCategory = async (req, res) => {
 // Get all job categories
 export const getJobCategories = async (req, res) => {
   try {
-    const { type, isActive = true } = req.query;
+    const { type, isActive = "true" } = req.query;
     
     const query = { isActive: isActive === "true" };
     if (type) {
@@ -88,7 +88,7 @@ export const deleteJobCategory = async (req, res) => {
 export const getCategoriesByType = async (req, res) => {
   try {
     const { type } = req.params;
-    const { isActive = true } = req.query;
+    const { isActive = "true" } = req.query;
 
     const categories = await JobCategory.find({ 
       type, 

@@ -4,7 +4,7 @@ import Course from "../../models/course/Course.js";
 // POST /api/enrollments/enroll/:courseId
 export const enrollInCourse = async (req, res, next) => {
   try {
-    const { userId } = req.body;  // from body temporarily
+    const userId = req.user?.id || req.body.userId;
     const { courseId } = req.params;
 
     if (!userId) {
@@ -33,7 +33,7 @@ export const enrollInCourse = async (req, res, next) => {
 // GET /api/enrollments/user/:userId
 export const getMyEnrollments = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user?.id || req.params.userId;
 
     const enrollments = await Enrollment.find({ userId })
       .populate("courseId")
@@ -50,6 +50,7 @@ export const updateProgress = async (req, res, next) => {
   try {
     const { enrollmentId } = req.params;
     const { progress } = req.body;
+    const userId = req.user?.id;
 
     if (progress === undefined) {
       return res.status(400).json({ message: "progress is required" });
@@ -60,6 +61,10 @@ export const updateProgress = async (req, res, next) => {
 
     const enrollment = await Enrollment.findById(enrollmentId);
     if (!enrollment) return res.status(404).json({ message: "Enrollment not found" });
+
+    if (userId && String(enrollment.userId) !== String(userId)) {
+      return res.status(403).json({ message: "You can only update your own enrollment progress" });
+    }
 
     enrollment.progress = progress;
 

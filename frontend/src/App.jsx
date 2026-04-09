@@ -4,11 +4,13 @@ import Cookies from 'js-cookie';
 import { useAuthStore } from './stores/authStore';
 import Home from './pages/Home';
 import Feed from './pages/Feed';
+import JobMarket from './pages/JobMarket';
 import Profile from './pages/Profile';
 import Network from './pages/Network';
 import UserProfile from './pages/UserProfile';
 import Messaging from './pages/Messaging';
 import Forums from './pages/Forums';
+import Courses from './pages/Courses';
 import Notifications from './pages/Notifications';
 
 const ProtectedRoute = ({ children }) => {
@@ -55,8 +57,30 @@ const GoogleCallback = () => {
   );
 };
 
+const JobsRoute = () => {
+  const { user, hasFetchedUser } = useAuthStore();
+  const [searchParams] = useSearchParams();
+
+  const guestRequested = searchParams.get('guest') === '1';
+  const guestMode = import.meta.env.DEV && guestRequested && !user;
+
+  if (!hasFetchedUser && !guestMode) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+      </div>
+    );
+  }
+
+  if (!user && !guestMode) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <JobMarket guestMode={guestMode} />;
+};
+
 function App() {
-  const { fetchUser, user } = useAuthStore();
+  const { fetchUser } = useAuthStore();
 
   useEffect(() => {
     fetchUser();
@@ -86,17 +110,13 @@ function App() {
         path="/courses" 
         element={
           <ProtectedRoute>
-            <Feed />
+            <Courses />
           </ProtectedRoute>
         } 
       />
       <Route 
         path="/jobs" 
-        element={
-          <ProtectedRoute>
-            <Feed />
-          </ProtectedRoute>
-        } 
+        element={<JobsRoute />} 
       />
       <Route 
         path="/learning" 

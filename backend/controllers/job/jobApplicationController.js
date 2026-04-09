@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import JobApplication from "../../models/job/JobApplication.js";
 import Job from "../../models/job/Job.js";
 
+const isAdmin = (req) => String(req.user?.role || "").toLowerCase() === "admin";
+const isSelf = (req, userId) => String(req.user?.id) === String(userId);
+
 // ---------------------- Job Application CRUD ----------------------
 
 // Submit a job application
@@ -92,6 +95,10 @@ export const getUserApplications = async (req, res) => {
     const { userId } = req.params;
     const { status, page = 1, limit = 10 } = req.query;
 
+    if (!isAdmin(req) && !isSelf(req, userId)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     const query = { applicant: userId };
     if (status) {
       query.status = status;
@@ -128,6 +135,11 @@ export const getApplicationById = async (req, res) => {
 
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
+    }
+
+    const applicantId = application.applicant?._id || application.applicant;
+    if (!isAdmin(req) && !isSelf(req, applicantId)) {
+      return res.status(403).json({ message: "Access denied" });
     }
 
     res.json(application);
@@ -225,20 +237,26 @@ export const addCommunication = async (req, res) => {
 // Withdraw application
 export const withdrawApplication = async (req, res) => {
   try {
-    const application = await JobApplication.findByIdAndUpdate(
-      req.params.id,
-      { status: "withdrawn" },
-      { new: true }
-    );
+    const application = await JobApplication.findById(req.params.id);
 
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
     }
 
+    if (!isAdmin(req) && !isSelf(req, application.applicant)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const wasWithdrawn = application.status === "withdrawn";
+    application.status = "withdrawn";
+    await application.save();
+
     // Update job application count
-    await Job.findByIdAndUpdate(application.job, {
-      $inc: { applicationsCount: -1 }
-    });
+    if (!wasWithdrawn) {
+      await Job.findByIdAndUpdate(application.job, {
+        $inc: { applicationsCount: -1 }
+      });
+    }
 
     res.json({ message: "Application withdrawn", application });
   } catch (error) {
@@ -273,9 +291,30 @@ export const getApplicationStatistics = async (req, res) => {
   try {
     const { jobId, userId } = req.query;
 
+    if (!isAdmin(req) && jobId) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     let matchStage = {};
-    if (jobId) matchStage.job = new mongoose.Types.ObjectId(jobId);
-    if (userId) matchStage.applicant = new mongoose.Types.ObjectId(userId);
+    if (jobId) {
+      if (!mongoose.isValidObjectId(jobId)) {
+        return res.status(400).json({ message: "Invalid jobId" });
+      }
+      matchStage.job = new mongoose.Types.ObjectId(jobId);
+    }
+    if (userId) {
+      if (!mongoose.isValidObjectId(userId)) {
+        return res.status(400).json({ message: "Invalid userId" });
+      }
+
+      if (!isAdmin(req) && !isSelf(req, userId)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      matchStage.applicant = new mongoose.Types.ObjectId(userId);
+    } else if (!isAdmin(req)) {
+      matchStage.applicant = new mongoose.Types.ObjectId(req.user.id);
+    }
 
     const stats = await JobApplication.aggregate([
       { $match: matchStage },

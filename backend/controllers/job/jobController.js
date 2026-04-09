@@ -1,4 +1,6 @@
 import Job from "../../models/job/Job.js";
+import JobCategory from "../../models/job/JobCategory.js";
+import TrendingSkills from "../../models/job/TrendingSkills.js";
 
 // ---------------------- Job CRUD ----------------------
 
@@ -196,7 +198,7 @@ export const deleteJob = async (req, res) => {
         { new: true }
     );
 
-    if (!job) {
+    if (!job) { // If job not found, return 404
       return res.status(404).json({ message: "Job not found" });
     }
 
