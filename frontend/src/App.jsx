@@ -11,6 +11,10 @@ import UserProfile from './pages/UserProfile';
 import Messaging from './pages/Messaging';
 import Forums from './pages/Forums';
 import Courses from './pages/Courses';
+import SkillProfile from './pages/SkillProfile';
+import RecommendedJobs from './pages/RecommendedJobs';
+import SkillGapAnalysis from './pages/SkillGapAnalysis';
+import RecommendedCourses from './pages/RecommendedCourses';
 
 const ProtectedRoute = ({ children }) => {
   const { user, hasFetchedUser } = useAuthStore();
@@ -116,6 +120,38 @@ function App() {
       <Route 
         path="/jobs" 
         element={<JobsRoute />} 
+      />
+      <Route
+        path="/skill-profile"
+        element={
+          <ProtectedRoute>
+            <SkillProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/recommended-jobs"
+        element={
+          <ProtectedRoute>
+            <RecommendedJobs />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/skill-gap-analysis"
+        element={
+          <ProtectedRoute>
+            <SkillGapAnalysis />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/recommended-courses"
+        element={
+          <ProtectedRoute>
+            <RecommendedCourses />
+          </ProtectedRoute>
+        }
       />
       <Route 
         path="/learning" 

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
   BarChart3,
@@ -96,6 +97,8 @@ const emptyApplicationForm = {
 };
 
 function JobMarket({ guestMode = false }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const deepLinkJobId = searchParams.get('jobId');
   const { user } = useAuthStore();
   const currentUserId = user?._id || user?.id;
   const isGuestMode = guestMode && !currentUserId;
@@ -133,6 +136,7 @@ function JobMarket({ guestMode = false }) {
   const [showJobDetails, setShowJobDetails] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [jobDetailsLoading, setJobDetailsLoading] = useState(false);
+  const [highlightedJobId, setHighlightedJobId] = useState('');
 
   const [showApply, setShowApply] = useState(false);
   const [applyingJob, setApplyingJob] = useState(null);
@@ -664,6 +668,28 @@ function JobMarket({ guestMode = false }) {
       setJobDetailsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!deepLinkJobId) return;
+
+    if (activeTab !== 'jobs') {
+      setActiveTab('jobs');
+    }
+  }, [deepLinkJobId, activeTab]);
+
+  useEffect(() => {
+    if (!deepLinkJobId || activeTab !== 'jobs' || jobsLoading) return;
+
+    const target = document.getElementById(`job-card-${deepLinkJobId}`);
+    if (!target) return;
+
+    setHighlightedJobId(deepLinkJobId);
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    const next = new URLSearchParams(searchParams);
+    next.delete('jobId');
+    setSearchParams(next, { replace: true });
+  }, [deepLinkJobId, activeTab, jobsLoading, jobs, searchParams, setSearchParams]);
 
   const openEditJob = async (jobId) => {
     if (!isAdmin) {
@@ -1461,7 +1487,15 @@ function JobMarket({ guestMode = false }) {
                 </div>
               ) : (
                 jobs.map((job) => (
-                  <article key={job._id} className="bg-white rounded-xl border shadow-sm p-4 hover:border-teal-300 transition">
+                  <article
+                    id={`job-card-${job._id}`}
+                    key={job._id}
+                    className={`bg-white rounded-xl border shadow-sm p-4 transition ${
+                      highlightedJobId === job._id
+                        ? 'border-teal-400 ring-2 ring-teal-100'
+                        : 'hover:border-teal-300'
+                    }`}
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-start gap-3">
                         <div className="h-10 w-10 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center text-sm font-semibold shrink-0">
