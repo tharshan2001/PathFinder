@@ -113,7 +113,7 @@ const Network = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb5]"></div>
       </div>
     );
   }
@@ -130,13 +130,13 @@ const Network = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-gray-900">Pending Invitations</h2>
-                  <button className="text-sm text-teal-600 font-semibold hover:underline">Manage All</button>
+                  <button className="text-sm text-[#005eb5] font-semibold hover:underline">Manage All</button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {pendingRequests.map((request) => (
                     <div key={request._id} className="bg-white rounded-xl p-5 shadow-sm flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-bold text-lg">
+                        <div className="w-14 h-14 bg-[#d6e3ff] rounded-full flex items-center justify-center text-[#005eb5] font-bold text-lg">
                           {request.requester?.name?.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -153,7 +153,7 @@ const Network = () => {
                         </button>
                         <button 
                           onClick={() => handleAccept(request._id)}
-                          className="px-4 py-2 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700"
+                          className="px-4 py-2 bg-[#005eb5] text-white text-sm font-semibold rounded-lg hover:bg-[#004c99]"
                         >
                           Accept
                         </button>
@@ -173,7 +173,7 @@ const Network = () => {
                   placeholder="Search your connections..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#005eb5] focus:border-transparent outline-none"
                 />
               </div>
             </div>
@@ -191,25 +191,25 @@ const Network = () => {
                   {filteredConnections.map((connection) => {
                     const otherUser = getOtherUser(connection);
                     return (
-                      <div key={connection._id} className="bg-white rounded-xl p-5 shadow-sm text-center flex flex-col items-center border border-transparent hover:border-teal-200 transition-all group">
+                      <div key={connection._id} className="bg-white rounded-xl p-5 shadow-sm text-center flex flex-col items-center border border-transparent hover:border-[#d6e3ff] transition-all group">
                         <div 
                           onClick={() => navigate(`/profile/${otherUser._id}`)}
                           className="w-20 h-20 rounded-full overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                         >
-                          <div className="w-full h-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold text-2xl">
+                          <div className="w-full h-full bg-[#d6e3ff] flex items-center justify-center text-[#005eb5] font-bold text-2xl">
                             {otherUser?.name?.charAt(0).toUpperCase()}
                           </div>
                         </div>
                         <h4 
                           onClick={() => navigate(`/profile/${otherUser._id}`)}
-                          className="font-bold text-gray-900 cursor-pointer hover:text-teal-600"
+                          className="font-bold text-gray-900 cursor-pointer hover:text-[#005eb5]"
                         >
                           {otherUser?.name}
                         </h4>
                         <p className="text-sm text-gray-500 mb-4">{otherUser?.headline || 'No headline'}</p>
                         <button 
                           onClick={() => handleMessage(otherUser._id)}
-                          className="mt-auto w-full py-2 border border-teal-600 text-teal-600 text-sm font-semibold rounded-lg hover:bg-teal-50"
+                          className="mt-auto w-full py-2 border border-[#005eb5] text-[#005eb5] text-sm font-semibold rounded-lg hover:bg-[#d6e3ff]"
                         >
                           Message
                         </button>
@@ -226,7 +226,7 @@ const Network = () => {
                 <h2 className="text-xl font-bold text-gray-900">People You May Know</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {suggestions.map((person) => (
-                    <div key={person._id} className="bg-white rounded-xl p-5 shadow-sm text-center flex flex-col items-center border border-transparent hover:border-teal-200 transition-all group">
+                    <div key={person._id} className="bg-white rounded-xl p-5 shadow-sm text-center flex flex-col items-center border border-transparent hover:border-[#d6e3ff] transition-all group">
                       <div className="w-20 h-20 rounded-full overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300">
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold text-2xl">
                           {person.name?.charAt(0).toUpperCase()}
@@ -236,7 +236,7 @@ const Network = () => {
                       <p className="text-xs text-gray-500 mb-4">{person.headline || 'No headline'}</p>
                       <button 
                         onClick={() => handleConnect(person._id)}
-                        className="mt-auto w-full py-2 border border-teal-600 text-teal-600 text-sm font-semibold rounded-lg hover:bg-teal-50"
+                        className="mt-auto w-full py-2 border border-[#005eb5] text-[#005eb5] text-sm font-semibold rounded-lg hover:bg-[#d6e3ff]"
                       >
                         Connect
                       </button>
@@ -257,7 +257,7 @@ const Network = () => {
                   const otherUser = getOtherUser(connection);
                   return (
                     <div key={connection._id} className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-[#d6e3ff] flex items-center justify-center text-[#005eb5] font-bold flex-shrink-0">
                         {otherUser?.name?.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -265,7 +265,7 @@ const Network = () => {
                         <p className="text-[11px] text-gray-500 leading-tight">{otherUser?.headline || 'No headline'}</p>
                         <button 
                           onClick={() => handleMessage(otherUser._id)}
-                          className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-teal-600 hover:text-teal-700"
+                          className="mt-2 flex items-center gap-1 text-[10px] font-semibold text-[#005eb5] hover:text-[#004c99]"
                         >
                           <UserPlus size={12} /> Connect
                         </button>
@@ -278,10 +278,10 @@ const Network = () => {
 
             {/* Footer */}
             <div className="px-4 flex flex-wrap gap-x-4 gap-y-2 opacity-50 text-xs">
-              <a className="font-medium hover:text-teal-600" href="#">About</a>
-              <a className="font-medium hover:text-teal-600" href="#">Privacy</a>
-              <a className="font-medium hover:text-teal-600" href="#">Accessibility</a>
-              <a className="font-medium hover:text-teal-600" href="#">Help Center</a>
+              <a className="font-medium hover:text-[#005eb5]" href="#">About</a>
+              <a className="font-medium hover:text-[#005eb5]" href="#">Privacy</a>
+              <a className="font-medium hover:text-[#005eb5]" href="#">Accessibility</a>
+              <a className="font-medium hover:text-[#005eb5]" href="#">Help Center</a>
               <p className="w-full mt-2">© 2026 PathFinder</p>
             </div>
           </aside>

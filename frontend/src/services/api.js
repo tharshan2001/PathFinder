@@ -10,26 +10,12 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
-    console.log('[API] Request:', config.method?.toUpperCase(), config.url);
-    return config;
-  },
-  (error) => {
-    console.error('[API] Request error:', error);
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    console.log('[API] Response:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('[API] Response error:', error.response?.status, error.response?.data || error.message);
+    if (error.response?.status === 401) {
+      window.location.href = '/';
+    }
     return Promise.reject(error);
   }
 );
