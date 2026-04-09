@@ -9,6 +9,8 @@ import UserProfile from './pages/UserProfile';
 import Messaging from './pages/Messaging';
 import Forums from './pages/Forums';
 import Courses from './pages/Courses';
+import CourseAdmin from './pages/CourseAdmin';
+import { isAdminUser } from './utils/adminAuth';
 
 const ProtectedRoute = ({ children }) => {
   const { user, hasFetchedUser } = useAuthStore();
@@ -52,6 +54,28 @@ const GoogleCallback = () => {
   );
 };
 
+const AdminRoute = ({ children }) => {
+  const { user, hasFetchedUser } = useAuthStore();
+
+  if (!hasFetchedUser) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!isAdminUser(user)) {
+    return <Navigate to="/courses" replace />;
+  }
+
+  return children;
+};
+
 function App() {
   const { fetchUser, user } = useAuthStore();
 
@@ -85,6 +109,14 @@ function App() {
           <ProtectedRoute>
             <Courses />
           </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/courses/admin" 
+        element={
+          <AdminRoute>
+            <CourseAdmin />
+          </AdminRoute>
         } 
       />
       <Route 

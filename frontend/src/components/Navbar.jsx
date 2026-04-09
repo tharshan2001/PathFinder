@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { Home, BookOpen, Briefcase, Users, User, MessageSquare, LogOut } from 'lucide-react';
+import { Home, BookOpen, Briefcase, Users, User, MessageSquare, LogOut, Shield } from 'lucide-react';
+import { isAdminUser } from '../utils/adminAuth';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Navbar = () => {
     if (path === '/home') return 'home';
     if (path === '/forums') return 'forums';
     if (path === '/courses') return 'courses';
+    if (path === '/courses/admin') return 'course-admin';
     if (path === '/jobs') return 'jobs';
     if (path === '/network') return 'network';
     if (path === '/profile') return 'profile';
@@ -19,6 +21,7 @@ const Navbar = () => {
   };
 
   const activeNav = getActiveNav();
+  const admin = isAdminUser(user);
 
   const handleLogout = async () => {
     await logout();
@@ -29,6 +32,7 @@ const Navbar = () => {
     { id: 'home', icon: Home, label: 'Home', path: '/home' },
     { id: 'forums', icon: MessageSquare, label: 'Forums', path: '/forums' },
     { id: 'courses', icon: BookOpen, label: 'Courses', path: '/courses' },
+    ...(admin ? [{ id: 'course-admin', icon: Shield, label: 'Course Admin', path: '/courses/admin' }] : []),
     { id: 'jobs', icon: Briefcase, label: 'Jobs', path: '/jobs' },
     { id: 'network', icon: Users, label: 'Network', path: '/network' },
     { id: 'profile', icon: User, label: 'Profile', path: '/profile' },

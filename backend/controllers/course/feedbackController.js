@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Course from "../../models/course/Course.js";
 import Enrollment from "../../models/course/Enrollment.js";
 import Feedback from "../../models/course/Feedback.js";
+import { isAdminUser } from "../../utils/adminAuth.js";
 
 const recalculateCourseRatings = async (courseId) => {
   const stats = await Feedback.aggregate([
@@ -163,13 +164,14 @@ export const deleteFeedback = async (req, res, next) => {
   try {
     const { courseId, feedbackId } = req.params;
     const userId = req.user?.id;
+    const isAdmin = isAdminUser(req.user);
 
     const feedback = await Feedback.findById(feedbackId);
     if (!feedback || String(feedback.courseId) !== String(courseId)) {
       return res.status(404).json({ message: "Feedback not found" });
     }
 
-    if (String(feedback.userId) !== String(userId)) {
+    if (!isAdmin && String(feedback.userId) !== String(userId)) {
       return res.status(403).json({ message: "You can only delete your own feedback" });
     }
 

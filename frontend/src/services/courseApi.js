@@ -5,6 +5,31 @@ export const getCourses = async (params = {}) => {
   return response.data;
 };
 
+export const getCourseById = async (courseId) => {
+  const response = await api.get(`/courses/${courseId}`);
+  return response.data;
+};
+
+export const createCourse = async (payload) => {
+  const response = await api.post("/courses", payload);
+  return response.data;
+};
+
+export const updateCourse = async (courseId, payload) => {
+  const response = await api.put(`/courses/${courseId}`, payload);
+  return response.data;
+};
+
+export const deleteCourse = async (courseId) => {
+  const response = await api.delete(`/courses/${courseId}`);
+  return response.data;
+};
+
+export const getCourseMetaOptions = async () => {
+  const response = await api.get("/courses/meta/options");
+  return response.data;
+};
+
 export const getCourseFeedback = async (courseId) => {
   const response = await api.get(`/courses/${courseId}/feedback`);
   return response.data;
@@ -31,7 +56,9 @@ export const enrollInCourse = async (courseId, userId) => {
 };
 
 export const getMyEnrollments = async (userId) => {
-  const response = await api.get(`/enrollments/user/${userId}`);
+  const response = userId
+    ? await api.get(`/enrollments/user/${userId}`)
+    : await api.get("/enrollments/my");
   return response.data;
 };
 

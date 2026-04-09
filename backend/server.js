@@ -6,6 +6,7 @@ import passport from "passport";
 import connectDB from "./config/mongodb.js";
 import http from "http";
 import { initSocket } from "./controllers/message/chatController.js";
+import { ensureAdminUser } from "./utils/ensureAdminUser.js";
 
 // Routes
 import userRoutes from "./routes/userRoutes.js";
@@ -76,6 +77,7 @@ const startServer = async () => {
   try {
     await connectDB();
     console.log("MongoDB connected");
+    await ensureAdminUser();
 
     const server = http.createServer(app);
 

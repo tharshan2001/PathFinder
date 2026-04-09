@@ -6,12 +6,13 @@ import {
   deleteFeedback,
   enrollInCourse,
   getCourseFeedback,
+  getCourseMetaOptions,
   getCourses,
   getMyEnrollments,
   updateEnrollmentProgress,
   updateFeedback,
 } from "../services/courseApi";
-import { BookOpen, Star, UserRound } from "lucide-react";
+import { BookOpen, ExternalLink, Star, UserRound } from "lucide-react";
 
 const emptyForm = { rating: 5, comment: "" };
 
@@ -29,6 +30,8 @@ const renderStars = (rating = 0) => {
 const Courses = () => {
   const { user } = useAuthStore();
   const [courses, setCourses] = useState([]);
+  const [metaOptions, setMetaOptions] = useState({ industries: [], levels: [], skills: [] });
+  const [filters, setFilters] = useState({ search: "", industry: "", level: "", skill: "" });
   const [enrollmentsByCourse, setEnrollmentsByCourse] = useState({});
   const [feedbackByCourse, setFeedbackByCourse] = useState({});
   const [myFeedbackByCourse, setMyFeedbackByCourse] = useState({});
@@ -39,16 +42,34 @@ const Courses = () => {
 
   const userId = user?._id;
 
-  const loadCoursesPage = async () => {
-    if (!userId) return;
+  const loadMeta = async () => {
+    try {
+      const data = await getCourseMetaOptions();
+      setMetaOptions(data);
+    } catch (_err) {
+      // Ignore this silently so the rest of the page can still function.
+    }
+  };
+
+  const loadCoursesPage = async (activeFilters = filters) => {
+    if (!userId) {
+      return;
+    }
 
     setLoading(true);
     setError("");
 
     try {
+      const queryParams = {
+        ...(activeFilters.search ? { search: activeFilters.search } : {}),
+        ...(activeFilters.industry ? { industry: activeFilters.industry } : {}),
+        ...(activeFilters.level ? { level: activeFilters.level } : {}),
+        ...(activeFilters.skill ? { skill: activeFilters.skill } : {}),
+      };
+
       const [coursesData, enrollmentData] = await Promise.all([
-        getCourses(),
-        getMyEnrollments(userId),
+        getCourses(queryParams),
+        getMyEnrollments(),
       ]);
 
       const enrollmentMap = {};
@@ -95,6 +116,10 @@ const Courses = () => {
   };
 
   useEffect(() => {
+    loadMeta();
+  }, []);
+
+  useEffect(() => {
     loadCoursesPage();
   }, [userId]);
 
@@ -111,6 +136,29 @@ const Courses = () => {
         ...partial,
       },
     }));
+  };
+
+  const handleFilterChange = (partial) => {
+    setFilters((prev) => ({ ...prev, ...partial }));
+  };
+
+  const applyFilters = async () => {
+    await loadCoursesPage(filters);
+  };
+
+  const clearFilters = async () => {
+    const reset = { search: "", industry: "", level: "", skill: "" };
+    setFilters(reset);
+    await loadCoursesPage(reset);
+  };
+
+  const handleStartCourse = (courseUrl) => {
+    if (!courseUrl) {
+      setError("This course does not have an external course link yet.");
+      return;
+    }
+
+    window.open(courseUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleEnroll = async (courseId) => {
@@ -205,8 +253,72 @@ const Courses = () => {
       <main className="max-w-6xl mx-auto px-4 py-6">
         <div className="mb-5">
           <h1 className="text-2xl font-bold text-gray-900">Course Hub</h1>
-          <p className="text-gray-600 mt-1">Enroll, track progress, and share your course feedback.</p>
+          <p className="text-gray-600 mt-1">
+            Discover courses, enroll, start learning through official links, and track your progress.
+          </p>
         </div>
+
+        <section className="mb-5 rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Course Categories & Search</h2>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <input
+              value={filters.search}
+              onChange={(e) => handleFilterChange({ search: e.target.value })}
+              placeholder="Search title/provider/skill"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm md:col-span-2"
+            />
+            <select
+              value={filters.industry}
+              onChange={(e) => handleFilterChange({ industry: e.target.value })}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+            >
+              <option value="">All industries</option>
+              {metaOptions.industries.map((industry) => (
+                <option key={industry} value={industry}>
+                  {industry}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filters.level}
+              onChange={(e) => handleFilterChange({ level: e.target.value })}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+            >
+              <option value="">All levels</option>
+              {metaOptions.levels.map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filters.skill}
+              onChange={(e) => handleFilterChange({ skill: e.target.value })}
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+            >
+              <option value="">All skills</option>
+              {metaOptions.skills.map((skill) => (
+                <option key={skill} value={skill}>
+                  {skill}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={applyFilters}
+              className="px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-black"
+            >
+              Apply Filters
+            </button>
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Clear
+            </button>
+          </div>
+        </section>
 
         {error && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -269,6 +381,13 @@ const Courses = () => {
                         </div>
 
                         <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleStartCourse(course.courseUrl)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md border border-teal-300 text-sm text-teal-700 hover:bg-teal-50"
+                          >
+                            <ExternalLink size={14} />
+                            Start Course
+                          </button>
                           {[25, 50, 75, 100].map((step) => (
                             <button
                               key={step}
@@ -342,7 +461,7 @@ const Courses = () => {
                             disabled={actionLoading === `delete-feedback-${courseId}`}
                             className="px-4 py-2 rounded-lg border border-red-300 text-red-600 text-sm font-medium hover:bg-red-50 disabled:opacity-60"
                           >
-                            Delete
+                            Delete My Review
                           </button>
                         )}
                       </div>
