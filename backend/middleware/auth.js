@@ -14,19 +14,19 @@ export const hasRole = (req, roles = []) => {
 export const authenticateJWT = (req, res, next) => {
   // Check both cookie and Authorization header
   let token = req.cookies?.[COOKIE_NAME];
-  
+
   // If no cookie, check Authorization header (Bearer token)
   if (!token && req.headers.authorization) {
     const authHeader = req.headers.authorization;
-    if (authHeader.startsWith('Bearer ')) {
+    if (authHeader.startsWith("Bearer ")) {
       token = authHeader.substring(7);
     }
   }
-  
+
   if (!token) {
     return res.status(401).json({ message: "Authentication required" });
   }
-  
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;

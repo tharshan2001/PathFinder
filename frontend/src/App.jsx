@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 
 // Pages
@@ -44,6 +45,28 @@ const AdminRoute = ({ children }) => {
   }
 
   return children;
+};
+
+const JobsRoute = () => {
+  const { user, hasFetchedUser } = useAuthStore();
+  const [searchParams] = useSearchParams();
+
+  const guestRequested = searchParams.get('guest') === '1';
+  const guestMode = import.meta.env.DEV && guestRequested && !user;
+
+  if (!hasFetchedUser && !guestMode) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+      </div>
+    );
+  }
+
+  if (!user && !guestMode) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <JobMarket guestMode={guestMode} />;
 };
 
 function App() {
