@@ -9,6 +9,7 @@ import Network from './pages/Network';
 import UserProfile from './pages/UserProfile';
 import Messaging from './pages/Messaging';
 import Forums from './pages/Forums';
+import Notifications from './pages/Notifications';
 
 const ProtectedRoute = ({ children }) => {
   const { user, hasFetchedUser } = useAuthStore();
@@ -134,6 +135,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Messaging />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/notifications" 
+        element={
+          <ProtectedRoute>
+            <Notifications />
           </ProtectedRoute>
         } 
       />
