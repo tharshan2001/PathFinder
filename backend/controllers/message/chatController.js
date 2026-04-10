@@ -1,6 +1,8 @@
 import Chat from "../../models/message/Chat.js";
 import Message from "../../models/message/Message.js";
+import User from "../../models/user/User.js";
 import { Server } from "socket.io";
+import { notifyMessage } from "../../services/notificationService.js";
 
 let io;
 
@@ -110,7 +112,11 @@ export const sendMessage = async (req, res) => {
     );
 
     io.to(senderId).emit("newMessage", { chat: updatedChat, message });
-    if (receiver) io.to(receiver._id.toString()).emit("newMessage", { chat: updatedChat, message });
+    if (receiver) {
+      io.to(receiver._id.toString()).emit("newMessage", { chat: updatedChat, message });
+      const sender = await User.findById(senderId).select("name profileMedia");
+      await notifyMessage(sender, receiver);
+    }
 
     res.status(201).json(message);
   } catch (error) {
