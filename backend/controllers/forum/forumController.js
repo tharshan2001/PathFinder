@@ -1,4 +1,6 @@
 import Forum from "../../models/forum/Forum.js";
+import User from "../../models/user/User.js";
+import { notifyForumReply } from "../../services/notificationService.js";
 
 // Get all forums
 export const getForums = async (req, res) => {
@@ -107,12 +109,20 @@ export const addReply = async (req, res) => {
     if (!forum) return res.status(404).json({ message: "Forum not found" });
     if (forum.isLocked) return res.status(403).json({ message: "Forum is locked" });
     
+    const replyUserId = req.user.id;
+    
     forum.replies.push({
-      userId: req.user.id,
+      userId: replyUserId,
       content
     });
     await forum.save();
     await forum.populate("replies.userId", "name profileMedia");
+    
+    // Notify forum author (if not self-reply)
+    if (forum.userId.toString() !== replyUserId) {
+      const replier = await User.findById(replyUserId).select("name profileMedia");
+      await notifyForumReply(replier, forum, replier);
+    }
     
     res.json({ message: "Reply added", forum });
   } catch (error) {

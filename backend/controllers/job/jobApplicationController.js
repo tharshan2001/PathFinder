@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import JobApplication from "../../models/job/JobApplication.js";
 import Job from "../../models/job/Job.js";
+import User from "../../models/user/User.js";
+import { notifyJobApplication } from "../../services/notificationService.js";
 
 const isAdmin = (req) => String(req.user?.role || "").toLowerCase() === "admin";
 const isSelf = (req, userId) => String(req.user?.id) === String(userId);
@@ -43,6 +45,13 @@ export const submitApplication = async (req, res) => {
     await Job.findByIdAndUpdate(jobId, {
       $inc: { applicationsCount: 1 }
     });
+
+    // Notify employer about new application
+    const applicant = await User.findById(userId).select("name profileMedia");
+    const employer = await User.findById(job.createdBy).select("name profileMedia");
+    if (employer && applicant) {
+      await notifyJobApplication(applicant, job, employer);
+    }
 
     // Populate related data
     await application.populate([

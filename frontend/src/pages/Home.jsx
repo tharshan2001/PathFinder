@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { Briefcase, BookOpen, Users, TrendingUp, ArrowRight, CheckCircle, Star, Globe, Lightbulb } from 'lucide-react';
+import { Briefcase, BookOpen, Users, TrendingUp, ArrowRight, Globe, Lightbulb } from 'lucide-react';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -36,36 +36,12 @@ const Home = () => {
   };
 
   const features = [
-    {
-      icon: Briefcase,
-      title: 'Job Recommendations',
-      desc: 'Get personalized job matches based on your skills and experience'
-    },
-    {
-      icon: BookOpen,
-      title: 'Skill Courses',
-      desc: 'Discover courses that match trending skills in your industry'
-    },
-    {
-      icon: Users,
-      title: 'Professional Network',
-      desc: 'Connect with professionals in your field and expand your network'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Learning Paths',
-      desc: 'Follow structured learning paths to advance your career'
-    },
-    {
-      icon: Lightbulb,
-      title: 'Skills Analytics',
-      desc: 'Track skill gaps and get recommendations for improvement'
-    },
-    {
-      icon: Globe,
-      title: 'Local Opportunities',
-      desc: 'Find jobs and training opportunities specific to your region'
-    }
+    { icon: Briefcase, title: 'Job Recommendations', desc: 'Get personalized job matches based on your skills' },
+    { icon: BookOpen, title: 'Skill Courses', desc: 'Discover courses that match trending skills in your industry' },
+    { icon: Users, title: 'Professional Network', desc: 'Connect with professionals and expand your network' },
+    { icon: TrendingUp, title: 'Learning Paths', desc: 'Follow structured paths to advance your career' },
+    { icon: Lightbulb, title: 'Skills Analytics', desc: 'Track skill gaps and get improvement recommendations' },
+    { icon: Globe, title: 'Local Opportunities', desc: 'Find jobs and training opportunities in your region' }
   ];
 
   const stats = [
@@ -76,24 +52,22 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#faf9f6]">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-[#e0e4de] z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="text-2xl font-bold text-[#005eb5] font-headline">
-              PathFinder
-            </div>
+    <div className="min-h-screen bg-[#F5F5F7]">
+      {/* Apple-style Navigation */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-xl border-b border-[#E5E5EA] z-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-center h-14">
+            <div className="text-2xl font-bold text-[#1D1D1F] tracking-tight">PathFinder</div>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsLogin(true)}
-                className="text-[#5c605c] hover:text-[#005eb5] font-medium transition-colors"
+                className="text-[17px] text-[#86868B] hover:text-[#007AFF] font-medium transition-colors"
               >
                 Sign In
               </button>
               <button
                 onClick={() => setIsLogin(false)}
-                className="px-5 py-2 bg-[#005eb5] text-white rounded-full font-semibold hover:bg-[#004c99] transition-colors"
+                className="px-5 py-2 bg-[#007AFF] text-white rounded-[10px] font-semibold text-[15px] hover:bg-[#0056B3] transition-colors"
               >
                 Join Now
               </button>
@@ -103,41 +77,40 @@ const Home = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section className="pt-36 pb-20 px-6">
+        <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl font-bold text-[#2f3330] font-headline leading-tight mb-6">
-                Unlock Your Career Potential
+            <div className="animate-fade-in">
+              <h1 className="text-[56px] leading-[1.05] font-bold text-[#1D1D1F] tracking-tight mb-6">
+                Unlock Your<br/>Career Potential
               </h1>
-              <p className="text-xl text-[#5c605c] mb-8 leading-relaxed">
-                Connect with opportunities that match your skills. Get personalized job recommendations, 
-                discover relevant courses, and build your professional network—all in one platform.
+              <p className="text-[21px] leading-relaxed text-[#86868B] mb-8">
+                Connect with opportunities that match your skills. Get personalized job recommendations, discover relevant courses, and build your professional network.
               </p>
-              <div className="flex flex-wrap gap-4 mb-8">
+              <div className="flex items-center gap-8 mb-8">
                 {stats.map((stat, idx) => (
                   <div key={idx} className="text-center">
-                    <div className="text-2xl font-bold text-[#005eb5]">{stat.value}</div>
-                    <div className="text-sm text-[#5c605c]">{stat.label}</div>
+                    <div className="text-[28px] font-bold text-[#007AFF]">{stat.value}</div>
+                    <div className="text-[13px] text-[#86868B]">{stat.label}</div>
                   </div>
                 ))}
               </div>
               <button
                 onClick={() => setIsLogin(false)}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#005eb5] text-white rounded-full font-semibold text-lg hover:bg-[#004c99] transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#007AFF] text-white rounded-[12px] font-semibold text-[17px] hover:bg-[#0056B3] transition-colors shadow-sm"
               >
                 Get Started Free <ArrowRight size={20} />
               </button>
             </div>
             
-            {/* Auth Card */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#e0e4de]">
+            {/* Auth Card - Apple style */}
+            <div className="bg-white rounded-[24px] shadow-[0_12px_40px_rgba(0,0,0,0.08)] p-8 border border-[#E5E5EA] animate-fade-in">
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-[#2f3330] mb-2">
+                <h2 className="text-[28px] font-bold text-[#1D1D1F] mb-2">
                   {isLogin ? 'Welcome back' : 'Create your account'}
                 </h2>
-                <p className="text-[#5c605c]">
-                  {isLogin ? 'Sign in to continue your journey' : 'Start your professional journey today'}
+                <p className="text-[15px] text-[#86868B]">
+                  {isLogin ? 'Sign in to continue' : 'Start your professional journey'}
                 </p>
               </div>
 
@@ -149,7 +122,7 @@ const Home = () => {
                     placeholder="Full Name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-[#e0e4de] rounded-xl focus:ring-2 focus:ring-[#005eb5] focus:border-transparent outline-none transition bg-[#faf9f6]"
+                    className="w-full px-4 py-3.5 bg-[#F5F5F7] border-0 rounded-[12px] text-[17px] placeholder-[#86868B] focus:ring-2 focus:ring-[#007AFF] focus:bg-white transition-all"
                     required
                   />
                 )}
@@ -159,7 +132,7 @@ const Home = () => {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-[#e0e4de] rounded-xl focus:ring-2 focus:ring-[#005eb5] focus:border-transparent outline-none transition bg-[#faf9f6]"
+                  className="w-full px-4 py-3.5 bg-[#F5F5F7] border-0 rounded-[12px] text-[17px] placeholder-[#86868B] focus:ring-2 focus:ring-[#007AFF] focus:bg-white transition-all"
                   required
                 />
                 <input
@@ -168,18 +141,18 @@ const Home = () => {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-[#e0e4de] rounded-xl focus:ring-2 focus:ring-[#005eb5] focus:border-transparent outline-none transition bg-[#faf9f6]"
+                  className="w-full px-4 py-3.5 bg-[#F5F5F7] border-0 rounded-[12px] text-[17px] placeholder-[#86868B] focus:ring-2 focus:ring-[#007AFF] focus:bg-white transition-all"
                   required
                 />
 
                 {error && (
-                  <p className="text-red-500 text-sm text-center">{error}</p>
+                  <p className="text-[#FF3B30] text-[14px] text-center">{error}</p>
                 )}
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-[#005eb5] text-white py-3 rounded-xl font-semibold hover:bg-[#004c99] transition disabled:opacity-50"
+                  className="w-full bg-[#007AFF] text-white py-3.5 rounded-[12px] font-semibold text-[17px] hover:bg-[#0056B3] transition-colors disabled:opacity-50"
                 >
                   {isLoading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
                 </button>
@@ -188,16 +161,16 @@ const Home = () => {
               <div className="mt-6">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[#e0e4de]"></div>
+                    <div className="w-full border-t border-[#E5E5EA]"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-[#5c605c]">or continue with</span>
+                    <span className="px-4 bg-white text-[#86868B]">or continue with</span>
                   </div>
                 </div>
 
                 <button
                   onClick={handleGoogleAuth}
-                  className="mt-4 w-full flex items-center justify-center gap-3 border border-[#e0e4de] py-3 rounded-xl hover:bg-[#faf9f6] transition-colors"
+                  className="mt-4 w-full flex items-center justify-center gap-3 bg-[#F5F5F7] py-3.5 rounded-[12px] hover:bg-[#E5E5EA] transition-colors"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -205,15 +178,15 @@ const Home = () => {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
-                  <span className="font-medium">Google</span>
+                  <span className="text-[17px] font-medium text-[#1D1D1F]">Google</span>
                 </button>
               </div>
 
-              <p className="mt-6 text-center text-[#5c605c]">
+              <p className="mt-6 text-center text-[15px] text-[#86868B]">
                 {isLogin ? "Don't have an account?" : 'Already have an account?'}
                 <button
                   onClick={() => { setIsLogin(!isLogin); clearError(); setFormData({ name: '', email: '', password: '' }); }}
-                  className="ml-1 text-[#005eb5] hover:underline font-medium"
+                  className="ml-1 text-[#007AFF] hover:underline font-medium"
                 >
                   {isLogin ? 'Join now' : 'Sign in'}
                 </button>
@@ -224,28 +197,28 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-[#2f3330] font-headline mb-4">
-              Everything You Need to Succeed
+            <h2 className="text-[40px] font-bold text-[#1D1D1F] tracking-tight mb-4">
+              Everything You Need
             </h2>
-            <p className="text-xl text-[#5c605c] max-w-2xl mx-auto">
+            <p className="text-[19px] text-[#86868B] max-w-2xl mx-auto">
               A complete platform designed to help you find the right job, learn new skills, and build meaningful connections.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, idx) => (
               <div 
                 key={idx} 
-                className="p-6 rounded-2xl border border-[#e0e4de] hover:border-[#005eb5] hover:shadow-lg transition-all duration-300 group"
+                className="p-6 rounded-[20px] bg-[#F5F5F7] hover:bg-[#E5F1FF] transition-all duration-300 group cursor-pointer"
               >
-                <div className="w-14 h-14 rounded-xl bg-[#d6e3ff] flex items-center justify-center mb-4 group-hover:bg-[#005eb5] transition-colors">
-                  <feature.icon size={28} className="text-[#005eb5] group-hover:text-white transition-colors" />
+                <div className="w-14 h-14 rounded-[16px] bg-white flex items-center justify-center mb-4 shadow-sm group-hover:shadow-md transition-shadow">
+                  <feature.icon size={26} className="text-[#007AFF]" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2f3330] mb-2">{feature.title}</h3>
-                <p className="text-[#5c605c]">{feature.desc}</p>
+                <h3 className="text-[20px] font-semibold text-[#1D1D1F] mb-2">{feature.title}</h3>
+                <p className="text-[15px] text-[#86868B] leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -253,18 +226,18 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-[#005eb5] to-[#00529f] rounded-3xl p-12 text-white">
-            <h2 className="text-4xl font-bold font-headline mb-4">
-              Ready to Take the Next Step?
+      <section className="py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="bg-gradient-to-r from-[#007AFF] to-[#5856D6] rounded-[28px] p-12 text-white">
+            <h2 className="text-[40px] font-bold mb-4">
+              Take the Next Step
             </h2>
-            <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
+            <p className="text-[19px] opacity-90 mb-8 max-w-xl mx-auto">
               Join thousands of professionals who have accelerated their careers with PathFinder.
             </p>
             <button
               onClick={() => setIsLogin(false)}
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#005eb5] rounded-full font-semibold text-lg hover:bg-[#faf9f6] transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-[#007AFF] rounded-[12px] font-semibold text-[17px] hover:bg-[#F5F5F7] transition-colors"
             >
               Create Free Account <ArrowRight size={20} />
             </button>
@@ -273,20 +246,18 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 border-t border-[#e0e4de]">
-        <div className="max-w-7xl mx-auto">
+      <footer className="py-10 px-6 border-t border-[#E5E5EA]">
+        <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-2xl font-bold text-[#005eb5] font-headline">
-              PathFinder
+            <div className="text-2xl font-bold text-[#1D1D1F]">PathFinder</div>
+            <div className="flex gap-8 text-[#86868B]">
+              <a href="#" className="text-[15px] hover:text-[#007AFF] transition-colors">About</a>
+              <a href="#" className="text-[15px] hover:text-[#007AFF] transition-colors">Privacy</a>
+              <a href="#" className="text-[15px] hover:text-[#007AFF] transition-colors">Terms</a>
+              <a href="#" className="text-[15px] hover:text-[#007AFF] transition-colors">Help</a>
             </div>
-            <div className="flex gap-8 text-[#5c605c]">
-              <a href="#" className="hover:text-[#005eb5] transition-colors">About</a>
-              <a href="#" className="hover:text-[#005eb5] transition-colors">Privacy</a>
-              <a href="#" className="hover:text-[#005eb5] transition-colors">Terms</a>
-              <a href="#" className="hover:text-[#005eb5] transition-colors">Help</a>
-            </div>
-            <div className="text-[#5c605c]">
-              © 2026 PathFinder. All rights reserved.
+            <div className="text-[15px] text-[#86868B]">
+              © 2026 PathFinder
             </div>
           </div>
         </div>
