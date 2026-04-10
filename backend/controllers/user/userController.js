@@ -1,4 +1,5 @@
 import User from "../../models/user/User.js";
+import { notifyProfileView } from "../../services/notificationService.js";
 
 // Create a new user
 export const createUser = async (req, res) => {
@@ -54,13 +55,20 @@ export const deactivateUser = async (req, res) => {
 export const getPublicProfile = async (req, res) => {
   try {
     const { userId } = req.params;
+    const viewerId = req.user?.id;
+    const notify = req.query.notify === 'true' && viewerId && viewerId !== userId;
+    
     const user = await User.findById(userId).select(
       "name headline about location profileMedia skills experience education certifications projects socialLinks connectionsCount profileViews resumes"
     );
     if (!user) return res.status(404).json({ message: "User not found" });
     
-    // Increment profile view
     await User.findByIdAndUpdate(userId, { $inc: { profileViews: 1 } });
+    
+    if (notify) {
+      const viewer = await User.findById(viewerId).select("name profileMedia");
+      await notifyProfileView(viewer, user);
+    }
     
     res.json(user);
   } catch (error) {

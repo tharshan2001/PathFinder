@@ -1,5 +1,8 @@
 import Connection from "../../models/user/connectionRef.js";
 import User from "../../models/user/User.js";
+import { notifyConnectionRequest, notifyConnectionAccepted } from "../../services/notificationService.js";
+
+const populateFields = "requester recipient";
 
 // Send connection request
 export const sendConnectionRequest = async (req, res) => {
@@ -11,7 +14,6 @@ export const sendConnectionRequest = async (req, res) => {
       return res.status(400).json({ message: "Cannot connect with yourself" });
     }
 
-    // Check if a connection already exists (either direction)
     const existing = await Connection.findOne({
       $or: [
         { requester: requesterId, recipient: recipientId },
@@ -23,11 +25,18 @@ export const sendConnectionRequest = async (req, res) => {
       return res.status(400).json({ message: "A connection or request already exists between these users" });
     }
 
+    const [requester, recipient] = await Promise.all([
+      User.findById(requesterId),
+      User.findById(recipientId)
+    ]);
+
     const connection = await Connection.create({
       requester: requesterId,
       recipient: recipientId,
       message
     });
+
+    await notifyConnectionRequest(requester, recipient);
 
     res.status(201).json({ message: "Connection request sent", connection });
   } catch (error) {
@@ -48,7 +57,6 @@ export const acceptConnectionRequest = async (req, res) => {
       return res.status(400).json({ message: "Connection request already processed" });
     }
 
-    // Only recipient can accept
     if (connection.recipient.toString() !== userId) {
       return res.status(403).json({ message: "You are not authorized to accept this request" });
     }
@@ -56,9 +64,15 @@ export const acceptConnectionRequest = async (req, res) => {
     connection.status = "accepted";
     await connection.save();
 
-    // Increment connections count for both users
+    const [requester, recipient] = await Promise.all([
+      User.findById(connection.requester),
+      User.findById(connection.recipient)
+    ]);
+
     await User.findByIdAndUpdate(connection.requester, { $inc: { connectionsCount: 1 } });
     await User.findByIdAndUpdate(connection.recipient, { $inc: { connectionsCount: 1 } });
+
+    await notifyConnectionAccepted(requester, recipient);
 
     res.json({ message: "Connection accepted", connection });
   } catch (error) {
@@ -75,7 +89,6 @@ export const rejectConnectionRequest = async (req, res) => {
     const connection = await Connection.findById(connectionId);
     if (!connection) return res.status(404).json({ message: "Connection request not found" });
 
-    // Only recipient can reject
     if (connection.recipient.toString() !== userId) {
       return res.status(403).json({ message: "You are not authorized to reject this request" });
     }
@@ -100,12 +113,10 @@ export const removeConnection = async (req, res) => {
     const connection = await Connection.findById(connectionId);
     if (!connection) return res.status(404).json({ message: "Connection not found" });
 
-    // Only requester or recipient can remove
     if (![connection.requester.toString(), connection.recipient.toString()].includes(userId)) {
       return res.status(403).json({ message: "You are not authorized to remove this connection" });
     }
 
-    // Decrement connections count if accepted
     if (connection.status === "accepted") {
       await User.findByIdAndUpdate(connection.requester, { $inc: { connectionsCount: -1 } });
       await User.findByIdAndUpdate(connection.recipient, { $inc: { connectionsCount: -1 } });
