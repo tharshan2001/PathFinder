@@ -1,9 +1,133 @@
 import mongoose from "mongoose";
 import JobAlert from "../../models/job/JobAlert.js";
 import Job from "../../models/job/Job.js";
+import Notification from "../../models/user/Notification.js";
 
 const isAdmin = (req) => String(req.user?.role || "").toLowerCase() === "admin";
 const isSelf = (req, userId) => String(req.user?.id) === String(userId);
+
+let cachedEmailTransporter;
+
+const getEmailTransporter = async () => {
+  if (cachedEmailTransporter !== undefined) {
+    return cachedEmailTransporter;
+  }
+
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) {
+    cachedEmailTransporter = null;
+    return cachedEmailTransporter;
+  }
+
+  try {
+    const nodemailerModule = await import("nodemailer");
+    const nodemailer = nodemailerModule.default || nodemailerModule;
+
+    cachedEmailTransporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: {
+        user,
+        pass,
+      },
+    });
+
+    return cachedEmailTransporter;
+  } catch (error) {
+    console.warn("Email transport unavailable:", error.message);
+    cachedEmailTransporter = null;
+    return cachedEmailTransporter;
+  }
+};
+
+const sendAlertEmailNotification = async ({ alert, user, jobs }) => {
+  if (!alert.emailNotifications) {
+    return { sent: false, reason: "email-disabled" };
+  }
+
+  if (!user?.email) {
+    return { sent: false, reason: "missing-user-email" };
+  }
+
+  const transporter = await getEmailTransporter();
+  if (!transporter) {
+    return { sent: false, reason: "smtp-not-configured" };
+  }
+
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const userName = user.name || "there";
+  const topJobsHtml = jobs
+    .slice(0, 5)
+    .map(
+      (job) =>
+        `<li><strong>${job.title}</strong> at ${job.company || "Unknown company"}${
+          job.location ? ` (${job.location})` : ""
+        }</li>`
+    )
+    .join("");
+
+  const subject = `PathFinder Alert: ${jobs.length} new match${jobs.length === 1 ? "" : "es"}`;
+  const html = `
+    <p>Hi ${userName},</p>
+    <p>Your alert <strong>${alert.title}</strong> found <strong>${jobs.length}</strong> new matching job${
+      jobs.length === 1 ? "" : "s"
+    }.</p>
+    <ul>${topJobsHtml}</ul>
+    <p>Open PathFinder to review all matches.</p>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from,
+      to: user.email,
+      subject,
+      html,
+    });
+
+    return { sent: true };
+  } catch (error) {
+    console.error("Failed to send alert email:", error.message);
+    return { sent: false, reason: "email-send-failed" };
+  }
+};
+
+const createPushNotificationRecord = async ({ alert, user, jobs }) => {
+  if (!alert.pushNotifications) {
+    return { sent: false, reason: "push-disabled" };
+  }
+
+  if (!user?._id) {
+    return { sent: false, reason: "missing-user-id" };
+  }
+
+  try {
+    await Notification.create({
+      userId: user._id,
+      type: "job",
+      title: `Job Alert: ${jobs.length} new match${jobs.length === 1 ? "" : "es"}`,
+      message: `Your alert \"${alert.title}\" found ${jobs.length} new job match${
+        jobs.length === 1 ? "" : "es"
+      }.`,
+      link: "/jobs",
+      metadata: {
+        alertId: alert._id,
+        alertTitle: alert.title,
+        matchCount: jobs.length,
+        jobIds: jobs.map((job) => job._id),
+      },
+    });
+
+    return { sent: true };
+  } catch (error) {
+    console.error("Failed to create push notification record:", error.message);
+    return { sent: false, reason: "push-record-create-failed" };
+  }
+};
 
 // ---------------------- Job Alert CRUD ----------------------
 
@@ -271,7 +395,7 @@ export const findMatchingJobs = async (req, res) => {
 // Process all active alerts (for cron job)
 export const processAllAlerts = async (req, res) => {
   try {
-    if (req.user?.role !== "admin") {
+    if (!isAdmin(req)) {
       return res.status(403).json({ message: "Admin access required" });
     }
 
@@ -286,6 +410,10 @@ export const processAllAlerts = async (req, res) => {
       .populate("user", "name email");
 
     const results = [];
+    let emailSent = 0;
+    let pushSent = 0;
+    let emailSkipped = 0;
+    let pushSkipped = 0;
 
     for (const alert of alerts) {
       try {
@@ -308,24 +436,55 @@ export const processAllAlerts = async (req, res) => {
           .sort({ postedDate: -1 })
           .limit(20);
 
+        const emailResult =
+          matchingJobs.length > 0
+            ? await sendAlertEmailNotification({
+                alert,
+                user: alert.user,
+                jobs: matchingJobs,
+              })
+            : { sent: false, reason: "no-matches" };
+        const pushResult =
+          matchingJobs.length > 0
+            ? await createPushNotificationRecord({
+                alert,
+                user: alert.user,
+                jobs: matchingJobs,
+              })
+            : { sent: false, reason: "no-matches" };
+
+        if (emailResult.sent) emailSent += 1;
+        else emailSkipped += 1;
+
+        if (pushResult.sent) pushSent += 1;
+        else pushSkipped += 1;
+
         if (matchingJobs.length > 0) {
-          // Here you would typically send notifications
-          // For now, just collect the results
           results.push({
             alertId: alert._id,
+            alertTitle: alert.title,
             userId: alert.user._id,
             userEmail: alert.user.email,
             matchCount: matchingJobs.length,
-            jobs: matchingJobs
-          });
-
-          // Update alert
-          await JobAlert.findByIdAndUpdate(alert._id, {
-            lastRun: new Date(),
-            lastMatchCount: matchingJobs.length,
-            totalMatches: alert.totalMatches + matchingJobs.length
+            notifications: {
+              email: emailResult,
+              push: pushResult,
+            },
+            jobs: matchingJobs.map((job) => ({
+              _id: job._id,
+              title: job.title,
+              company: job.company,
+              location: job.location,
+              postedDate: job.postedDate,
+            })),
           });
         }
+
+        await JobAlert.findByIdAndUpdate(alert._id, {
+          lastRun: new Date(),
+          lastMatchCount: matchingJobs.length,
+          totalMatches: alert.totalMatches + matchingJobs.length,
+        });
       } catch (error) {
         console.error(`Error processing alert ${alert._id}:`, error);
       }
@@ -335,7 +494,13 @@ export const processAllAlerts = async (req, res) => {
       message: "Alert processing completed",
       processedAlerts: alerts.length,
       alertsWithMatches: results.length,
-      results
+      notificationSummary: {
+        emailSent,
+        pushSent,
+        emailSkipped,
+        pushSkipped,
+      },
+      results,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });

@@ -128,19 +128,26 @@ export const getUserApplications = async (req, res) => {
 // Get application by ID
 export const getApplicationById = async (req, res) => {
   try {
-    const application = await JobApplication.findById(req.params.id)
-      .populate("applicant", "name email headline profileMedia experience education skills")
-      .populate("job", "title company location description skillsRequired salary")
-      .populate("reviewedBy", "name headline");
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid application id" });
+    }
 
-    if (!application) {
+    const applicationMeta = await JobApplication.findById(id).select("applicant");
+
+    if (!applicationMeta) {
       return res.status(404).json({ message: "Application not found" });
     }
 
-    const applicantId = application.applicant?._id || application.applicant;
+    const applicantId = applicationMeta.applicant?._id || applicationMeta.applicant;
     if (!isAdmin(req) && !isSelf(req, applicantId)) {
       return res.status(403).json({ message: "Access denied" });
     }
+
+    const application = await JobApplication.findById(id)
+      .populate("applicant", "name email headline profileMedia experience education skills")
+      .populate("job", "title company location description skillsRequired salary")
+      .populate("reviewedBy", "name headline");
 
     res.json(application);
   } catch (error) {
@@ -243,8 +250,8 @@ export const withdrawApplication = async (req, res) => {
       return res.status(404).json({ message: "Application not found" });
     }
 
-    if (!isAdmin(req) && !isSelf(req, application.applicant)) {
-      return res.status(403).json({ message: "Access denied" });
+    if (!isSelf(req, application.applicant)) {
+      return res.status(403).json({ message: "You can only withdraw your own application" });
     }
 
     const wasWithdrawn = application.status === "withdrawn";
