@@ -25,106 +25,19 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
-      <Route 
-        path="/home" 
-        element={
-          <ProtectedRoute>
-            <Feed />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/forums" 
-        element={
-          <ProtectedRoute>
-            <Forums />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/courses" 
-        element={
-          <ProtectedRoute>
-            <Courses />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/jobs" 
-        element={<JobsRoute />} 
-      />
-      <Route
-        path="/skill-profile"
-        element={
-          <ProtectedRoute>
-            <SkillProfile />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/recommended-jobs"
-        element={
-          <ProtectedRoute>
-            <RecommendedJobs />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/skill-gap-analysis"
-        element={
-          <ProtectedRoute>
-            <SkillGapAnalysis />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/recommended-courses"
-        element={
-          <ProtectedRoute>
-            <RecommendedCourses />
-          </ProtectedRoute>
-        }
-      />
-      <Route 
-        path="/learning" 
-        element={
-          <ProtectedRoute>
-            <Feed />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/profile" 
-        element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/network" 
-        element={
-          <ProtectedRoute>
-            <Network />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/profile/:userId" 
-        element={
-          <ProtectedRoute>
-            <UserProfile />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/messaging" 
-        element={
-          <ProtectedRoute>
-            <Messaging />
-          </ProtectedRoute>
-        } 
-      />
+      <Route path="/home" element={<ProtectedRoute><Feed /></ProtectedRoute>}/>
+      <Route path="/forums" element={<ProtectedRoute><Forums /></ProtectedRoute>}/>
+      <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>}/>
+      <Route path="/jobs" element={<JobMarket />}/>
+      <Route path="/skill-profile" element={<ProtectedRoute><SkillProfile /></ProtectedRoute>}/>
+      <Route path="/recommended-jobs" element={<ProtectedRoute><RecommendedJobs /></ProtectedRoute>}/>
+      <Route path="/skill-gap-analysis" element={<ProtectedRoute><SkillGapAnalysis /></ProtectedRoute>}/>
+      <Route path="/recommended-courses" element={<ProtectedRoute><RecommendedCourses /></ProtectedRoute>}/>
+      <Route path="/learning" element={<ProtectedRoute><Feed /></ProtectedRoute>}/>
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>}/>
+      <Route path="/network" element={<ProtectedRoute><Network /></ProtectedRoute>}/>
+      <Route path="/profile/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>}/>
+      <Route path="/messaging" element={<ProtectedRoute><Messaging /></ProtectedRoute>}/>
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
