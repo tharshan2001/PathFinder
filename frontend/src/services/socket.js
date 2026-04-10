@@ -6,6 +6,7 @@ class SocketService {
   constructor() {
     this.socket = null;
     this.listeners = new Map();
+    this.onlineUsers = new Set();
   }
 
   connect(userId) {
@@ -31,6 +32,22 @@ class SocketService {
       const callback = this.listeners.get('newMessage');
       if (callback) callback(data);
     });
+
+    this.socket.on('userOnline', (data) => {
+      this.onlineUsers.add(data.userId);
+      const callback = this.listeners.get('userOnline');
+      if (callback) callback(data);
+    });
+
+    this.socket.on('userOffline', (data) => {
+      this.onlineUsers.delete(data.userId);
+      const callback = this.listeners.get('userOffline');
+      if (callback) callback(data);
+    });
+
+    this.socket.on('onlineUsers', (userIds) => {
+      this.onlineUsers = new Set(userIds);
+    });
   }
 
   disconnect() {
@@ -46,6 +63,10 @@ class SocketService {
 
   off(event) {
     this.listeners.delete(event);
+  }
+
+  isOnline(userId) {
+    return this.onlineUsers.has(userId);
   }
 
   joinRoom(userId) {

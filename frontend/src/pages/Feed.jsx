@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import userApi from '../services/userApi';
-import Navbar from '../components/Navbar';
+
 import { BookOpen, Briefcase, TrendingUp, ArrowRight, Clock, Star, MapPin, Users, Building2, GraduationCap } from 'lucide-react';
 
 const Feed = () => {
@@ -47,7 +47,6 @@ const Feed = () => {
 
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
-      <Navbar />
       <main className="max-w-6xl mx-auto px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}

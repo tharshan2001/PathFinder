@@ -1,5 +1,15 @@
 import User from "../../models/user/User.js";
+import Connection from "../../models/user/connectionRef.js";
 import { notifyProfileView } from "../../services/notificationService.js";
+
+// Helper: calculate connections count dynamically
+const getConnectionsCount = async (userId) => {
+  const count = await Connection.countDocuments({
+    $or: [{ requester: userId }, { recipient: userId }],
+    status: "accepted"
+  });
+  return count;
+};
 
 // Create a new user
 export const createUser = async (req, res) => {
@@ -22,6 +32,11 @@ export const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate("savedCourses savedJobs");
     if (!user) return res.status(404).json({ message: "User not found" });
+    
+    // Dynamic connections count
+    const dynamicCount = await getConnectionsCount(req.user.id);
+    user.connectionsCount = dynamicCount;
+    
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });

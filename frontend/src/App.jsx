@@ -19,25 +19,31 @@ import Notifications from './pages/Notifications';
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
 import GoogleCallback from './components/GoogleCallback';
+import AppLayout from './components/AppLayout';
 
 function App() {
   return (
     <Routes>
+      {/* Landing page - no sidebar */}
       <Route path="/" element={<Home />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
-      <Route path="/home" element={<ProtectedRoute><Feed /></ProtectedRoute>}/>
-      <Route path="/forums" element={<ProtectedRoute><Forums /></ProtectedRoute>}/>
-      <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>}/>
-      <Route path="/jobs" element={<JobMarket />}/>
-      <Route path="/skill-profile" element={<ProtectedRoute><SkillProfile /></ProtectedRoute>}/>
-      <Route path="/recommended-jobs" element={<ProtectedRoute><RecommendedJobs /></ProtectedRoute>}/>
-      <Route path="/skill-gap-analysis" element={<ProtectedRoute><SkillGapAnalysis /></ProtectedRoute>}/>
-      <Route path="/recommended-courses" element={<ProtectedRoute><RecommendedCourses /></ProtectedRoute>}/>
-      <Route path="/learning" element={<ProtectedRoute><Feed /></ProtectedRoute>}/>
-      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>}/>
-      <Route path="/network" element={<ProtectedRoute><Network /></ProtectedRoute>}/>
-      <Route path="/profile/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>}/>
-      <Route path="/messaging" element={<ProtectedRoute><Messaging /></ProtectedRoute>}/>
+      
+      {/* All protected routes with sidebar layout */}
+      <Route path="/home" element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>}/>
+      <Route path="/forums" element={<ProtectedRoute><AppLayout><Forums /></AppLayout></ProtectedRoute>}/>
+      <Route path="/courses" element={<ProtectedRoute><AppLayout><Courses /></AppLayout></ProtectedRoute>}/>
+      <Route path="/jobs" element={<ProtectedRoute><AppLayout><JobMarket /></AppLayout></ProtectedRoute>}/>
+      <Route path="/skill-profile" element={<ProtectedRoute><AppLayout><SkillProfile /></AppLayout></ProtectedRoute>}/>
+      <Route path="/recommended-jobs" element={<ProtectedRoute><AppLayout><RecommendedJobs /></AppLayout></ProtectedRoute>}/>
+      <Route path="/skill-gap-analysis" element={<ProtectedRoute><AppLayout><SkillGapAnalysis /></AppLayout></ProtectedRoute>}/>
+      <Route path="/recommended-courses" element={<ProtectedRoute><AppLayout><RecommendedCourses /></AppLayout></ProtectedRoute>}/>
+      <Route path="/learning" element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>}/>
+      <Route path="/profile" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>}/>
+      <Route path="/network" element={<ProtectedRoute><AppLayout><Network /></AppLayout></ProtectedRoute>}/>
+      <Route path="/profile/:userId" element={<ProtectedRoute><AppLayout><UserProfile /></AppLayout></ProtectedRoute>}/>
+      <Route path="/messaging" element={<ProtectedRoute><AppLayout><Messaging /></AppLayout></ProtectedRoute>}/>
+      <Route path="/notifications" element={<ProtectedRoute><AppLayout><Notifications /></AppLayout></ProtectedRoute>}/>
+      
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );

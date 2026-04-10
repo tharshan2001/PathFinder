@@ -1,5 +1,6 @@
 // controllers/user/authController.js
 import User from "../../models/user/User.js";
+import Connection from "../../models/user/connectionRef.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -119,6 +120,15 @@ export const logout = (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
 
+// Helper: calculate connections count dynamically
+const getConnectionsCount = async (userId) => {
+  const count = await Connection.countDocuments({
+    $or: [{ requester: userId }, { recipient: userId }],
+    status: "accepted"
+  });
+  return count;
+};
+
 // GET CURRENT USER
 export const getMe = async (req, res) => {
   try {
@@ -144,6 +154,9 @@ export const getMe = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    // Dynamic connections count
+    user.connectionsCount = await getConnectionsCount(decoded.id);
 
     res.json({ user });
   } catch (err) {

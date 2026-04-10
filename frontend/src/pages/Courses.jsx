@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import Navbar from "../components/Navbar";
+
 import { useAuthStore } from "../stores/authStore";
 import {
   createFeedback,
@@ -213,7 +213,6 @@ const Courses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-6">
         <div className="mb-5">
           <h1 className="text-2xl font-bold text-gray-900">Course Hub</h1>
@@ -244,7 +243,7 @@ const Courses = () => {
                   key={courseId}
                   className={`bg-white rounded-xl border p-5 transition ${
                     selectedCourseId === courseId
-                      ? 'border-teal-400 ring-2 ring-teal-100'
+                      ? 'border-[#007AFF] ring-2 ring-[#E5F1FF]'
                       : 'border-gray-200'
                   }`}
                 >

@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import chatApi from '../services/chatApi';
 import socketService from '../services/socket';
-import Navbar from '../components/Navbar';
-import { Search, Send, ArrowLeft, Phone, Video, MoreVertical, Smile, MessageSquare } from 'lucide-react';
+
+import { Search, Send, ArrowLeft, Phone, Video, MoreVertical, Smile, MessageSquare, Circle } from 'lucide-react';
 
 const Messaging = () => {
   const navigate = useNavigate();
@@ -17,6 +17,7 @@ const Messaging = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [otherUserOnline, setOtherUserOnline] = useState(false);
   const messagesEndRef = useRef(null);
   const selectedChatRef = useRef(null);
 
@@ -56,8 +57,31 @@ const Messaging = () => {
 
     socketService.on('newMessage', handleNewMessage);
 
+    const handleUserOnline = (data) => {
+      if (selectedChatRef.current) {
+        const otherUser = getOtherUser(selectedChatRef.current);
+        if (otherUser && (otherUser._id || otherUser) === data.userId) {
+          setOtherUserOnline(true);
+        }
+      }
+    };
+
+    const handleUserOffline = (data) => {
+      if (selectedChatRef.current) {
+        const otherUser = getOtherUser(selectedChatRef.current);
+        if (otherUser && (otherUser._id || otherUser) === data.userId) {
+          setOtherUserOnline(false);
+        }
+      }
+    };
+
+    socketService.on('userOnline', handleUserOnline);
+    socketService.on('userOffline', handleUserOffline);
+
     return () => {
       socketService.off('newMessage');
+      socketService.off('userOnline');
+      socketService.off('userOffline');
     };
   }, []);
 
@@ -88,6 +112,11 @@ const Messaging = () => {
   useEffect(() => {
     if (selectedChat) {
       fetchMessages(selectedChat._id);
+      const otherUser = getOtherUser(selectedChat);
+      if (otherUser) {
+        const otherUserId = otherUser._id || otherUser;
+        setOtherUserOnline(socketService.isOnline(otherUserId));
+      }
     }
   }, [selectedChat]);
 
@@ -168,16 +197,14 @@ const Messaging = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
+    <div className="h-[550px] bg-gray-50">
       {/* Main Content */}
-      <main className="max-w-[1400px] mx-auto px-4 py-6 h-[calc(100vh-64px)]">
+      <main className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-full">
           {/* Left - Chat List */}
-          <div className={`${selectedChat ? 'hidden md:block' : ''} md:col-span-4 bg-white rounded-2xl overflow-hidden shadow-sm ${selectedChat ? 'md:w-full' : ''}`}>
+          <div className={`${selectedChat ? 'hidden md:block' : ''} md:col-span-4 bg-white rounded-2xl overflow-hidden shadow-sm`}>
             {/* Search Header */}
-            <div className="p-4">
+            <div className="sticky top-0 bg-white z-10 p-4 border-b border-gray-100">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Messages</h2>
               <div className="relative">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -221,7 +248,6 @@ const Messaging = () => {
                           <div className="w-12 h-12 bg-gradient-to-br from-[#005eb5] to-[#005eb5] rounded-full flex items-center justify-center text-white font-bold">
                             {otherUser?.name?.charAt(0).toUpperCase() || '?'}
                           </div>
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#005eb5] rounded-full border-2 border-white"></div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
@@ -245,11 +271,11 @@ const Messaging = () => {
           </div>
 
           {/* Right - Chat Window */}
-          <div className={`${!selectedChat ? 'hidden md:flex' : ''} md:col-span-8 bg-white rounded-2xl overflow-hidden shadow-sm flex-col`}>
+          <div className={`${!selectedChat ? 'hidden md:flex' : ''} md:col-span-8 bg-white rounded-2xl overflow-hidden shadow-sm flex-col h-full`}>
             {selectedChat ? (
               <>
                 {/* Chat Header */}
-                <div className="p-4 flex items-center justify-between">
+                <div className="flex-shrink-0 p-4 border-b border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <button 
                       onClick={() => setSelectedChat(null)}
@@ -265,14 +291,20 @@ const Messaging = () => {
                         <div className="w-10 h-10 bg-gradient-to-br from-[#005eb5] to-[#005eb5] rounded-full flex items-center justify-center text-white font-bold">
                           {getOtherUser(selectedChat)?.name?.charAt(0).toUpperCase()}
                         </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                        {otherUserOnline && (
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                        )}
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">
                           {getOtherUser(selectedChat)?.name}
                         </h3>
                         <p className="text-xs text-gray-500">
-                          {getOtherUser(selectedChat)?.headline || 'Online'}
+                          {otherUserOnline ? (
+                            <span className="text-green-600 flex items-center gap-1">
+                              <Circle size={8} fill="currentColor" /> Online
+                            </span>
+                          ) : getOtherUser(selectedChat)?.headline || 'Offline'}
                         </p>
                       </div>
                     </div>
@@ -291,10 +323,7 @@ const Messaging = () => {
                 </div>
 
                 {/* Messages */}
-                <div 
-                  className="flex-1 overflow-y-auto p-4 space-y-4"
-                  style={{ maxHeight: 'calc(100vh - 280px)' }}
-                >
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(100vh-280px)]">
                   {messages.length === 0 ? (
                     <div className="text-center py-12">
                       <div className="w-20 h-20 bg-[#d6e3ff] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -337,27 +366,29 @@ const Messaging = () => {
                 </div>
 
                 {/* Message Input */}
-                <form onSubmit={handleSendMessage} className="p-4">
-                  <div className="flex items-center gap-3 bg-gray-100 rounded-2xl px-4 py-2">
-                    <button type="button" className="text-gray-400 hover:text-gray-600 transition">
-                      <Smile size={24} />
-                    </button>
-                    <input
-                      type="text"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type a message..."
-                      className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-400"
-                    />
-                    <button
-                      type="submit"
-                      disabled={!newMessage.trim() || sending}
-                      className="p-2 bg-[#005eb5] text-white rounded-xl hover:bg-[#004c99] disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    >
-                      <Send size={20} />
-                    </button>
-                  </div>
-                </form>
+                <div className="sticky bottom-0 flex-shrink-0 border-t border-gray-100 bg-white z-10">
+                  <form onSubmit={handleSendMessage} className="p-4 pb-6 md:pb-4">
+                    <div className="flex items-center gap-3 bg-gray-100 rounded-2xl px-4 py-2">
+                      <button type="button" className="text-gray-400 hover:text-gray-600 transition flex-shrink-0">
+                        <Smile size={24} />
+                      </button>
+                      <input
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Type a message..."
+                        className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-400 py-2 min-w-0"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!newMessage.trim() || sending}
+                        className="flex-shrink-0 p-2 bg-[#005eb5] text-white rounded-xl hover:bg-[#004c99] disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      >
+                        <Send size={20} />
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </>
             ) : (
               <div className="h-full flex items-center justify-center">
