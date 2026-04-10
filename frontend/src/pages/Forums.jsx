@@ -95,7 +95,7 @@ const Forums = () => {
           <h1 className="text-2xl font-bold text-gray-900">Discussion Forums</h1>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700"
+            className="flex items-center gap-2 px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium hover:bg-[#004c99]"
           >
             <Plus size={18} /> New Post
           </button>
@@ -106,7 +106,7 @@ const Forums = () => {
           <button
             onClick={() => setSelectedCategory('')}
             className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap ${
-              selectedCategory === '' ? 'bg-teal-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+              selectedCategory === '' ? 'bg-[#005eb5] text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
             }`}
           >
             All
@@ -116,7 +116,7 @@ const Forums = () => {
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap ${
-                selectedCategory === cat ? 'bg-teal-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                selectedCategory === cat ? 'bg-[#005eb5] text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
               }`}
             >
               {cat}
@@ -159,7 +159,7 @@ const Forums = () => {
               </select>
               <button
                 onClick={handleCreatePost}
-                className="w-full py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700"
+                className="w-full py-2 bg-[#005eb5] text-white rounded-lg font-medium hover:bg-[#004c99]"
               >
                 Post
               </button>
@@ -186,14 +186,14 @@ const Forums = () => {
                   </div>
                   <div>
                     <p className="font-medium text-sm">{selectedForum.userId?.name || 'Unknown'}</p>
-                    <span className="text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded">{selectedForum.category}</span>
+                    <span className="text-xs text-[#005eb5] bg-[#d6e3ff] px-2 py-0.5 rounded">{selectedForum.category}</span>
                   </div>
                 </div>
                 <p className="text-gray-700 mb-3">{selectedForum.content}</p>
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <button 
                     onClick={() => handleVote(selectedForum._id, 'up')}
-                    className="flex items-center gap-1 hover:text-teal-600"
+                    className="flex items-center gap-1 hover:text-[#005eb5]"
                   >
                     <ThumbsUp size={16} /> {selectedForum.upvotes?.length || 0}
                   </button>
@@ -230,7 +230,7 @@ const Forums = () => {
                 />
                 <button
                   onClick={handleAddReply}
-                  className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700"
+                  className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium hover:bg-[#004c99]"
                 >
                   Reply
                 </button>
@@ -242,7 +242,7 @@ const Forums = () => {
         {/* Forums List */}
         {loading ? (
           <div className="flex justify-center py-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb5]"></div>
           </div>
         ) : forums.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
@@ -262,7 +262,7 @@ const Forums = () => {
                   </div>
                   <div>
                     <p className="font-medium text-sm">{forum.userId?.name || 'Unknown'}</p>
-                    <span className="text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded">{forum.category}</span>
+                    <span className="text-xs text-[#005eb5] bg-[#d6e3ff] px-2 py-0.5 rounded">{forum.category}</span>
                   </div>
                 </div>
                 <h3 className="font-semibold text-lg mb-2">{forum.title}</h3>
@@ -270,7 +270,7 @@ const Forums = () => {
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <button 
                     onClick={(e) => { e.stopPropagation(); handleVote(forum._id, 'up') }}
-                    className="flex items-center gap-1 hover:text-teal-600"
+                    className="flex items-center gap-1 hover:text-[#005eb5]"
                   >
                     <ThumbsUp size={16} /> {forum.upvotes?.length || 0}
                   </button>
