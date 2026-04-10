@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import connectionApi from '../services/connectionApi';
 import chatApi from '../services/chatApi';
-import Navbar from '../components/Navbar';
+
 import { Check, X, MessageSquare, UserPlus, Trash2, Search } from 'lucide-react';
 
 const Network = () => {
@@ -120,7 +120,6 @@ const Network = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <main className="max-w-screen-xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Main Content */}

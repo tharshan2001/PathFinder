@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import userApi from '../services/userApi';
 import connectionApi from '../services/connectionApi';
 import chatApi from '../services/chatApi';
-import Navbar from '../components/Navbar';
+
 import { UserPlus, Check, X, MapPin, MoreHorizontal, FileText, Download } from 'lucide-react';
 
 const UserProfile = () => {
@@ -143,8 +143,6 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
       {/* Main Content */}
       <main className="max-w-[1128px] mx-auto px-4 py-6 mt-2">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar';
+
 import { useAuthStore } from '../stores/authStore';
 import forumApi from '../services/forumApi';
 import { MessageCircle, ThumbsUp, User, Plus, X } from 'lucide-react';
@@ -89,7 +89,6 @@ const Forums = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <main className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Discussion Forums</h1>

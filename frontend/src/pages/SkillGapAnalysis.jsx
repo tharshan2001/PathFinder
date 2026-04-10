@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, ArrowRight, BarChart3, CheckCircle2, Sparkles, TriangleAlert } from 'lucide-react';
-import Navbar from '../components/Navbar';
+
 import { getSkillGapAnalysis } from '../services/skillProfileApi';
 
 const SkillGapAnalysis = () => {
@@ -35,7 +35,6 @@ const SkillGapAnalysis = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-5">
         <section className="bg-gradient-to-r from-[#007AFF] to-[#0056B3] rounded-xl p-6 text-white shadow-sm">
           <div className="flex items-center justify-between gap-3 flex-wrap">

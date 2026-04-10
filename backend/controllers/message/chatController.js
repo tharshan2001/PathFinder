@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import { notifyMessage } from "../../services/notificationService.js";
 
 let io;
+const onlineUsers = new Map();
 
 export const initSocket = (server) => {
   io = new Server(server, {
@@ -16,11 +17,26 @@ export const initSocket = (server) => {
 
     socket.on("joinRoom", (userId) => {
       socket.join(userId);
+      socket.userId = userId;
+      onlineUsers.set(userId, socket.id);
+      
+      io.emit("userOnline", { userId });
+      io.emit("onlineUsers", Array.from(onlineUsers.keys()));
       console.log(`User ${userId} joined their room.`);
     });
 
-    socket.on("disconnect", () => console.log(`User disconnected: ${socket.id}`));
+    socket.on("disconnect", () => {
+      if (socket.userId) {
+        onlineUsers.delete(socket.userId);
+        io.emit("userOffline", { userId: socket.userId });
+      }
+      console.log(`User disconnected: ${socket.id}`);
+    });
   });
+};
+
+export const isUserOnline = (userId) => {
+  return onlineUsers.has(userId);
 };
 
 

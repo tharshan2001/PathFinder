@@ -17,7 +17,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import Navbar from '../components/Navbar';
+
 import { useAuthStore } from '../stores/authStore';
 import jobMarketApi from '../services/jobMarketApi';
 
@@ -1565,7 +1565,6 @@ function JobMarket({ guestMode = false }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 py-6">
         <section className="bg-linear-to-r from-[#005eb5] to-[#004c99] rounded-xl shadow-sm p-6 mb-6 text-white">
           <div className="flex items-center justify-between gap-3 flex-wrap">

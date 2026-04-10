@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+
 import notificationApi from '../services/notificationApi';
 import { Bell, Check, Trash2, CheckCircle, UserPlus, MessageSquare, Briefcase, BookOpen, ArrowLeft } from 'lucide-react';
 
@@ -95,8 +95,6 @@ const Notifications = () => {
 
   return (
     <div className="min-h-screen bg-[#faf9f6]">
-      <Navbar />
-      
       <main className="max-w-3xl mx-auto px-4 py-6">
         <button 
           onClick={() => navigate('/home')}
