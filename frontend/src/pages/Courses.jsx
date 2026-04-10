@@ -244,7 +244,7 @@ const Courses = () => {
                   key={courseId}
                   className={`bg-white rounded-xl border p-5 transition ${
                     selectedCourseId === courseId
-                      ? 'border-teal-400 ring-2 ring-teal-100'
+                      ? 'border-[#007AFF] ring-2 ring-[#E5F1FF]'
                       : 'border-gray-200'
                   }`}
                 >

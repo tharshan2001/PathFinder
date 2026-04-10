@@ -32,7 +32,7 @@ const RecommendedCourses = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-5">
-        <section className="bg-gradient-to-r from-teal-500 to-teal-700 rounded-xl p-6 text-white shadow-sm">
+        <section className="bg-gradient-to-r from-[#007AFF] to-[#0056B3] rounded-xl p-6 text-white shadow-sm">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <p className="inline-flex items-center gap-2 text-xs bg-white/20 border border-white/30 px-2.5 py-1 rounded-full mb-3">
@@ -46,7 +46,7 @@ const RecommendedCourses = () => {
             </div>
             <button
               onClick={() => navigate('/skill-gap-analysis')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-teal-700 text-sm font-semibold hover:bg-teal-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-[#0056B3] text-sm font-semibold hover:bg-[#E5F1FF] transition"
             >
               <ArrowLeft size={16} />
               Back to Analysis
@@ -78,9 +78,9 @@ const RecommendedCourses = () => {
                   {(group.courses || []).map((course) => (
                     <article
                       key={course._id}
-                      className="rounded-xl border border-gray-200 p-4 bg-gray-50 hover:border-teal-300 transition"
+                      className="rounded-xl border border-gray-200 p-4 bg-gray-50 hover:border-[#E5F1FF] transition"
                     >
-                      <div className="inline-flex items-center gap-1 text-xs text-teal-700 bg-teal-50 border border-teal-100 px-2 py-1 rounded-full">
+                      <div className="inline-flex items-center gap-1 text-xs text-[#0056B3] bg-[#E5F1FF] border border-[#E5F1FF] px-2 py-1 rounded-full">
                         <BookOpen size={13} />
                         {course.category}
                       </div>
@@ -97,7 +97,7 @@ const RecommendedCourses = () => {
                       </div>
                       <button
                         onClick={() => navigate(`/courses?courseId=${encodeURIComponent(course._id)}`)}
-                        className="mt-3 w-full px-3 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 transition"
+                        className="mt-3 w-full px-3 py-2 rounded-lg bg-[#007AFF] text-white text-sm font-medium hover:bg-[#0056B3] transition"
                       >
                         Open Course
                       </button>

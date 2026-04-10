@@ -1850,8 +1850,8 @@ function JobMarket({ guestMode = false }) {
                     key={job._id}
                     className={`bg-white rounded-xl border shadow-sm p-4 transition ${
                       highlightedJobId === job._id
-                        ? 'border-teal-400 ring-2 ring-teal-100'
-                        : 'hover:border-teal-300'
+                        ? 'border-[#007AFF] ring-2 ring-[#E5F1FF]'
+                        : 'hover:border-[#E5F1FF]'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -2009,7 +2009,7 @@ function JobMarket({ guestMode = false }) {
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => loadApplications({ showNotice: true })}
-                  className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium"
+                  className="px-4 py-2 bg-[#007AFF] text-white rounded-lg text-sm font-medium"
                 >
                   Search
                 </button>
@@ -2073,7 +2073,7 @@ function JobMarket({ guestMode = false }) {
                     </div>
 
                     {item.interviewSchedule?.date ? (
-                      <div className="mt-3 p-3 rounded-lg bg-teal-50 border border-teal-100 text-sm text-teal-900">
+                      <div className="mt-3 p-3 rounded-lg bg-[#E5F1FF] border border-[#E5F1FF] text-sm text-[#0056B3]">
                         <p className="font-semibold">Interview Details</p>
                         <p className="mt-1">When: {formatDateTime(item.interviewSchedule.date)}</p>
                         <p>Type: {item.interviewSchedule.type || '-'}</p>
@@ -2197,36 +2197,36 @@ function JobMarket({ guestMode = false }) {
               ) : null}
 
               {alertProcessSummary ? (
-                <div className="mt-4 border rounded-lg p-3 bg-teal-50/60 border-teal-200">
+                <div className="mt-4 border rounded-lg p-3 bg-[#E5F1FF]/60 border-[#E5F1FF]">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div>
-                      <p className="text-sm font-semibold text-teal-900">Last Process Run</p>
-                      <p className="text-xs text-teal-700 mt-0.5">
+                      <p className="text-sm font-semibold text-[#0056B3]">Last Process Run</p>
+                      <p className="text-xs text-[#0056B3] mt-0.5">
                         {formatDateTime(alertProcessSummary.processedAt)}
                       </p>
                     </div>
                     <button
                       onClick={() => setAlertProcessSummary(null)}
-                      className="px-2.5 py-1.5 border border-teal-300 rounded-lg text-xs font-medium text-teal-700 hover:bg-teal-100"
+                      className="px-2.5 py-1.5 border border-[#E5F1FF] rounded-lg text-xs font-medium text-[#0056B3] hover:bg-[#E5F1FF]"
                     >
                       Clear
                     </button>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
-                    <div className="p-2 rounded bg-white border border-teal-100">
+                    <div className="p-2 rounded bg-white border border-[#E5F1FF]">
                       <p className="text-xs text-gray-500">Processed Alerts</p>
                       <p className="font-semibold text-gray-900">{alertProcessSummary.processedAlerts || 0}</p>
                     </div>
-                    <div className="p-2 rounded bg-white border border-teal-100">
+                    <div className="p-2 rounded bg-white border border-[#E5F1FF]">
                       <p className="text-xs text-gray-500">Alerts With Matches</p>
                       <p className="font-semibold text-gray-900">{alertProcessSummary.alertsWithMatches || 0}</p>
                     </div>
-                    <div className="p-2 rounded bg-white border border-teal-100">
+                    <div className="p-2 rounded bg-white border border-[#E5F1FF]">
                       <p className="text-xs text-gray-500">Email Sent</p>
                       <p className="font-semibold text-gray-900">{alertProcessSummary.notificationSummary?.emailSent || 0}</p>
                     </div>
-                    <div className="p-2 rounded bg-white border border-teal-100">
+                    <div className="p-2 rounded bg-white border border-[#E5F1FF]">
                       <p className="text-xs text-gray-500">Push Saved</p>
                       <p className="font-semibold text-gray-900">{alertProcessSummary.notificationSummary?.pushSent || 0}</p>
                     </div>
@@ -2235,10 +2235,10 @@ function JobMarket({ guestMode = false }) {
                   {Array.isArray(alertProcessSummary.results) && alertProcessSummary.results.length > 0 ? (
                     <div className="mt-3 space-y-2">
                       {alertProcessSummary.results.map((result) => (
-                        <div key={String(result.alertId)} className="p-2.5 rounded-lg bg-white border border-teal-100">
+                        <div key={String(result.alertId)} className="p-2.5 rounded-lg bg-white border border-[#E5F1FF]">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-sm font-semibold text-gray-900">{result.alertTitle || 'Alert'}</p>
-                            <span className="text-xs px-2 py-1 rounded bg-teal-100 text-teal-800">
+                            <span className="text-xs px-2 py-1 rounded bg-[#E5F1FF] text-[#0056B3]">
                               {result.matchCount || 0} matches
                             </span>
                           </div>
@@ -2285,7 +2285,7 @@ function JobMarket({ guestMode = false }) {
                         <p className="text-sm text-gray-500 mt-1">{alert.frequency} • {alert.remotePolicy}</p>
                         <p className="text-xs text-gray-500 mt-2">Matches so far: {alert.totalMatches || 0}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded ${alert.isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`text-xs px-2 py-1 rounded ${alert.isActive ? 'bg-[#E5F1FF] text-[#0056B3]' : 'bg-gray-100 text-gray-700'}`}>
                         {alert.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -2961,18 +2961,18 @@ function JobMarket({ guestMode = false }) {
               : 'opacity-0 translate-y-2 scale-95 pointer-events-none'
           }`}
         >
-          <div className="rounded-xl border border-emerald-300/70 bg-linear-to-br from-emerald-500 to-emerald-600 text-white shadow-xl">
+          <div className="rounded-xl border border-[#E5F1FF]/70 bg-linear-to-br from-[#E5F1FF]0 to-[#007AFF] text-white shadow-xl">
             <div className="px-3 py-2.5 flex items-start gap-3">
               <span className="mt-0.5 shrink-0 h-7 w-7 rounded-full bg-white/20 inline-flex items-center justify-center">
                 <CheckCircle2 size={16} />
               </span>
               <div className="min-w-0">
                 <p className="text-sm font-semibold leading-tight">{applicationNoticeTitle}</p>
-                <p className="text-xs text-emerald-50 mt-0.5 truncate">{applicationNotice}</p>
+                <p className="text-xs text-[#E5F1FF] mt-0.5 truncate">{applicationNotice}</p>
               </div>
               <button
                 onClick={dismissApplicationNotice}
-                className="ml-auto shrink-0 p-1 rounded-md text-emerald-50/90 hover:bg-white/15 hover:text-white transition-colors"
+                className="ml-auto shrink-0 p-1 rounded-md text-[#E5F1FF]/90 hover:bg-white/15 hover:text-white transition-colors"
                 title="Dismiss"
               >
                 <X size={14} />

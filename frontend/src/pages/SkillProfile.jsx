@@ -138,7 +138,7 @@ const SkillProfile = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-5">
-        <section className="bg-gradient-to-r from-teal-500 to-teal-700 rounded-xl p-6 text-white shadow-sm">
+        <section className="bg-gradient-to-r from-[#007AFF] to-[#0056B3] rounded-xl p-6 text-white shadow-sm">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <p className="inline-flex items-center gap-2 text-xs bg-white/20 border border-white/30 px-2.5 py-1 rounded-full mb-3">
@@ -152,7 +152,7 @@ const SkillProfile = () => {
             </div>
             <button
               onClick={() => navigate('/recommended-jobs')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-teal-700 text-sm font-semibold hover:bg-teal-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-[#0056B3] text-sm font-semibold hover:bg-[#E5F1FF] transition"
             >
               <Briefcase size={16} />
               Recommended Jobs
@@ -174,12 +174,12 @@ const SkillProfile = () => {
               value={newSkill.name}
               onChange={(e) => setNewSkill((prev) => ({ ...prev, name: e.target.value }))}
               placeholder="Skill name"
-              className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="md:col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#007AFF]"
             />
             <select
               value={newSkill.level}
               onChange={(e) => setNewSkill((prev) => ({ ...prev, level: e.target.value }))}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#007AFF]"
             >
               {levels.map((level) => (
                 <option key={level} value={level}>{level}</option>
@@ -188,7 +188,7 @@ const SkillProfile = () => {
             <button
               type="submit"
               disabled={actionLoading === 'add'}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#007AFF] text-white text-sm font-medium hover:bg-[#0056B3] disabled:opacity-60"
             >
               <Plus size={16} />
               {actionLoading === 'add' ? 'Adding...' : 'Add Skill'}
@@ -204,7 +204,7 @@ const SkillProfile = () => {
                 value={editLevel}
                 onChange={(e) => setEditLevel(e.target.value)}
                 disabled={!canUpdateSelectedSkill || actionLoading === 'update'}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#007AFF] disabled:opacity-50"
               >
                 {levels.map((level) => (
                   <option key={level} value={level}>{level}</option>
@@ -213,7 +213,7 @@ const SkillProfile = () => {
               <button
                 onClick={handleUpdateSelectedSkill}
                 disabled={!canUpdateSelectedSkill || actionLoading === 'update'}
-                className="px-4 py-2 rounded-lg bg-teal-600 text-white text-sm font-medium hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-lg bg-[#007AFF] text-white text-sm font-medium hover:bg-[#0056B3] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {actionLoading === 'update' ? 'Updating...' : 'Update Selected'}
               </button>
@@ -248,11 +248,11 @@ const SkillProfile = () => {
                         type="checkbox"
                         checked={selectedSkills.has(skill.name)}
                         onChange={() => toggleSkillSelection(skill.name)}
-                        className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                        className="h-4 w-4 rounded border-gray-300 text-[#007AFF] focus:ring-[#007AFF]"
                       />
                       <span className="font-medium text-gray-900">{skill.name}</span>
                     </div>
-                    <span className="text-xs px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-100">
+                    <span className="text-xs px-2.5 py-1 rounded-full bg-[#E5F1FF] text-[#0056B3] border border-[#E5F1FF]">
                       {skill.level}
                     </span>
                   </label>

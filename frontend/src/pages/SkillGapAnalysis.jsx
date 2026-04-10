@@ -37,7 +37,7 @@ const SkillGapAnalysis = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-5">
-        <section className="bg-gradient-to-r from-teal-500 to-teal-700 rounded-xl p-6 text-white shadow-sm">
+        <section className="bg-gradient-to-r from-[#007AFF] to-[#0056B3] rounded-xl p-6 text-white shadow-sm">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <p className="inline-flex items-center gap-2 text-xs bg-white/20 border border-white/30 px-2.5 py-1 rounded-full mb-3">
@@ -51,7 +51,7 @@ const SkillGapAnalysis = () => {
             </div>
             <button
               onClick={() => navigate('/recommended-courses')}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-teal-700 text-sm font-semibold hover:bg-teal-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-[#0056B3] text-sm font-semibold hover:bg-[#E5F1FF] transition"
             >
               Recommended Courses
               <ArrowRight size={16} />
@@ -94,7 +94,7 @@ const SkillGapAnalysis = () => {
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="bg-white border rounded-xl p-5 shadow-sm">
                 <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <CheckCircle2 size={18} className="text-teal-600" />
+                  <CheckCircle2 size={18} className="text-[#007AFF]" />
                   Your Current Skills
                 </h2>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -102,7 +102,7 @@ const SkillGapAnalysis = () => {
                     <p className="text-sm text-gray-500">No skills found.</p>
                   ) : (
                     userSkills.map((skill) => (
-                      <span key={skill.name} className="text-xs px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-100">
+                      <span key={skill.name} className="text-xs px-2.5 py-1 rounded-full bg-[#E5F1FF] text-[#0056B3] border border-[#E5F1FF]">
                         {skill.name} - {skill.level}
                       </span>
                     ))
@@ -112,7 +112,7 @@ const SkillGapAnalysis = () => {
 
               <div className="bg-white border rounded-xl p-5 shadow-sm">
                 <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <BarChart3 size={18} className="text-teal-600" />
+                  <BarChart3 size={18} className="text-[#007AFF]" />
                   Top Market Skills
                 </h2>
                 <div className="mt-4 space-y-3">
@@ -128,7 +128,7 @@ const SkillGapAnalysis = () => {
                             <span className="text-gray-500">{skill.demandCount} jobs</span>
                           </div>
                           <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-teal-500 rounded-full" style={{ width: `${percent}%` }} />
+                            <div className="h-full bg-[#007AFF] rounded-full" style={{ width: `${percent}%` }} />
                           </div>
                         </div>
                       );
