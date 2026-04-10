@@ -14,6 +14,7 @@ import {
   Send,
   TrendingUp,
   Trash2,
+  X,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useAuthStore } from '../stores/authStore';
@@ -38,9 +39,165 @@ const formatDate = (value) => {
   return new Date(value).toLocaleDateString();
 };
 
+const formatDateTime = (value) => {
+  if (!value) return '-';
+  return new Date(value).toLocaleString();
+};
+
+const formatStatusLabel = (value) =>
+  String(value || '-')
+    .split('_')
+    .join(' ');
+
 const money = (value, currency = 'USD') => {
   if (value === null || value === undefined || value === '') return '-';
   return `${currency} ${Number(value).toLocaleString()}`;
+};
+
+const isValidHttpUrl = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw) return true;
+
+  try {
+    const parsed = new URL(raw);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+const parseOptionalNumber = (value) => {
+  const raw = String(value ?? '').trim();
+  if (!raw) return null;
+
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : Number.NaN;
+};
+
+const toNumberOrDefault = (value, defaultValue = 0) => {
+  const parsed = parseOptionalNumber(value);
+  if (parsed === null || Number.isNaN(parsed)) return defaultValue;
+  return parsed;
+};
+
+const validateSalaryRange = (minValue, maxValue, label) => {
+  const min = parseOptionalNumber(minValue);
+  const max = parseOptionalNumber(maxValue);
+
+  if (Number.isNaN(min) || Number.isNaN(max)) {
+    return `${label} values must be valid numbers`;
+  }
+
+  if (min !== null && min < 0) {
+    return `${label} minimum cannot be negative`;
+  }
+
+  if (max !== null && max < 0) {
+    return `${label} maximum cannot be negative`;
+  }
+
+  if (min !== null && max !== null && max < min) {
+    return `${label} maximum must be greater than or equal to minimum`;
+  }
+
+  return '';
+};
+
+const validateJobForm = (form) => {
+  if (!String(form.title || '').trim()) return 'Job title is required';
+  if (!String(form.company || '').trim()) return 'Company is required';
+  if (!String(form.location || '').trim()) return 'Location is required';
+  if (!String(form.industry || '').trim()) return 'Industry is required';
+  if (!String(form.role || '').trim()) return 'Role is required';
+  if (!String(form.description || '').trim()) return 'Job description is required';
+
+  const salaryError = validateSalaryRange(form.salaryMin, form.salaryMax, 'Salary');
+  if (salaryError) return salaryError;
+
+  if (!isValidHttpUrl(form.companyWebsite)) {
+    return 'Company website must be a valid http/https URL';
+  }
+
+  if (!isValidHttpUrl(form.applicationUrl)) {
+    return 'Application URL must be a valid http/https URL';
+  }
+
+  return '';
+};
+
+const validateApplicationForm = (form) => {
+  if (String(form.coverLetter || '').trim().length < 20) {
+    return 'Cover letter must be at least 20 characters';
+  }
+
+  const expectedSalaryError = validateSalaryRange(
+    form.expectedSalaryMin,
+    form.expectedSalaryMax,
+    'Expected salary'
+  );
+  if (expectedSalaryError) return expectedSalaryError;
+
+  if (!isValidHttpUrl(form.resumeUrl)) {
+    return 'Resume URL must be a valid http/https URL';
+  }
+
+  if (!isValidHttpUrl(form.portfolioUrl)) {
+    return 'Portfolio URL must be a valid http/https URL';
+  }
+
+  return '';
+};
+
+const validateAlertForm = (form) => {
+  if (!String(form.title || '').trim()) return 'Alert title is required';
+
+  const hasTargeting =
+    toCsvList(form.keywordsCsv).length > 0 ||
+    toCsvList(form.skillsCsv).length > 0 ||
+    toCsvList(form.companiesCsv).length > 0 ||
+    Boolean(String(form.location || '').trim());
+
+  if (!hasTargeting) {
+    return 'Add at least one filter: keyword, skill, company, or location';
+  }
+
+  return '';
+};
+
+const validateCategoryForm = (form) => {
+  if (String(form.name || '').trim().length < 2) {
+    return 'Category name must be at least 2 characters';
+  }
+
+  if (String(form.description || '').trim().length > 500) {
+    return 'Category description cannot exceed 500 characters';
+  }
+
+  return '';
+};
+
+const validateSkillForm = (form) => {
+  if (!String(form.skill || '').trim()) return 'Skill name is required';
+
+  const demandScore = parseOptionalNumber(form.demandScore);
+  if (Number.isNaN(demandScore)) return 'Demand score must be a valid number';
+  if (demandScore !== null && (demandScore < 0 || demandScore > 100)) {
+    return 'Demand score must be between 0 and 100';
+  }
+
+  const remoteDemandScore = parseOptionalNumber(form.remoteDemandScore);
+  if (Number.isNaN(remoteDemandScore)) return 'Remote demand score must be a valid number';
+  if (remoteDemandScore !== null && (remoteDemandScore < 0 || remoteDemandScore > 100)) {
+    return 'Remote demand score must be between 0 and 100';
+  }
+
+  const growthRate = parseOptionalNumber(form.growthRate);
+  if (Number.isNaN(growthRate)) return 'Growth rate must be a valid number';
+  if (growthRate !== null && (growthRate < -100 || growthRate > 500)) {
+    return 'Growth rate must be between -100 and 500';
+  }
+
+  return '';
 };
 
 const emptyJobForm = {
@@ -142,7 +299,15 @@ function JobMarket({ guestMode = false }) {
   const [applicationsLoading, setApplicationsLoading] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState('');
   const [applicationViewMode, setApplicationViewMode] = useState('mine');
+  const [applicationNoticeTitle, setApplicationNoticeTitle] = useState('Update Complete');
+  const [applicationNotice, setApplicationNotice] = useState('');
+  const [applicationNoticeVisible, setApplicationNoticeVisible] = useState(false);
   const [applicationJobId, setApplicationJobId] = useState('');
+  const [adminJobOptions, setAdminJobOptions] = useState([]);
+  const [adminJobOptionsLoading, setAdminJobOptionsLoading] = useState(false);
+  const [showApplicationDetails, setShowApplicationDetails] = useState(false);
+  const [applicationDetailsLoading, setApplicationDetailsLoading] = useState(false);
+  const [selectedApplicationDetails, setSelectedApplicationDetails] = useState(null);
   const [showApplicationManager, setShowApplicationManager] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [applicationManagerStatus, setApplicationManagerStatus] = useState('submitted');
@@ -165,6 +330,7 @@ function JobMarket({ guestMode = false }) {
   const [alertForm, setAlertForm] = useState(emptyAlertForm);
   const [alertMatches, setAlertMatches] = useState({});
   const [loadingMatchesFor, setLoadingMatchesFor] = useState('');
+  const [alertProcessSummary, setAlertProcessSummary] = useState(null);
 
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
@@ -189,6 +355,7 @@ function JobMarket({ guestMode = false }) {
   const userRole = String(user?.role || '').toLowerCase();
   const isAdmin = userRole === 'admin';
   const isCandidateRole = userRole === 'user' || userRole === 'mentor';
+  const canSubmitApplications = isCandidateRole;
   const canRunProcessAllAlerts = isAdmin;
   const roleWorkspaceLabel = isGuestMode
     ? 'Guest Workspace'
@@ -259,30 +426,35 @@ function JobMarket({ guestMode = false }) {
     [isGuestMode, jobStats, appStats, alertStats, skillStats, publicCategoryCount]
   );
 
-  const buildJobPayload = (form) => ({
-    title: form.title,
-    description: form.description,
-    company: form.company,
-    location: form.location,
-    category: {
-      industry: form.industry,
-      role: form.role,
-      level: form.level,
-    },
-    employmentType: form.employmentType,
-    remotePolicy: form.remotePolicy,
-    skillsRequired: toCsvList(form.skillsCsv).map((name) => ({
-      name,
-      level: 'Intermediate',
-    })),
-    salary: {
-      min: form.salaryMin ? Number(form.salaryMin) : undefined,
-      max: form.salaryMax ? Number(form.salaryMax) : undefined,
-      currency: 'USD',
-    },
-    companyWebsite: form.companyWebsite,
-    applicationUrl: form.applicationUrl,
-  });
+  const buildJobPayload = (form) => {
+    const salaryMin = parseOptionalNumber(form.salaryMin);
+    const salaryMax = parseOptionalNumber(form.salaryMax);
+
+    return {
+      title: String(form.title || '').trim(),
+      description: String(form.description || '').trim(),
+      company: String(form.company || '').trim(),
+      location: String(form.location || '').trim(),
+      category: {
+        industry: String(form.industry || '').trim(),
+        role: String(form.role || '').trim(),
+        level: form.level,
+      },
+      employmentType: form.employmentType,
+      remotePolicy: form.remotePolicy,
+      skillsRequired: toCsvList(form.skillsCsv).map((name) => ({
+        name,
+        level: 'Intermediate',
+      })),
+      salary: {
+        min: salaryMin === null || Number.isNaN(salaryMin) ? undefined : salaryMin,
+        max: salaryMax === null || Number.isNaN(salaryMax) ? undefined : salaryMax,
+        currency: 'USD',
+      },
+      companyWebsite: String(form.companyWebsite || '').trim(),
+      applicationUrl: String(form.applicationUrl || '').trim(),
+    };
+  };
 
   const mapJobToForm = (job) => ({
     title: job?.title || '',
@@ -427,7 +599,8 @@ function JobMarket({ guestMode = false }) {
     }
   };
 
-  const loadApplications = async () => {
+  const loadApplications = async (options = {}) => {
+    const showNotice = Boolean(options?.showNotice);
     if (!currentUserId) return;
     setApplicationsLoading(true);
     setError('');
@@ -436,6 +609,9 @@ function JobMarket({ guestMode = false }) {
       const res = await jobMarketApi.getUserApplications(currentUserId, params);
       setApplications(res.data.applications || []);
       setApplicationViewMode('mine');
+      if (showNotice) {
+        showApplicationNotice('Your applications are up to date.', 'Applications Refreshed');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load applications');
     } finally {
@@ -443,14 +619,41 @@ function JobMarket({ guestMode = false }) {
     }
   };
 
-  const loadApplicationsByJob = async () => {
+  const loadAdminJobOptions = async () => {
+    if (!isAdmin) return;
+
+    setAdminJobOptionsLoading(true);
+    try {
+      const res = await jobMarketApi.getJobs({
+        page: 1,
+        limit: 100,
+        sortBy: 'postedDate',
+        sortOrder: 'desc',
+      });
+
+      const jobItems = res.data?.jobs || [];
+      setAdminJobOptions(jobItems);
+
+      // Preserve current selection; otherwise pick first job so admin can view quickly.
+      if (!applicationJobId && jobItems.length > 0) {
+        setApplicationJobId(jobItems[0]._id);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load jobs for recruiter view');
+    } finally {
+      setAdminJobOptionsLoading(false);
+    }
+  };
+
+  const loadApplicationsByJob = async (options = {}) => {
+    const showNotice = Boolean(options?.showNotice);
     if (!isAdmin) {
       setError('Admin access required');
       return;
     }
 
     if (!applicationJobId) {
-      setError('Enter a Job ID to load applications');
+      setError('Select a job to load applications');
       return;
     }
 
@@ -461,6 +664,9 @@ function JobMarket({ guestMode = false }) {
       const res = await jobMarketApi.getJobApplications(applicationJobId, params);
       setApplications(res.data.applications || []);
       setApplicationViewMode('job');
+      if (showNotice) {
+        showApplicationNotice('Applications for the selected job are loaded.', 'Recruiter View Ready');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load job applications');
     } finally {
@@ -468,7 +674,8 @@ function JobMarket({ guestMode = false }) {
     }
   };
 
-  const loadApplicationsByStatusView = async () => {
+  const loadApplicationsByStatusView = async (options = {}) => {
+    const showNotice = Boolean(options?.showNotice);
     if (!isAdmin) {
       setError('Admin access required');
       return;
@@ -485,6 +692,9 @@ function JobMarket({ guestMode = false }) {
       const res = await jobMarketApi.getApplicationsByStatus(applicationStatus);
       setApplications(res.data.applications || []);
       setApplicationViewMode('status');
+      if (showNotice) {
+        showApplicationNotice('Status feed is loaded for the selected stage.', 'Status Feed Ready');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load applications by status');
     } finally {
@@ -602,6 +812,9 @@ function JobMarket({ guestMode = false }) {
 
     if (activeTab === 'applications') {
       if (!currentUserId) return;
+      if (isAdmin) {
+        loadAdminJobOptions();
+      }
       loadApplications();
       return;
     }
@@ -620,7 +833,7 @@ function JobMarket({ guestMode = false }) {
     if (activeTab === 'trending') {
       loadTrending();
     }
-  }, [activeTab, currentUserId, jobFeedMode, categoryViewMode, trendingViewMode]);
+  }, [activeTab, currentUserId, isAdmin, jobFeedMode, categoryViewMode, trendingViewMode]);
 
   useEffect(() => {
     if (!isGuestMode) return;
@@ -629,10 +842,45 @@ function JobMarket({ guestMode = false }) {
     }
   }, [activeTab, isGuestMode]);
 
+  useEffect(() => {
+    if (!applicationNotice) return;
+
+    setApplicationNoticeVisible(true);
+
+    const fadeTimer = setTimeout(() => {
+      setApplicationNoticeVisible(false);
+    }, 2000);
+
+    const clearTimer = setTimeout(() => {
+      setApplicationNotice('');
+    }, 2400);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [applicationNotice]);
+
+  const showApplicationNotice = (message, title = 'Update Complete') => {
+    setApplicationNoticeTitle(title);
+    setApplicationNotice(message);
+  };
+
+  const dismissApplicationNotice = () => {
+    setApplicationNoticeVisible(false);
+    setTimeout(() => setApplicationNotice(''), 250);
+  };
+
   const handleCreateJob = async (event) => {
     event.preventDefault();
     if (!isAdmin) {
       setError('Admin access required');
+      return;
+    }
+
+    const jobValidationError = validateJobForm(jobForm);
+    if (jobValidationError) {
+      setError(jobValidationError);
       return;
     }
 
@@ -646,6 +894,7 @@ function JobMarket({ guestMode = false }) {
       setJobForm(emptyJobForm);
       await loadJobs(1, jobFeedMode);
       await loadDashboard();
+      showApplicationNotice('The job was published successfully.', 'Job Posted');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create job');
     }
@@ -696,6 +945,12 @@ function JobMarket({ guestMode = false }) {
 
     if (!editingJobId) return;
 
+    const jobValidationError = validateJobForm(editJobForm);
+    if (jobValidationError) {
+      setError(jobValidationError);
+      return;
+    }
+
     setError('');
     try {
       const payload = buildJobPayload(editJobForm);
@@ -710,6 +965,8 @@ function JobMarket({ guestMode = false }) {
         const res = await jobMarketApi.getJobById(editingJobId);
         setSelectedJob(res.data || null);
       }
+
+      showApplicationNotice('Job details were updated successfully.', 'Job Updated');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update job');
     }
@@ -727,12 +984,18 @@ function JobMarket({ guestMode = false }) {
       await jobMarketApi.deleteJob(jobId);
       await loadJobs(jobsPage, jobFeedMode);
       await loadDashboard();
+      showApplicationNotice('The job posting was removed.', 'Job Deleted');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete job');
     }
   };
 
   const openApply = (job) => {
+    if (!canSubmitApplications) {
+      setError('Your role is not allowed to submit applications');
+      return;
+    }
+
     setApplyingJob(job);
     setApplicationForm(emptyApplicationForm);
     setShowApply(true);
@@ -740,21 +1003,30 @@ function JobMarket({ guestMode = false }) {
 
   const handleApplyToJob = async (event) => {
     event.preventDefault();
+    if (!canSubmitApplications) {
+      setError('Your role is not allowed to submit applications');
+      return;
+    }
+
     if (!applyingJob?._id) return;
 
+    const applicationValidationError = validateApplicationForm(applicationForm);
+    if (applicationValidationError) {
+      setError(applicationValidationError);
+      return;
+    }
+
     setError('');
+    const expectedSalaryMin = parseOptionalNumber(applicationForm.expectedSalaryMin);
+    const expectedSalaryMax = parseOptionalNumber(applicationForm.expectedSalaryMax);
     try {
       await jobMarketApi.submitApplication(applyingJob._id, {
-        coverLetter: applicationForm.coverLetter,
-        resumeUrl: applicationForm.resumeUrl,
-        portfolioUrl: applicationForm.portfolioUrl,
+        coverLetter: String(applicationForm.coverLetter || '').trim(),
+        resumeUrl: String(applicationForm.resumeUrl || '').trim(),
+        portfolioUrl: String(applicationForm.portfolioUrl || '').trim(),
         expectedSalary: {
-          min: applicationForm.expectedSalaryMin
-            ? Number(applicationForm.expectedSalaryMin)
-            : undefined,
-          max: applicationForm.expectedSalaryMax
-            ? Number(applicationForm.expectedSalaryMax)
-            : undefined,
+          min: expectedSalaryMin === null ? undefined : expectedSalaryMin,
+          max: expectedSalaryMax === null ? undefined : expectedSalaryMax,
           currency: 'USD',
         },
       });
@@ -763,20 +1035,43 @@ function JobMarket({ guestMode = false }) {
       await loadApplications();
       await loadDashboard();
       setActiveTab('applications');
+      showApplicationNotice('Your application has been submitted.', 'Application Sent');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to submit application');
     }
   };
 
   const handleWithdrawApplication = async (applicationId) => {
+    if (!canSubmitApplications) {
+      setError('Your role is not allowed to withdraw applications');
+      return;
+    }
+
     if (!window.confirm('Withdraw this application?')) return;
     setError('');
     try {
       await jobMarketApi.withdrawApplication(applicationId);
       await reloadApplicationsView();
       await loadDashboard();
+      showApplicationNotice('Application was withdrawn successfully.', 'Application Updated');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to withdraw application');
+    }
+  };
+
+  const openApplicationDetails = async (applicationId) => {
+    setApplicationDetailsLoading(true);
+    setShowApplicationDetails(true);
+    setSelectedApplicationDetails(null);
+    setError('');
+
+    try {
+      const res = await jobMarketApi.getApplicationById(applicationId);
+      setSelectedApplicationDetails(res.data || null);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load application details');
+    } finally {
+      setApplicationDetailsLoading(false);
     }
   };
 
@@ -828,6 +1123,7 @@ function JobMarket({ guestMode = false }) {
       setSelectedApplication(res.data || null);
       await reloadApplicationsView();
       await loadDashboard();
+      showApplicationNotice('Application status has been updated.', 'Status Updated');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update application status');
     }
@@ -857,6 +1153,7 @@ function JobMarket({ guestMode = false }) {
       const res = await jobMarketApi.getApplicationById(selectedApplication._id);
       setSelectedApplication(res.data || null);
       await reloadApplicationsView();
+      showApplicationNotice('Interview has been scheduled.', 'Interview Scheduled');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to schedule interview');
     }
@@ -887,6 +1184,7 @@ function JobMarket({ guestMode = false }) {
       setSelectedApplication(res.data || null);
       setCommunicationForm({ type: 'email', subject: '', message: '' });
       await reloadApplicationsView();
+      showApplicationNotice('Communication note was added.', 'Communication Saved');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to add communication');
     }
@@ -908,6 +1206,7 @@ function JobMarket({ guestMode = false }) {
       setSelectedApplication(null);
       await reloadApplicationsView();
       await loadDashboard();
+      showApplicationNotice('Application record has been deleted.', 'Application Deleted');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete application');
     }
@@ -915,12 +1214,19 @@ function JobMarket({ guestMode = false }) {
 
   const handleCreateAlert = async (event) => {
     event.preventDefault();
+
+    const alertValidationError = validateAlertForm(alertForm);
+    if (alertValidationError) {
+      setError(alertValidationError);
+      return;
+    }
+
     setError('');
     try {
       await jobMarketApi.createJobAlert({
-        title: alertForm.title,
+        title: String(alertForm.title || '').trim(),
         keywords: toCsvList(alertForm.keywordsCsv),
-        location: alertForm.location,
+        location: String(alertForm.location || '').trim(),
         remotePolicy: alertForm.remotePolicy,
         frequency: alertForm.frequency,
         skills: toCsvList(alertForm.skillsCsv),
@@ -930,6 +1236,7 @@ function JobMarket({ guestMode = false }) {
       setShowAlertForm(false);
       await loadAlerts();
       await loadDashboard();
+      showApplicationNotice('Job alert created successfully.', 'Alert Created');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create alert');
     }
@@ -941,6 +1248,10 @@ function JobMarket({ guestMode = false }) {
       await jobMarketApi.toggleJobAlert(alert._id, !alert.isActive);
       await loadAlerts();
       await loadDashboard();
+      showApplicationNotice(
+        `Alert is now ${!alert.isActive ? 'active' : 'inactive'}.`,
+        'Alert Updated'
+      );
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to toggle alert');
     }
@@ -953,6 +1264,7 @@ function JobMarket({ guestMode = false }) {
       await jobMarketApi.deleteJobAlert(alertId);
       await loadAlerts();
       await loadDashboard();
+      showApplicationNotice('Alert deleted successfully.', 'Alert Deleted');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete alert');
     }
@@ -963,7 +1275,9 @@ function JobMarket({ guestMode = false }) {
     setError('');
     try {
       const res = await jobMarketApi.findMatchingJobs(alertId, 5);
-      setAlertMatches((prev) => ({ ...prev, [alertId]: res.data.matchingJobs || [] }));
+      const matchingJobs = res.data.matchingJobs || [];
+      setAlertMatches((prev) => ({ ...prev, [alertId]: matchingJobs }));
+      showApplicationNotice(`${matchingJobs.length} matching jobs found.`, 'Matches Ready');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch matching jobs');
     } finally {
@@ -979,9 +1293,18 @@ function JobMarket({ guestMode = false }) {
 
     setError('');
     try {
-      await jobMarketApi.processAllAlerts('daily');
+      const res = await jobMarketApi.processAllAlerts('daily');
+      const processResult = res.data || {};
+      setAlertProcessSummary({
+        ...processResult,
+        processedAt: new Date().toISOString(),
+      });
       await loadAlerts();
       await loadDashboard();
+      showApplicationNotice(
+        `Processed ${processResult.processedAlerts || 0} alerts. ${processResult.alertsWithMatches || 0} had matches.`,
+        'Alerts Processed'
+      );
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to process alerts');
     }
@@ -994,14 +1317,23 @@ function JobMarket({ guestMode = false }) {
       return;
     }
 
+    const categoryValidationError = validateCategoryForm(categoryForm);
+    if (categoryValidationError) {
+      setError(categoryValidationError);
+      return;
+    }
+
     setError('');
     try {
       await jobMarketApi.createJobCategory({
         ...categoryForm,
+        name: String(categoryForm.name || '').trim(),
+        description: String(categoryForm.description || '').trim(),
       });
       setCategoryForm(emptyCategoryForm);
       setShowCategoryForm(false);
       await loadCategories();
+      showApplicationNotice('Category created successfully.', 'Category Created');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create category');
     }
@@ -1034,13 +1366,24 @@ function JobMarket({ guestMode = false }) {
 
     if (!editingCategoryId) return;
 
+    const categoryValidationError = validateCategoryForm(editCategoryForm);
+    if (categoryValidationError) {
+      setError(categoryValidationError);
+      return;
+    }
+
     setError('');
     try {
-      await jobMarketApi.updateJobCategory(editingCategoryId, { ...editCategoryForm });
+      await jobMarketApi.updateJobCategory(editingCategoryId, {
+        ...editCategoryForm,
+        name: String(editCategoryForm.name || '').trim(),
+        description: String(editCategoryForm.description || '').trim(),
+      });
       setShowEditCategoryForm(false);
       setEditingCategoryId('');
       setEditCategoryForm(emptyCategoryForm);
       await loadCategories();
+      showApplicationNotice('Category updated successfully.', 'Category Updated');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update category');
     }
@@ -1057,6 +1400,7 @@ function JobMarket({ guestMode = false }) {
     try {
       await jobMarketApi.deleteJobCategory(categoryId);
       await loadCategories();
+      showApplicationNotice('Category deleted successfully.', 'Category Deleted');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete category');
     }
@@ -1069,19 +1413,26 @@ function JobMarket({ guestMode = false }) {
       return;
     }
 
+    const skillValidationError = validateSkillForm(skillForm);
+    if (skillValidationError) {
+      setError(skillValidationError);
+      return;
+    }
+
     setError('');
     try {
-      await jobMarketApi.upsertTrendingSkill(skillForm.skill, {
-        demandScore: skillForm.demandScore ? Number(skillForm.demandScore) : 0,
-        growthRate: skillForm.growthRate ? Number(skillForm.growthRate) : 0,
-        category: skillForm.category,
+      await jobMarketApi.upsertTrendingSkill(String(skillForm.skill || '').trim(), {
+        demandScore: toNumberOrDefault(skillForm.demandScore, 0),
+        growthRate: toNumberOrDefault(skillForm.growthRate, 0),
+        category: String(skillForm.category || '').trim(),
         skillType: skillForm.skillType,
-        remoteDemandScore: skillForm.remoteDemandScore ? Number(skillForm.remoteDemandScore) : 0,
+        remoteDemandScore: toNumberOrDefault(skillForm.remoteDemandScore, 0),
       });
       setSkillForm(emptySkillForm);
       setShowSkillForm(false);
       await loadTrending();
       await loadDashboard();
+      showApplicationNotice('Trending skill saved successfully.', 'Skill Saved');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to upsert trending skill');
     }
@@ -1124,23 +1475,28 @@ function JobMarket({ guestMode = false }) {
 
     if (!editingSkillId) return;
 
+    const skillValidationError = validateSkillForm(editSkillForm);
+    if (skillValidationError) {
+      setError(skillValidationError);
+      return;
+    }
+
     setError('');
     try {
       await jobMarketApi.updateTrendingSkill(editingSkillId, {
-        skill: editSkillForm.skill,
-        demandScore: editSkillForm.demandScore ? Number(editSkillForm.demandScore) : 0,
-        growthRate: editSkillForm.growthRate ? Number(editSkillForm.growthRate) : 0,
-        category: editSkillForm.category,
+        skill: String(editSkillForm.skill || '').trim(),
+        demandScore: toNumberOrDefault(editSkillForm.demandScore, 0),
+        growthRate: toNumberOrDefault(editSkillForm.growthRate, 0),
+        category: String(editSkillForm.category || '').trim(),
         skillType: editSkillForm.skillType,
-        remoteDemandScore: editSkillForm.remoteDemandScore
-          ? Number(editSkillForm.remoteDemandScore)
-          : 0,
+        remoteDemandScore: toNumberOrDefault(editSkillForm.remoteDemandScore, 0),
       });
       setShowEditSkillForm(false);
       setEditingSkillId('');
       setEditSkillForm(emptySkillForm);
       await loadTrending();
       await loadDashboard();
+      showApplicationNotice('Trending skill updated successfully.', 'Skill Updated');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update skill');
     }
@@ -1158,6 +1514,7 @@ function JobMarket({ guestMode = false }) {
       await jobMarketApi.deleteTrendingSkill(skillId);
       await loadTrending();
       await loadDashboard();
+      showApplicationNotice('Trending skill deleted successfully.', 'Skill Deleted');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to delete trending skill');
     }
@@ -1174,6 +1531,7 @@ function JobMarket({ guestMode = false }) {
       await jobMarketApi.updateSkillTrends();
       await loadTrending();
       await loadDashboard();
+      showApplicationNotice('Trend metrics were recalculated.', 'Trend Update Complete');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to run trend update');
     }
@@ -1364,10 +1722,10 @@ function JobMarket({ guestMode = false }) {
                       <option>Remote</option>
                       <option>Remote-friendly</option>
                     </select>
-                    <input value={jobForm.salaryMin} onChange={(e) => setJobForm((p) => ({ ...p, salaryMin: e.target.value }))} placeholder="Salary min" type="number" className="px-3 py-2 border rounded-lg" />
-                    <input value={jobForm.salaryMax} onChange={(e) => setJobForm((p) => ({ ...p, salaryMax: e.target.value }))} placeholder="Salary max" type="number" className="px-3 py-2 border rounded-lg" />
-                    <input value={jobForm.companyWebsite} onChange={(e) => setJobForm((p) => ({ ...p, companyWebsite: e.target.value }))} placeholder="Company website" className="px-3 py-2 border rounded-lg" />
-                    <input value={jobForm.applicationUrl} onChange={(e) => setJobForm((p) => ({ ...p, applicationUrl: e.target.value }))} placeholder="Application URL" className="px-3 py-2 border rounded-lg" />
+                    <input value={jobForm.salaryMin} onChange={(e) => setJobForm((p) => ({ ...p, salaryMin: e.target.value }))} placeholder="Salary min" type="number" min="0" className="px-3 py-2 border rounded-lg" />
+                    <input value={jobForm.salaryMax} onChange={(e) => setJobForm((p) => ({ ...p, salaryMax: e.target.value }))} placeholder="Salary max" type="number" min="0" className="px-3 py-2 border rounded-lg" />
+                    <input type="url" value={jobForm.companyWebsite} onChange={(e) => setJobForm((p) => ({ ...p, companyWebsite: e.target.value }))} placeholder="Company website" className="px-3 py-2 border rounded-lg" />
+                    <input type="url" value={jobForm.applicationUrl} onChange={(e) => setJobForm((p) => ({ ...p, applicationUrl: e.target.value }))} placeholder="Application URL" className="px-3 py-2 border rounded-lg" />
                   </div>
                   <textarea
                     required
@@ -1421,10 +1779,10 @@ function JobMarket({ guestMode = false }) {
                       <option>Remote</option>
                       <option>Remote-friendly</option>
                     </select>
-                    <input value={editJobForm.salaryMin} onChange={(e) => setEditJobForm((p) => ({ ...p, salaryMin: e.target.value }))} placeholder="Salary min" type="number" className="px-3 py-2 border rounded-lg" />
-                    <input value={editJobForm.salaryMax} onChange={(e) => setEditJobForm((p) => ({ ...p, salaryMax: e.target.value }))} placeholder="Salary max" type="number" className="px-3 py-2 border rounded-lg" />
-                    <input value={editJobForm.companyWebsite} onChange={(e) => setEditJobForm((p) => ({ ...p, companyWebsite: e.target.value }))} placeholder="Company website" className="px-3 py-2 border rounded-lg" />
-                    <input value={editJobForm.applicationUrl} onChange={(e) => setEditJobForm((p) => ({ ...p, applicationUrl: e.target.value }))} placeholder="Application URL" className="px-3 py-2 border rounded-lg" />
+                    <input value={editJobForm.salaryMin} onChange={(e) => setEditJobForm((p) => ({ ...p, salaryMin: e.target.value }))} placeholder="Salary min" type="number" min="0" className="px-3 py-2 border rounded-lg" />
+                    <input value={editJobForm.salaryMax} onChange={(e) => setEditJobForm((p) => ({ ...p, salaryMax: e.target.value }))} placeholder="Salary max" type="number" min="0" className="px-3 py-2 border rounded-lg" />
+                    <input type="url" value={editJobForm.companyWebsite} onChange={(e) => setEditJobForm((p) => ({ ...p, companyWebsite: e.target.value }))} placeholder="Company website" className="px-3 py-2 border rounded-lg" />
+                    <input type="url" value={editJobForm.applicationUrl} onChange={(e) => setEditJobForm((p) => ({ ...p, applicationUrl: e.target.value }))} placeholder="Application URL" className="px-3 py-2 border rounded-lg" />
                   </div>
                   <textarea
                     required
@@ -1507,6 +1865,15 @@ function JobMarket({ guestMode = false }) {
                           <Send size={14} />
                           Apply
                         </button>
+                      ) : !canSubmitApplications ? (
+                        <button
+                          disabled
+                          title="Your role cannot apply to jobs"
+                          className="px-3 py-2 bg-gray-200 text-gray-600 rounded-lg text-sm font-medium inline-flex items-center gap-1 cursor-not-allowed"
+                        >
+                          <Send size={14} />
+                          Apply
+                        </button>
                       ) : (
                         <button
                           onClick={() => openApply(job)}
@@ -1583,25 +1950,38 @@ function JobMarket({ guestMode = false }) {
                   <option value="withdrawn">withdrawn</option>
                 </select>
                 {isAdmin ? (
-                  <input
+                  <select
                     value={applicationJobId}
                     onChange={(e) => setApplicationJobId(e.target.value)}
-                    placeholder="Job ID for recruiter view"
+                    disabled={adminJobOptionsLoading || adminJobOptions.length === 0}
                     className="px-3 py-2 border rounded-lg text-sm min-w-64"
-                  />
+                  >
+                    <option value="">
+                      {adminJobOptionsLoading
+                        ? 'Loading jobs...'
+                        : adminJobOptions.length
+                          ? 'Select job for recruiter view'
+                          : 'No jobs available'}
+                    </option>
+                    {adminJobOptions.map((job) => (
+                      <option key={job._id} value={job._id}>
+                        {job.title} - {job.company}
+                      </option>
+                    ))}
+                  </select>
                 ) : null}
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
                 <button
-                  onClick={loadApplications}
-                  className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium"
+                  onClick={() => loadApplications({ showNotice: true })}
+                  className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium"
                 >
-                  My Applications
+                  Search
                 </button>
                 {isAdmin ? (
                   <button
-                    onClick={loadApplicationsByJob}
+                    onClick={() => loadApplicationsByJob({ showNotice: true })}
                     className="px-4 py-2 border rounded-lg text-sm font-medium"
                   >
                     Job Applications
@@ -1609,7 +1989,7 @@ function JobMarket({ guestMode = false }) {
                 ) : null}
                 {isAdmin ? (
                   <button
-                    onClick={loadApplicationsByStatusView}
+                    onClick={() => loadApplicationsByStatusView({ showNotice: true })}
                     className="px-4 py-2 border rounded-lg text-sm font-medium"
                   >
                     Status Feed
@@ -1623,6 +2003,16 @@ function JobMarket({ guestMode = false }) {
               {isAdmin ? (
                 <div className="text-xs text-gray-500">
                   Use Job Applications and Status Feed for recruiter/admin style workflows.
+                </div>
+              ) : (
+                <div className="text-xs text-gray-500">
+                  Application updates appear here. If interview details are available, they will be shown below each application.
+                </div>
+              )}
+
+              {isAdmin && applicationJobId ? (
+                <div className="text-xs text-gray-500">
+                  Selected Job ID: {applicationJobId}
                 </div>
               ) : null}
 
@@ -1647,7 +2037,54 @@ function JobMarket({ guestMode = false }) {
                       </div>
                       <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700">{item.status}</span>
                     </div>
+
+                    {item.interviewSchedule?.date ? (
+                      <div className="mt-3 p-3 rounded-lg bg-teal-50 border border-teal-100 text-sm text-teal-900">
+                        <p className="font-semibold">Interview Details</p>
+                        <p className="mt-1">When: {formatDateTime(item.interviewSchedule.date)}</p>
+                        <p>Type: {item.interviewSchedule.type || '-'}</p>
+                        <p>Location/Link: {item.interviewSchedule.location || '-'}</p>
+                        {item.interviewSchedule.notes ? (
+                          <p className="mt-1">Notes: {item.interviewSchedule.notes}</p>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    {item.reviewNotes ? (
+                      <div className="mt-3 p-3 rounded-lg bg-blue-50 border border-blue-100 text-sm text-blue-900">
+                        <p className="font-semibold">Recruiter Notes</p>
+                        <p className="mt-1">{item.reviewNotes}</p>
+                      </div>
+                    ) : null}
+
+                    {Array.isArray(item.communications) && item.communications.length > 0 ? (
+                      <div className="mt-3 p-3 rounded-lg bg-gray-50 border text-sm text-gray-700">
+                        <p className="font-semibold text-gray-900">Latest Update</p>
+                        <p className="mt-1">
+                          {(item.communications[item.communications.length - 1]?.subject || 'Communication')}
+                          {' • '}
+                          {(item.communications[item.communications.length - 1]?.type || '-')}
+                        </p>
+                        <p className="mt-1">{item.communications[item.communications.length - 1]?.message || '-'}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {formatDateTime(item.communications[item.communications.length - 1]?.date)}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    {!item.interviewSchedule?.date && !item.reviewNotes && (!Array.isArray(item.communications) || item.communications.length === 0) ? (
+                      <div className="mt-3 p-3 rounded-lg bg-gray-50 border text-sm text-gray-600">
+                        No recruiter updates yet for this application.
+                      </div>
+                    ) : null}
+
                     <div className="mt-3 flex justify-end">
+                      <button
+                        onClick={() => openApplicationDetails(item._id)}
+                        className="px-3 py-2 border rounded-lg text-sm font-medium mr-2"
+                      >
+                        View Details
+                      </button>
                       {isAdmin ? (
                         <button
                           onClick={() => openApplicationManager(item._id)}
@@ -1656,10 +2093,11 @@ function JobMarket({ guestMode = false }) {
                           Manage
                         </button>
                       ) : null}
-                      {item.status !== 'withdrawn' && item.status !== 'accepted' ? (
+                      {canSubmitApplications && item.status !== 'withdrawn' && item.status !== 'accepted' && item.status !== 'rejected' ? (
                         <button
                           onClick={() => handleWithdrawApplication(item._id)}
                           className="px-3 py-2 border rounded-lg text-sm font-medium"
+                          title="Withdraw means you are cancelling your own application for this job"
                         >
                           Withdraw
                         </button>
@@ -1722,6 +2160,77 @@ function JobMarket({ guestMode = false }) {
                     <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Create Alert</button>
                   </div>
                 </form>
+              ) : null}
+
+              {alertProcessSummary ? (
+                <div className="mt-4 border rounded-lg p-3 bg-teal-50/60 border-teal-200">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div>
+                      <p className="text-sm font-semibold text-teal-900">Last Process Run</p>
+                      <p className="text-xs text-teal-700 mt-0.5">
+                        {formatDateTime(alertProcessSummary.processedAt)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setAlertProcessSummary(null)}
+                      className="px-2.5 py-1.5 border border-teal-300 rounded-lg text-xs font-medium text-teal-700 hover:bg-teal-100"
+                    >
+                      Clear
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-sm">
+                    <div className="p-2 rounded bg-white border border-teal-100">
+                      <p className="text-xs text-gray-500">Processed Alerts</p>
+                      <p className="font-semibold text-gray-900">{alertProcessSummary.processedAlerts || 0}</p>
+                    </div>
+                    <div className="p-2 rounded bg-white border border-teal-100">
+                      <p className="text-xs text-gray-500">Alerts With Matches</p>
+                      <p className="font-semibold text-gray-900">{alertProcessSummary.alertsWithMatches || 0}</p>
+                    </div>
+                    <div className="p-2 rounded bg-white border border-teal-100">
+                      <p className="text-xs text-gray-500">Email Sent</p>
+                      <p className="font-semibold text-gray-900">{alertProcessSummary.notificationSummary?.emailSent || 0}</p>
+                    </div>
+                    <div className="p-2 rounded bg-white border border-teal-100">
+                      <p className="text-xs text-gray-500">Push Saved</p>
+                      <p className="font-semibold text-gray-900">{alertProcessSummary.notificationSummary?.pushSent || 0}</p>
+                    </div>
+                  </div>
+
+                  {Array.isArray(alertProcessSummary.results) && alertProcessSummary.results.length > 0 ? (
+                    <div className="mt-3 space-y-2">
+                      {alertProcessSummary.results.map((result) => (
+                        <div key={String(result.alertId)} className="p-2.5 rounded-lg bg-white border border-teal-100">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-gray-900">{result.alertTitle || 'Alert'}</p>
+                            <span className="text-xs px-2 py-1 rounded bg-teal-100 text-teal-800">
+                              {result.matchCount || 0} matches
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">Recipient: {result.userEmail || '-'}</p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Email: {result.notifications?.email?.sent ? 'sent' : result.notifications?.email?.reason || 'skipped'}
+                            {' | '}
+                            Push: {result.notifications?.push?.sent ? 'saved' : result.notifications?.push?.reason || 'skipped'}
+                          </p>
+
+                          {Array.isArray(result.jobs) && result.jobs.length > 0 ? (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {result.jobs.slice(0, 4).map((job) => (
+                                <span key={String(job._id)} className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                                  {job.title} • {job.company || '-'}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-600 mt-3">No alerts produced matches in the last process run.</p>
+                  )}
+                </div>
               ) : null}
             </div>
 
@@ -1827,7 +2336,7 @@ function JobMarket({ guestMode = false }) {
                       <option value="location">location</option>
                       <option value="skill">skill</option>
                     </select>
-                    <textarea value={categoryForm.description} onChange={(e) => setCategoryForm((p) => ({ ...p, description: e.target.value }))} rows={3} placeholder="Description" className="md:col-span-2 px-3 py-2 border rounded-lg" />
+                    <textarea value={categoryForm.description} onChange={(e) => setCategoryForm((p) => ({ ...p, description: e.target.value }))} rows={3} maxLength={500} placeholder="Description" className="md:col-span-2 px-3 py-2 border rounded-lg" />
                   </div>
                   <div className="flex items-center gap-4 text-sm">
                     <label className="inline-flex items-center gap-2">
@@ -1857,7 +2366,7 @@ function JobMarket({ guestMode = false }) {
                       <option value="location">location</option>
                       <option value="skill">skill</option>
                     </select>
-                    <textarea value={editCategoryForm.description} onChange={(e) => setEditCategoryForm((p) => ({ ...p, description: e.target.value }))} rows={3} placeholder="Description" className="md:col-span-2 px-3 py-2 border rounded-lg" />
+                    <textarea value={editCategoryForm.description} onChange={(e) => setEditCategoryForm((p) => ({ ...p, description: e.target.value }))} rows={3} maxLength={500} placeholder="Description" className="md:col-span-2 px-3 py-2 border rounded-lg" />
                   </div>
                   <div className="flex items-center gap-4 text-sm">
                     <label className="inline-flex items-center gap-2">
@@ -1980,10 +2489,10 @@ function JobMarket({ guestMode = false }) {
                       <option value="language">language</option>
                       <option value="framework">framework</option>
                     </select>
-                    <input type="number" value={skillForm.demandScore} onChange={(e) => setSkillForm((p) => ({ ...p, demandScore: e.target.value }))} placeholder="Demand score (0-100)" className="px-3 py-2 border rounded-lg" />
-                    <input type="number" value={skillForm.growthRate} onChange={(e) => setSkillForm((p) => ({ ...p, growthRate: e.target.value }))} placeholder="Growth rate" className="px-3 py-2 border rounded-lg" />
+                    <input type="number" min="0" max="100" value={skillForm.demandScore} onChange={(e) => setSkillForm((p) => ({ ...p, demandScore: e.target.value }))} placeholder="Demand score (0-100)" className="px-3 py-2 border rounded-lg" />
+                    <input type="number" min="-100" max="500" value={skillForm.growthRate} onChange={(e) => setSkillForm((p) => ({ ...p, growthRate: e.target.value }))} placeholder="Growth rate" className="px-3 py-2 border rounded-lg" />
                     <input value={skillForm.category} onChange={(e) => setSkillForm((p) => ({ ...p, category: e.target.value }))} placeholder="Category" className="px-3 py-2 border rounded-lg" />
-                    <input type="number" value={skillForm.remoteDemandScore} onChange={(e) => setSkillForm((p) => ({ ...p, remoteDemandScore: e.target.value }))} placeholder="Remote demand score" className="px-3 py-2 border rounded-lg" />
+                    <input type="number" min="0" max="100" value={skillForm.remoteDemandScore} onChange={(e) => setSkillForm((p) => ({ ...p, remoteDemandScore: e.target.value }))} placeholder="Remote demand score" className="px-3 py-2 border rounded-lg" />
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowSkillForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
@@ -2005,10 +2514,10 @@ function JobMarket({ guestMode = false }) {
                       <option value="language">language</option>
                       <option value="framework">framework</option>
                     </select>
-                    <input type="number" value={editSkillForm.demandScore} onChange={(e) => setEditSkillForm((p) => ({ ...p, demandScore: e.target.value }))} placeholder="Demand score (0-100)" className="px-3 py-2 border rounded-lg" />
-                    <input type="number" value={editSkillForm.growthRate} onChange={(e) => setEditSkillForm((p) => ({ ...p, growthRate: e.target.value }))} placeholder="Growth rate" className="px-3 py-2 border rounded-lg" />
+                    <input type="number" min="0" max="100" value={editSkillForm.demandScore} onChange={(e) => setEditSkillForm((p) => ({ ...p, demandScore: e.target.value }))} placeholder="Demand score (0-100)" className="px-3 py-2 border rounded-lg" />
+                    <input type="number" min="-100" max="500" value={editSkillForm.growthRate} onChange={(e) => setEditSkillForm((p) => ({ ...p, growthRate: e.target.value }))} placeholder="Growth rate" className="px-3 py-2 border rounded-lg" />
                     <input value={editSkillForm.category} onChange={(e) => setEditSkillForm((p) => ({ ...p, category: e.target.value }))} placeholder="Category" className="px-3 py-2 border rounded-lg" />
-                    <input type="number" value={editSkillForm.remoteDemandScore} onChange={(e) => setEditSkillForm((p) => ({ ...p, remoteDemandScore: e.target.value }))} placeholder="Remote demand score" className="px-3 py-2 border rounded-lg" />
+                    <input type="number" min="0" max="100" value={editSkillForm.remoteDemandScore} onChange={(e) => setEditSkillForm((p) => ({ ...p, remoteDemandScore: e.target.value }))} placeholder="Remote demand score" className="px-3 py-2 border rounded-lg" />
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowEditSkillForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
@@ -2087,6 +2596,102 @@ function JobMarket({ guestMode = false }) {
           </section>
         ) : null}
       </main>
+
+      {showApplicationDetails ? (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl w-full max-w-3xl p-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-gray-900">Application Details</h2>
+              <button
+                onClick={() => {
+                  setShowApplicationDetails(false);
+                  setSelectedApplicationDetails(null);
+                }}
+                className="text-gray-400 hover:text-gray-700"
+              >
+                Close
+              </button>
+            </div>
+
+            {applicationDetailsLoading ? (
+              <div className="p-6 text-center text-gray-500">
+                <Loader2 size={20} className="animate-spin inline mr-2" />
+                Loading application details...
+              </div>
+            ) : selectedApplicationDetails ? (
+              <div className="space-y-4">
+                <div className="p-3 rounded-lg bg-gray-50 text-sm text-gray-700">
+                  <p className="font-semibold text-gray-900">{selectedApplicationDetails.job?.title || 'Job'}</p>
+                  <p>{selectedApplicationDetails.job?.company || '-'} • {selectedApplicationDetails.job?.location || '-'}</p>
+                  <p className="mt-1">Status: {formatStatusLabel(selectedApplicationDetails.status)}</p>
+                  <p>Applied: {formatDateTime(selectedApplicationDetails.appliedDate)}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div className="p-3 rounded-lg bg-gray-50">
+                    Expected Salary: {money(selectedApplicationDetails.expectedSalary?.min, selectedApplicationDetails.expectedSalary?.currency)} - {money(selectedApplicationDetails.expectedSalary?.max, selectedApplicationDetails.expectedSalary?.currency)}
+                  </div>
+                  <div className="p-3 rounded-lg bg-gray-50">
+                    Portfolio: {selectedApplicationDetails.portfolioUrl || '-'}
+                  </div>
+                  <div className="p-3 rounded-lg bg-gray-50 md:col-span-2">
+                    Resume URL: {selectedApplicationDetails.resumeUrl || '-'}
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-3">
+                  <p className="text-sm font-semibold text-gray-700">Cover Letter</p>
+                  <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap">
+                    {selectedApplicationDetails.coverLetter || 'No cover letter provided.'}
+                  </p>
+                </div>
+
+                <div className="border rounded-lg p-3">
+                  <p className="text-sm font-semibold text-gray-700">Interview</p>
+                  {selectedApplicationDetails.interviewSchedule?.date ? (
+                    <div className="text-sm text-gray-700 mt-2 space-y-1">
+                      <p>When: {formatDateTime(selectedApplicationDetails.interviewSchedule.date)}</p>
+                      <p>Type: {selectedApplicationDetails.interviewSchedule.type || '-'}</p>
+                      <p>Location/Link: {selectedApplicationDetails.interviewSchedule.location || '-'}</p>
+                      <p>Notes: {selectedApplicationDetails.interviewSchedule.notes || '-'}</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-600 mt-2">Interview has not been scheduled yet.</p>
+                  )}
+                </div>
+
+                <div className="border rounded-lg p-3">
+                  <p className="text-sm font-semibold text-gray-700">Recruiter Notes</p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    {selectedApplicationDetails.reviewNotes || 'No recruiter notes yet.'}
+                  </p>
+                </div>
+
+                <div className="border rounded-lg p-3">
+                  <p className="text-sm font-semibold text-gray-700">Communication History</p>
+                  {(selectedApplicationDetails.communications || []).length > 0 ? (
+                    <div className="mt-2 space-y-2">
+                      {[...(selectedApplicationDetails.communications || [])]
+                        .reverse()
+                        .map((entry, idx) => (
+                          <div key={`${selectedApplicationDetails._id}-details-comm-${idx}`} className="text-sm p-2 rounded bg-gray-50">
+                            <p className="font-medium text-gray-800">{entry.subject || 'Communication'} • {entry.type || '-'}</p>
+                            <p className="text-gray-600 mt-1">{entry.message || '-'}</p>
+                            <p className="text-xs text-gray-500 mt-1">{formatDateTime(entry.date)}</p>
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-600 mt-2">No communication updates yet.</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="p-6 text-center text-gray-500">No application details available.</div>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       {showApplicationManager && selectedApplication ? (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -2261,6 +2866,7 @@ function JobMarket({ guestMode = false }) {
             <form onSubmit={handleApplyToJob} className="space-y-3">
               <textarea
                 required
+                minLength={20}
                 rows={4}
                 value={applicationForm.coverLetter}
                 onChange={(e) => setApplicationForm((p) => ({ ...p, coverLetter: e.target.value }))}
@@ -2269,12 +2875,14 @@ function JobMarket({ guestMode = false }) {
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input
+                  type="url"
                   value={applicationForm.resumeUrl}
                   onChange={(e) => setApplicationForm((p) => ({ ...p, resumeUrl: e.target.value }))}
                   placeholder="Resume URL (optional)"
                   className="px-3 py-2 border rounded-lg"
                 />
                 <input
+                  type="url"
                   value={applicationForm.portfolioUrl}
                   onChange={(e) => setApplicationForm((p) => ({ ...p, portfolioUrl: e.target.value }))}
                   placeholder="Portfolio URL (optional)"
@@ -2282,6 +2890,7 @@ function JobMarket({ guestMode = false }) {
                 />
                 <input
                   type="number"
+                  min="0"
                   value={applicationForm.expectedSalaryMin}
                   onChange={(e) => setApplicationForm((p) => ({ ...p, expectedSalaryMin: e.target.value }))}
                   placeholder="Expected salary min"
@@ -2289,6 +2898,7 @@ function JobMarket({ guestMode = false }) {
                 />
                 <input
                   type="number"
+                  min="0"
                   value={applicationForm.expectedSalaryMax}
                   onChange={(e) => setApplicationForm((p) => ({ ...p, expectedSalaryMax: e.target.value }))}
                   placeholder="Expected salary max"
@@ -2307,10 +2917,40 @@ function JobMarket({ guestMode = false }) {
         </div>
       ) : null}
 
-      {!error && activeTab === 'applications' && applications.length > 0 ? (
-        <div className="fixed bottom-4 right-4 bg-emerald-600 text-white px-3 py-2 rounded-lg shadow-lg text-sm inline-flex items-center gap-2">
-          <CheckCircle2 size={16} />
-          Applications loaded
+      {!error && applicationNotice ? (
+        <div
+          className={`fixed right-4 z-50 w-88 max-w-[calc(100vw-2rem)] transition-all duration-300 ease-out ${
+            error ? 'bottom-16' : 'bottom-4'
+          } ${
+            applicationNoticeVisible
+              ? 'opacity-100 translate-y-0 scale-100'
+              : 'opacity-0 translate-y-2 scale-95 pointer-events-none'
+          }`}
+        >
+          <div className="rounded-xl border border-emerald-300/70 bg-linear-to-br from-emerald-500 to-emerald-600 text-white shadow-xl">
+            <div className="px-3 py-2.5 flex items-start gap-3">
+              <span className="mt-0.5 shrink-0 h-7 w-7 rounded-full bg-white/20 inline-flex items-center justify-center">
+                <CheckCircle2 size={16} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold leading-tight">{applicationNoticeTitle}</p>
+                <p className="text-xs text-emerald-50 mt-0.5 truncate">{applicationNotice}</p>
+              </div>
+              <button
+                onClick={dismissApplicationNotice}
+                className="ml-auto shrink-0 p-1 rounded-md text-emerald-50/90 hover:bg-white/15 hover:text-white transition-colors"
+                title="Dismiss"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <div className="h-1 bg-black/10">
+              <div
+                className="h-full bg-white/45 transition-all duration-2200 ease-linear"
+                style={{ width: applicationNoticeVisible ? '100%' : '0%' }}
+              />
+            </div>
+          </div>
         </div>
       ) : null}
 

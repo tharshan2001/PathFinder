@@ -1,4 +1,68 @@
 import TrendingSkills from "../../models/job/TrendingSkills.js";
+import Job from "../../models/job/Job.js";
+
+const toSkillKey = (value) => String(value || "").trim().toLowerCase();
+
+const toDisplaySkill = (value) => String(value || "").trim();
+
+const getSalaryPoint = (job) => {
+  const min = Number(job?.salary?.min);
+  const max = Number(job?.salary?.max);
+
+  const hasMin = Number.isFinite(min) && min > 0;
+  const hasMax = Number.isFinite(max) && max > 0;
+
+  if (hasMin && hasMax) return (min + max) / 2;
+  if (hasMin) return min;
+  if (hasMax) return max;
+
+  return null;
+};
+
+const clampGrowthRate = (value) => {
+  if (value > 500) return 500;
+  if (value < -100) return -100;
+  return value;
+};
+
+const getTrendDirection = (growthRate) => {
+  if (growthRate > 5) return "rising";
+  if (growthRate < -5) return "declining";
+  return "stable";
+};
+
+const toTopBreakdown = (map, totalCount, keyField) => {
+  return Array.from(map.entries())
+    .map(([name, stats]) => ({
+      [keyField]: name,
+      demandScore: totalCount > 0 ? Math.round((stats.count / totalCount) * 100) : 0,
+      averageSalary:
+        stats.salaryCount > 0 ? Math.round(stats.salarySum / stats.salaryCount) : 0,
+      count: stats.count,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+    .map((item) => {
+      const { count, ...payload } = item;
+      return payload;
+    });
+};
+
+const emptyExperienceDemand = {
+  entry: 0,
+  mid: 0,
+  senior: 0,
+  lead: 0,
+};
+
+const levelToExperienceKey = {
+  "Entry-level": "entry",
+  "Mid-level": "mid",
+  Senior: "senior",
+  Lead: "lead",
+  Manager: "lead",
+  Director: "lead",
+};
 
 // ---------------------- Trending Skills CRUD ----------------------
 
@@ -303,11 +367,221 @@ export const getSkillStatistics = async (req, res) => {
 // Update skill trends (for cron job)
 export const updateSkillTrends = async (req, res) => {
   try {
-    // This would typically be called by a scheduled job
-    // For now, we'll just return a success message
-    res.json({ 
-      message: "Skill trends update initiated",
-      note: "This endpoint should be called by a scheduled job to update trending skills data"
+    const now = new Date();
+    const recentWindowStart = new Date(now);
+    recentWindowStart.setDate(now.getDate() - 30);
+
+    const previousWindowStart = new Date(recentWindowStart);
+    previousWindowStart.setDate(recentWindowStart.getDate() - 30);
+
+    const jobs = await Job.find({ isActive: true }).select(
+      "skillsRequired salary location category postedDate remotePolicy"
+    );
+
+    const skillMap = new Map();
+
+    for (const job of jobs) {
+      const rawSkills = Array.isArray(job.skillsRequired)
+        ? job.skillsRequired.map((entry) => entry?.name)
+        : [];
+      const uniqueSkills = Array.from(
+        new Set(rawSkills.map((value) => toDisplaySkill(value)).filter(Boolean))
+      );
+
+      if (uniqueSkills.length === 0) {
+        continue;
+      }
+
+      const salaryPoint = getSalaryPoint(job);
+      const postedDate = job.postedDate ? new Date(job.postedDate) : null;
+      const isRecent = postedDate && postedDate >= recentWindowStart;
+      const isPrevious =
+        postedDate && postedDate >= previousWindowStart && postedDate < recentWindowStart;
+      const isRemoteRelevant = ["Remote", "Remote-friendly", "Hybrid"].includes(
+        job.remotePolicy
+      );
+      const location = String(job.location || "").trim();
+      const industry = String(job?.category?.industry || "").trim();
+      const experienceKey = levelToExperienceKey[job?.category?.level] || "mid";
+
+      for (const skillName of uniqueSkills) {
+        const key = toSkillKey(skillName);
+        if (!key) continue;
+
+        let metric = skillMap.get(key);
+        if (!metric) {
+          metric = {
+            skill: skillName,
+            totalCount: 0,
+            recentCount: 0,
+            previousCount: 0,
+            remoteCount: 0,
+            salarySum: 0,
+            salaryCount: 0,
+            locationStats: new Map(),
+            industryStats: new Map(),
+            experienceLevelDemand: { ...emptyExperienceDemand },
+          };
+          skillMap.set(key, metric);
+        }
+
+        metric.totalCount += 1;
+        if (isRecent) metric.recentCount += 1;
+        if (isPrevious) metric.previousCount += 1;
+        if (isRemoteRelevant) metric.remoteCount += 1;
+        metric.experienceLevelDemand[experienceKey] += 1;
+
+        if (Number.isFinite(salaryPoint)) {
+          metric.salarySum += salaryPoint;
+          metric.salaryCount += 1;
+        }
+
+        if (location) {
+          const existingLocation = metric.locationStats.get(location) || {
+            count: 0,
+            salarySum: 0,
+            salaryCount: 0,
+          };
+          existingLocation.count += 1;
+          if (Number.isFinite(salaryPoint)) {
+            existingLocation.salarySum += salaryPoint;
+            existingLocation.salaryCount += 1;
+          }
+          metric.locationStats.set(location, existingLocation);
+        }
+
+        if (industry) {
+          const existingIndustry = metric.industryStats.get(industry) || {
+            count: 0,
+            salarySum: 0,
+            salaryCount: 0,
+          };
+          existingIndustry.count += 1;
+          if (Number.isFinite(salaryPoint)) {
+            existingIndustry.salarySum += salaryPoint;
+            existingIndustry.salaryCount += 1;
+          }
+          metric.industryStats.set(industry, existingIndustry);
+        }
+      }
+    }
+
+    const allMetrics = Array.from(skillMap.values());
+    const maxJobCount = allMetrics.reduce(
+      (max, metric) => (metric.totalCount > max ? metric.totalCount : max),
+      0
+    );
+
+    const existingSkills = await TrendingSkills.find();
+    const existingMap = new Map(existingSkills.map((doc) => [toSkillKey(doc.skill), doc]));
+
+    let created = 0;
+    let updated = 0;
+    let archived = 0;
+
+    for (const metric of allMetrics) {
+      const key = toSkillKey(metric.skill);
+      const existing = existingMap.get(key);
+
+      const demandScore = maxJobCount > 0 ? Math.round((metric.totalCount / maxJobCount) * 100) : 0;
+      let growthRate = 0;
+      if (metric.previousCount === 0) {
+        growthRate = metric.recentCount > 0 ? 100 : 0;
+      } else {
+        growthRate = ((metric.recentCount - metric.previousCount) / metric.previousCount) * 100;
+      }
+      growthRate = Number(clampGrowthRate(Number(growthRate.toFixed(2))));
+
+      const trendDirection = getTrendDirection(growthRate);
+      const averageSalary =
+        metric.salaryCount > 0 ? Math.round(metric.salarySum / metric.salaryCount) : 0;
+      const topLocations = toTopBreakdown(metric.locationStats, metric.totalCount, "location");
+      const topIndustries = toTopBreakdown(metric.industryStats, metric.totalCount, "industry");
+      const remoteDemandScore =
+        metric.totalCount > 0 ? Math.round((metric.remoteCount / metric.totalCount) * 100) : 0;
+
+      const historicalData = [...(existing?.historicalData || [])];
+      historicalData.push({
+        date: now,
+        demandScore,
+        jobCount: metric.totalCount,
+        averageSalary,
+      });
+      const cappedHistoricalData = historicalData.slice(-24);
+
+      const payload = {
+        skill: metric.skill,
+        demandScore,
+        jobCount: metric.totalCount,
+        averageSalary,
+        salaryCurrency: existing?.salaryCurrency || "USD",
+        growthRate,
+        trendDirection,
+        category: existing?.category || topIndustries[0]?.industry || "",
+        topLocations,
+        topIndustries,
+        experienceLevelDemand: metric.experienceLevelDemand,
+        remoteDemandScore,
+        historicalData: cappedHistoricalData,
+        lastUpdated: now,
+        skillType: existing?.skillType || "technical",
+      };
+
+      if (existing) {
+        Object.assign(existing, payload);
+        await existing.save();
+        updated += 1;
+      } else {
+        const createdDoc = new TrendingSkills(payload);
+        await createdDoc.save();
+        created += 1;
+      }
+    }
+
+    for (const existing of existingSkills) {
+      const key = toSkillKey(existing.skill);
+      if (skillMap.has(key)) {
+        continue;
+      }
+
+      const zeroHistory = [...(existing.historicalData || [])];
+      zeroHistory.push({
+        date: now,
+        demandScore: 0,
+        jobCount: 0,
+        averageSalary: 0,
+      });
+
+      const previousJobCount = Number(existing.jobCount || 0);
+      existing.demandScore = 0;
+      existing.jobCount = 0;
+      existing.averageSalary = 0;
+      existing.growthRate = previousJobCount > 0 ? -100 : 0;
+      existing.trendDirection = getTrendDirection(existing.growthRate);
+      existing.topLocations = [];
+      existing.topIndustries = [];
+      existing.experienceLevelDemand = { ...emptyExperienceDemand };
+      existing.remoteDemandScore = 0;
+      existing.historicalData = zeroHistory.slice(-24);
+      existing.lastUpdated = now;
+
+      await existing.save();
+      archived += 1;
+    }
+
+    res.json({
+      message: "Skill trends updated successfully",
+      summary: {
+        activeJobsAnalyzed: jobs.length,
+        skillsComputed: allMetrics.length,
+        created,
+        updated,
+        archived,
+      },
+      windows: {
+        recentWindowStart,
+        previousWindowStart,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });

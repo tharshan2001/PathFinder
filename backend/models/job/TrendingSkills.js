@@ -119,12 +119,11 @@ trendingSkillsSchema.index({ skillType: 1, demandScore: -1 });
 trendingSkillsSchema.index({ lastUpdated: -1 });
 
 // Pre-save middleware to update lastUpdated
-trendingSkillsSchema.pre("save", function(next) {
+trendingSkillsSchema.pre("save", function() {
   if (this.isModified("demandScore") || this.isModified("jobCount")) {
     this.lastUpdated = new Date();
     this.dataPoints += 1;
   }
-  next();
 });
 
 // Static method to get trending skills
