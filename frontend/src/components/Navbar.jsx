@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import notificationApi from '../services/notificationApi';
-import { Home, BookOpen, Briefcase, Users, User, MessageSquare, LogOut, Bell, Check, Trash2, X } from 'lucide-react';
+import { Home, BookOpen, Briefcase, Users, User, MessageSquare, LogOut, Sparkles, Bell, Check, Trash2, X } from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -76,6 +76,9 @@ const Navbar = () => {
     if (path === '/jobs') return 'jobs';
     if (path === '/network') return 'network';
     if (path === '/profile') return 'profile';
+    if (path === '/skill-profile' || path === '/recommended-jobs' || path === '/skill-gap-analysis' || path === '/recommended-courses') {
+      return 'skill-profile';
+    }
     return 'home';
   };
 
@@ -91,6 +94,7 @@ const Navbar = () => {
     { id: 'forums', icon: MessageSquare, label: 'Forums', path: '/forums' },
     { id: 'courses', icon: BookOpen, label: 'Courses', path: '/courses' },
     { id: 'jobs', icon: Briefcase, label: 'Jobs', path: '/jobs' },
+    { id: 'skill-profile', icon: Sparkles, label: 'My Skill Profile', path: '/skill-profile' },
     { id: 'network', icon: Users, label: 'Network', path: '/network' },
     { id: 'profile', icon: User, label: 'Profile', path: '/profile' },
   ];

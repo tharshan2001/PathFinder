@@ -96,24 +96,63 @@ export const updateSkillProfile = async (req, res) => {
 
 
 /* ADD NEW SKILL */
+// Add skill to profile
 export const addSkill = async (req, res) => {
     try {
-        const userId = req.user?.id || req.user?._id;
-        const { name, level } = req.body;
+        const { skills } = req.body;
 
-        const profile = await UserSkillProfile.findOne({ userId });
-
-        if (!profile) {
-            return res.status(404).json({
+        if (!skills || skills.length === 0) {
+            return res.status(400).json({
                 success: false,
-                message: "Skill profile not found"
+                message: "Skills array is required"
             });
         }
 
-        profile.skills.push({ name, level });
+        const userId = req.user.id;
+
+        let profile = await UserSkillProfile.findOne({ userId });
+        const existingSkillNames = new Set(
+            (profile?.skills || []).map((skill) => String(skill.name || "").trim().toLowerCase())
+        );
+
+        const incomingSkillNames = new Set();
+        const normalizedIncomingSkills = [];
+
+        for (const skill of skills) {
+            const skillName = String(skill?.name || "").trim();
+            const skillLevel = skill?.level;
+
+            if (!skillName || !skillLevel) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Each skill must include name and level"
+                });
+            }
+
+            const normalizedName = skillName.toLowerCase();
+            if (existingSkillNames.has(normalizedName) || incomingSkillNames.has(normalizedName)) {
+                return res.status(409).json({
+                    success: false,
+                    message: `Skill '${skillName}' already exists in profile`
+                });
+            }
+
+            incomingSkillNames.add(normalizedName);
+            normalizedIncomingSkills.push({ name: skillName, level: skillLevel });
+        }
+
+        if (!profile) {
+            profile = new UserSkillProfile({
+                userId,
+                skills: normalizedIncomingSkills
+            });
+        } else {
+            profile.skills.push(...normalizedIncomingSkills);
+        }
+
         await profile.save();
 
-        res.status(200).json({
+        res.json({
             success: true,
             data: profile
         });

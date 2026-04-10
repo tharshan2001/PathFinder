@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuthStore } from "../stores/authStore";
 import {
@@ -27,6 +28,8 @@ const renderStars = (rating = 0) => {
 };
 
 const Courses = () => {
+  const [searchParams] = useSearchParams();
+  const selectedCourseId = searchParams.get('courseId');
   const { user } = useAuthStore();
   const [courses, setCourses] = useState([]);
   const [enrollmentsByCourse, setEnrollmentsByCourse] = useState({});
@@ -97,6 +100,15 @@ const Courses = () => {
   useEffect(() => {
     loadCoursesPage();
   }, [userId]);
+
+  useEffect(() => {
+    if (!selectedCourseId || loading) return;
+
+    const target = document.getElementById(`course-${selectedCourseId}`);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedCourseId, loading, courses]);
 
   const enrolledCourseIds = useMemo(
     () => new Set(Object.keys(enrollmentsByCourse)),
@@ -227,7 +239,15 @@ const Courses = () => {
               const mine = myFeedbackByCourse[courseId];
 
               return (
-                <section key={courseId} className="bg-white rounded-xl border border-gray-200 p-5">
+                <section
+                  id={`course-${courseId}`}
+                  key={courseId}
+                  className={`bg-white rounded-xl border p-5 transition ${
+                    selectedCourseId === courseId
+                      ? 'border-teal-400 ring-2 ring-teal-100'
+                      : 'border-gray-200'
+                  }`}
+                >
                   <div className="flex flex-col gap-4 lg:flex-row lg:justify-between">
                     <div>
                       <div className="flex items-center gap-2 text-[#004c99] font-medium text-sm">
