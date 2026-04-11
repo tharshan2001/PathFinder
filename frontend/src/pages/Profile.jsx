@@ -75,6 +75,7 @@ const Profile = () => {
   const [modalType, setModalType] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [itemForm, setItemForm] = useState({});
+  const [uploadingResume, setUploadingResume] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -180,10 +181,31 @@ const Profile = () => {
         case 'project': await userApi.deleteProject(id); break;
         case 'certification': await userApi.deleteCertification(id); break;
         case 'skill': await userApi.deleteSkill(id); break;
+        case 'resume': await userApi.deleteResume(id); break;
       }
       fetchProfile();
     } catch (err) {
       console.error('Error deleting item:', err);
+    }
+  };
+
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('resume', file);
+    
+    setUploadingResume(true);
+    try {
+      await userApi.uploadResume(formData);
+      fetchProfile();
+      setModalType(null);
+    } catch (err) {
+      console.error('Error uploading resume:', err);
+      alert('Failed to upload resume. Please try again.');
+    } finally {
+      setUploadingResume(false);
     }
   };
 
@@ -429,26 +451,62 @@ const Profile = () => {
         </Section>
 
         {/* Resumes */}
-        {profile.resumes?.length > 0 && (
-          <Section title="Resumes" icon={<Download size={18} className="text-indigo-500" />} className="md:col-span-2">
+        <Section title="Resumes" icon={<FileText size={18} className="text-indigo-500" />} onAdd={() => openAddModal('resume')} className="md:col-span-2">
+          {profile.resumes?.length === 0 ? (
+            <div className="text-center py-6">
+              <FileText size={32} className="text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-500 mb-3">No resumes uploaded yet</p>
+              <button 
+                onClick={() => openAddModal('resume')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <Upload size={16} />
+                Upload Resume
+              </button>
+            </div>
+          ) : (
             <div className="space-y-2">
               {profile.resumes.map((resume) => (
-                <a
+                <div
                   key={resume._id}
-                  href={resume.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="section-item rounded-lg p-3 flex items-center justify-between border border-slate-200/60 hover:border-blue-300 group"
+                  className="section-item rounded-lg p-3 flex items-center justify-between border border-slate-200/60 group"
                 >
-                  <span className="text-sm font-500 text-slate-900 group-hover:text-blue-600 transition-colors">
-                    {resume.fileName}
-                  </span>
-                  <Download size={16} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                </a>
+                  <a
+                    href={resume.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center gap-3 hover:border-blue-300 cursor-pointer"
+                  >
+                    <FileText size={18} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors block truncate">
+                        {resume.fileName}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        {new Date(resume.uploadedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <Download size={16} className="text-slate-400 group-hover:text-blue-500 transition-colors flex-shrink-0" />
+                  </a>
+                  <button
+                    onClick={() => handleDelete('resume', resume._id)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors ml-2"
+                    title="Delete resume"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               ))}
+              <button 
+                onClick={() => openAddModal('resume')}
+                className="mt-3 inline-flex items-center gap-2 px-3 py-2 bg-slate-50 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <Plus size={14} />
+                Add Another Resume
+              </button>
             </div>
-          </Section>
-        )}
+          )}
+        </Section>
       </main>
 
       {/* Edit Modal */}
@@ -576,6 +634,33 @@ const Profile = () => {
             <option value="Intermediate">Intermediate</option>
             <option value="Advanced">Advanced</option>
           </select>
+        </div>
+      </Modal>
+
+      {/* Resume Upload Modal */}
+      <Modal isOpen={modalType === 'resume'} onClose={() => setModalType(null)} title="Upload Resume">
+        <div className="space-y-4">
+          <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors">
+            <Upload size={32} className="text-slate-400 mx-auto mb-3" />
+            <p className="text-sm text-slate-600 mb-2">Drag and drop or click to upload</p>
+            <p className="text-xs text-slate-400 mb-3">PDF, DOC, DOCX up to 10MB</p>
+            <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
+              {uploadingResume ? 'Uploading...' : 'Select File'}
+              <input 
+                type="file" 
+                accept=".pdf,.doc,.docx" 
+                className="hidden" 
+                onChange={handleResumeUpload} 
+                disabled={uploadingResume} 
+              />
+            </label>
+          </div>
+          {uploadingResume && (
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+              Uploading your resume...
+            </div>
+          )}
         </div>
       </Modal>
     </div>
