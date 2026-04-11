@@ -15,6 +15,8 @@ import RecommendedJobs from './pages/RecommendedJobs';
 import SkillGapAnalysis from './pages/SkillGapAnalysis';
 import RecommendedCourses from './pages/RecommendedCourses';
 import Notifications from './pages/Notifications';
+import CourseAdmin from './pages/CourseAdmin';
+import MyEnrollments from './pages/MyEnrollments';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -27,11 +29,13 @@ function App() {
       {/* Landing page - no sidebar */}
       <Route path="/" element={<Home />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
-      
+
       {/* All protected routes with sidebar layout */}
       <Route path="/home" element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>}/>
       <Route path="/forums" element={<ProtectedRoute><AppLayout><Forums /></AppLayout></ProtectedRoute>}/>
       <Route path="/courses" element={<ProtectedRoute><AppLayout><Courses /></AppLayout></ProtectedRoute>}/>
+      <Route path="/my-enrollments" element={<ProtectedRoute><AppLayout><MyEnrollments /></AppLayout></ProtectedRoute>}/>
+      <Route path="/courses/admin" element={<ProtectedRoute><AppLayout><CourseAdmin /></AppLayout></ProtectedRoute>}/>
       <Route path="/jobs" element={<ProtectedRoute><AppLayout><JobMarket /></AppLayout></ProtectedRoute>}/>
       <Route path="/skill-profile" element={<ProtectedRoute><AppLayout><SkillProfile /></AppLayout></ProtectedRoute>}/>
       <Route path="/recommended-jobs" element={<ProtectedRoute><AppLayout><RecommendedJobs /></AppLayout></ProtectedRoute>}/>
@@ -43,7 +47,6 @@ function App() {
       <Route path="/profile/:userId" element={<ProtectedRoute><AppLayout><UserProfile /></AppLayout></ProtectedRoute>}/>
       <Route path="/messaging" element={<ProtectedRoute><AppLayout><Messaging /></AppLayout></ProtectedRoute>}/>
       <Route path="/notifications" element={<ProtectedRoute><AppLayout><Notifications /></AppLayout></ProtectedRoute>}/>
-      
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
