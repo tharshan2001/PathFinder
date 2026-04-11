@@ -18,7 +18,7 @@ export const authenticateJWT = (req, res, next) => {
   // If no cookie, check Authorization header (Bearer token)
   if (!token && req.headers.authorization) {
     const authHeader = req.headers.authorization;
-    if (authHeader.startsWith("Bearer ")) {
+    if (authHeader.startsWith('Bearer' )) {
       token = authHeader.substring(7);
     }
   }
