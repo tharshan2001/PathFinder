@@ -3,9 +3,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import passport from "passport";
+import swaggerUi from "swagger-ui-express";
 import connectDB from "./config/mongodb.js";
 import http from "http";
 import { initSocket } from "./controllers/message/chatController.js";
+import { swaggerSpec } from "./config/swagger.js";
 
 // Import controllers to initialize passport strategies
 import "./controllers/user/googleAuthController.js";
@@ -39,6 +41,9 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
+
+// ---------------- Swagger Documentation ----------------
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ---------------- Health Check ----------------
 app.get("/", (req, res) => res.send("API is running..."));

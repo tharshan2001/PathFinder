@@ -1,0 +1,34 @@
+config:
+  target: "http://localhost:5080"
+  phases:
+    - duration: 30
+      arrivalRate: 10
+      name: "Gradual increase"
+    - duration: 60
+      arrivalRate: 30
+      name: "Medium load"
+    - duration: 60
+      arrivalRate: 50
+      name: "High load"
+    - duration: 60
+      arrivalRate: 100
+      name: "Stress test"
+  plugins:
+    expect: {}
+  ensures:
+    - avgResponseTime: 1000
+
+scenarios:
+  - name: "Public Endpoints Stress Test"
+    weight: 100
+    flow:
+      - get:
+          url: "/api/courses"
+      - get:
+          url: "/api/jobs"
+      - get:
+          url: "/api/jobs/featured"
+      - get:
+          url: "/api/jobs/recent?limit=10"
+      - get:
+          url: "/api/trending-skills"

@@ -13,22 +13,11 @@ const router = express.Router();
 
 router.use(authenticateJWT);
 
-// Send connection request
 router.post("/request", sendConnectionRequest);
-
-// Accept connection request
 router.post("/accept", acceptConnectionRequest);
-
-// Reject connection request
 router.post("/reject", rejectConnectionRequest);
-
-// Remove connection
 router.post("/remove", removeConnection);
-
-// Get all connections for logged-in user
 router.get("/connections", getUserConnections);
-
-// Get pending requests for logged-in user
 router.get("/pending", getPendingRequests);
 
 export default router;

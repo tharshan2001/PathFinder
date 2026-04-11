@@ -18,15 +18,14 @@ import { authenticateJWT } from "../middleware/auth.js";
 const router = Router();
 
 router.get("/", getCourses);
+router.get("/:id", getCourseById);
+router.post("/", createCourse);
+router.put("/:id", updateCourse);
+router.delete("/:id", deleteCourse);
 router.get("/:courseId/feedback", getCourseFeedback);
 router.get("/:courseId/feedback/me", authenticateJWT, getMyCourseFeedback);
 router.post("/:courseId/feedback", authenticateJWT, createFeedback);
 router.put("/:courseId/feedback/:feedbackId", authenticateJWT, updateFeedback);
 router.delete("/:courseId/feedback/:feedbackId", authenticateJWT, deleteFeedback);
-
-router.get("/:id", getCourseById);
-router.post("/", createCourse);
-router.put("/:id", updateCourse);
-router.delete("/:id", deleteCourse);
 
 export default router;
