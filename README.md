@@ -244,13 +244,80 @@ CollectionKey FieldsDescriptionusers\_id, name, email, password, role, skills, s
 5.  Verify endpoints and UI
     
 
-### Testing Plan
+### Testing Instructions
 
-*   Unit Testing: Jest for controllers, services, utils
-    
-*   Integration Testing: Supertest for API endpoints
-    
-*   Performance Testing: Artillery.io for load simulation
+#### Unit Testing (Jest)
+
+```bash
+cd backend
+
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+#### Test Structure
+
+```
+backend/__tests__/
+├── middleware/
+│   └── auth.test.js      # Auth middleware unit tests
+└── setup.js             # Test configuration
+```
+
+#### Writing Tests
+
+```javascript
+import { jest } from '@jest/globals';
+
+describe('Component Name', () => {
+  it('should do something', () => {
+    // Test implementation
+  });
+});
+```
+
+#### Integration Testing (Supertest)
+
+Integration tests require the actual Express app. Example:
+
+```bash
+# Install supertest
+npm install --save-dev supertest
+
+# Run integration tests
+npm test -- --testPathPattern=integration
+```
+
+#### Performance Testing (Artillery.io)
+
+```bash
+# Install Artillery
+npm install -g artillery
+
+# Run load test
+artillery run tests/load-test.yml
+```
+
+Example Artillery config (`tests/load-test.yml`):
+
+```yaml
+config:
+  target: "http://localhost:5080"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+scenarios:
+  - name: "Get courses"
+    flow:
+      - get:
+          url: "/api/courses"
+```
     
 
 ### Git Workflow
