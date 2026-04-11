@@ -18,6 +18,7 @@ import SkillGapAnalysis from './pages/SkillGapAnalysis';
 import RecommendedCourses from './pages/RecommendedCourses';
 import Notifications from './pages/Notifications';
 import CourseAdmin from './pages/CourseAdmin';
+import MyEnrollments from './pages/MyEnrollments';
 import { isAdminUser } from './utils/adminAuth';
 
 // Components
@@ -80,6 +81,7 @@ function App() {
       <Route path="/home" element={<ProtectedRoute><AppLayout><Feed /></AppLayout></ProtectedRoute>}/>
       <Route path="/forums" element={<ProtectedRoute><AppLayout><Forums /></AppLayout></ProtectedRoute>}/>
       <Route path="/courses" element={<ProtectedRoute><AppLayout><Courses /></AppLayout></ProtectedRoute>}/>
+      <Route path="/my-enrollments" element={<ProtectedRoute><AppLayout><MyEnrollments /></AppLayout></ProtectedRoute>}/>
       <Route path="/courses/admin" element={<AdminRoute><AppLayout><CourseAdmin /></AppLayout></AdminRoute>}/>
       <Route path="/jobs" element={<ProtectedRoute><AppLayout><JobMarket /></AppLayout></ProtectedRoute>}/>
       <Route path="/skill-profile" element={<ProtectedRoute><AppLayout><SkillProfile /></AppLayout></ProtectedRoute>}/>
