@@ -213,7 +213,7 @@ const Messaging = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search conversations..."
-                  className="w-full bg-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#005eb5] transition"
+                  className="w-full bg-gray-100 rounded-xl py-2.5 pl-10 pr-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition"
                 />
               </div>
             </div>
@@ -239,13 +239,13 @@ const Messaging = () => {
                       onClick={() => setSelectedChat(chat)}
                       className={`p-4 cursor-pointer transition ${
                           selectedChat?._id === chat._id 
-                              ? 'bg-[#d6e3ff]' 
+                              ? 'bg-[var(--color-primary-light)]' 
                               : 'hover:bg-gray-50'
                           }`}
                     >
                       <div className="flex gap-3">
                         <div className="relative">
-                          <div className="w-12 h-12 bg-gradient-to-br from-[#005eb5] to-[#005eb5] rounded-full flex items-center justify-center text-white font-bold">
+                          <div className="w-12 h-12 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)] rounded-full flex items-center justify-center text-white font-bold">
                             {otherUser?.name?.charAt(0).toUpperCase() || '?'}
                           </div>
                         </div>
@@ -288,7 +288,7 @@ const Messaging = () => {
                       className="flex items-center gap-3 cursor-pointer"
                     >
                       <div className="relative">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#005eb5] to-[#005eb5] rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)] rounded-full flex items-center justify-center text-white font-bold">
                           {getOtherUser(selectedChat)?.name?.charAt(0).toUpperCase()}
                         </div>
                         {otherUserOnline && (
@@ -326,8 +326,8 @@ const Messaging = () => {
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 h-[calc(100vh-280px)]">
                   {messages.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="w-20 h-20 bg-[#d6e3ff] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <MessageSquare size={40} className="text-[#005eb5]" />
+                      <div className="w-20 h-20 bg-[var(--color-primary-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare size={40} className="text-[var(--color-primary)]" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900">Start the conversation</h3>
                       <p className="text-gray-500 text-sm mt-1">Send a message to {getOtherUser(selectedChat)?.name}</p>
@@ -342,19 +342,19 @@ const Messaging = () => {
                           className={`flex gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}
                         >
                           {!isMe && (
-                            <div className="w-8 h-8 bg-gradient-to-br from-[#005eb5] to-[#005eb5] rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-auto">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)] rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mt-auto">
                               {getOtherUser(selectedChat)?.name?.charAt(0).toUpperCase()}
                             </div>
                           )}
                           <div 
                             className={`max-w-[70%] px-4 py-3 rounded-2xl ${
                               isMe 
-                                ? 'bg-[#005eb5] text-white rounded-br-md' 
+                                ? 'bg-[var(--color-primary)] text-white rounded-br-md' 
                                 : 'bg-gray-100 text-gray-900 rounded-bl-md'
                             }`}
                           >
                             <p className="text-sm">{msg.text}</p>
-                            <p className={`text-xs mt-1 ${isMe ? 'text-[#d6e3ff]' : 'text-gray-400'}`}>
+                            <p className={`text-xs mt-1 ${isMe ? 'text-[var(--color-primary-light)]' : 'text-gray-400'}`}>
                               {formatTime(msg.createdAt)}
                             </p>
                           </div>
@@ -382,7 +382,7 @@ const Messaging = () => {
                       <button
                         type="submit"
                         disabled={!newMessage.trim() || sending}
-                        className="flex-shrink-0 p-2 bg-[#005eb5] text-white rounded-xl hover:bg-[#004c99] disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        className="flex-shrink-0 p-2 bg-[var(--color-primary)] text-white rounded-xl hover:bg-[var(--color-primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition"
                       >
                         <Send size={20} />
                       </button>
@@ -393,8 +393,8 @@ const Messaging = () => {
             ) : (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-24 h-24 bg-[#d6e3ff] rounded-full flex items-center justify-center mx-auto mb-6">
-                    <MessageSquare size={48} className="text-[#005eb5]" />
+                  <div className="w-24 h-24 bg-[var(--color-primary-light)] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <MessageSquare size={48} className="text-[var(--color-primary)]" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Your Messages</h3>
                   <p className="text-gray-500 max-w-md">
@@ -402,7 +402,7 @@ const Messaging = () => {
                   </p>
                   <button 
                     onClick={() => navigate('/network')}
-                    className="mt-6 px-6 py-3 bg-[#005eb5] text-white font-semibold rounded-xl hover:bg-[#004c99] transition"
+                    className="mt-6 px-6 py-3 bg-[var(--color-primary)] text-white font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition"
                   >
                     Explore Network
                   </button>

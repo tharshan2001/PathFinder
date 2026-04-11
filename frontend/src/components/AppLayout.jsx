@@ -19,7 +19,7 @@ const AppLayout = ({ children }) => {
           paddingBottom: '24px'
         }}
       >
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-6 animate-fade-in">
           {children}
         </div>
       </main>

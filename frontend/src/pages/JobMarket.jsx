@@ -371,8 +371,8 @@ function JobMarket({ guestMode = false }) {
   const roleWorkspaceClass = isGuestMode
     ? 'bg-amber-50 text-amber-700 border-amber-200'
     : isAdmin
-      ? 'bg-[#d6e3ff] text-[#004c99] border-[#d6e3ff]'
-      : 'bg-[#d6e3ff] text-[#004c99] border-[#d6e3ff]';
+      ? 'bg-[var(--color-primary-light)] text-[var(--color-primary)] border-[var(--color-primary-light)]'
+      : 'bg-[var(--color-primary-light)] text-[var(--color-primary)] border-[var(--color-primary-light)]';
   const visibleTabs = isGuestMode
     ? tabs.filter((tab) => ['jobs', 'categories', 'trending'].includes(tab.id))
     : tabs;
@@ -1566,7 +1566,7 @@ function JobMarket({ guestMode = false }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <section className="bg-linear-to-r from-[#005eb5] to-[#004c99] rounded-xl shadow-sm p-6 mb-6 text-white">
+        <section className="bg-linear-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-xl shadow-sm p-6 mb-6 text-white">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
               <div className="inline-flex items-center gap-2 mb-3">
@@ -1581,7 +1581,7 @@ function JobMarket({ guestMode = false }) {
             </div>
             <button
               onClick={isGuestMode ? loadPublicDashboard : loadDashboard}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#004c99] rounded-lg text-sm font-medium hover:bg-[#d6e3ff] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[var(--color-primary)] rounded-lg text-sm font-medium hover:bg-[var(--color-primary-light)] transition-colors"
               disabled={busy}
             >
               {busy ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
@@ -1631,7 +1631,7 @@ function JobMarket({ guestMode = false }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 ${
                   activeTab === tab.id
-                    ? 'bg-[#d6e3ff] text-[#005eb5]'
+                    ? 'bg-[var(--color-primary-light)] text-[var(--color-primary)]'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -1682,7 +1682,7 @@ function JobMarket({ guestMode = false }) {
                 </select>
                 <button
                   onClick={() => loadJobs(1, jobFeedMode)}
-                  className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium hover:bg-[#004c99] transition-colors"
+                  className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-dark)] transition-colors"
                 >
                   {jobFeedMode === 'advanced' ? 'Run Search' : 'Search'}
                 </button>
@@ -1768,7 +1768,7 @@ function JobMarket({ guestMode = false }) {
                   />
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowJobForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Publish Job</button>
+                    <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium">Publish Job</button>
                   </div>
                 </form>
               ) : null}
@@ -1825,7 +1825,7 @@ function JobMarket({ guestMode = false }) {
                   />
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowEditJobForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Update Job</button>
+                    <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium">Update Job</button>
                   </div>
                 </form>
               ) : null}
@@ -1855,7 +1855,7 @@ function JobMarket({ guestMode = false }) {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-start gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-[#d6e3ff] text-[#004c99] flex items-center justify-center text-sm font-semibold shrink-0">
+                        <div className="h-10 w-10 rounded-lg bg-[var(--color-primary-light)] text-[var(--color-primary-dark)] flex items-center justify-center text-sm font-semibold shrink-0">
                           {String(job.company || '?').charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -1864,7 +1864,7 @@ function JobMarket({ guestMode = false }) {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <span className="text-xs px-2 py-1 rounded bg-[#d6e3ff] text-[#004c99]">{job.employmentType}</span>
+                        <span className="text-xs px-2 py-1 rounded bg-[var(--color-primary-light)] text-[var(--color-primary-dark)]">{job.employmentType}</span>
                         <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-700">{job.remotePolicy || 'On-site'}</span>
                       </div>
                     </div>
@@ -1910,7 +1910,7 @@ function JobMarket({ guestMode = false }) {
                       ) : (
                         <button
                           onClick={() => openApply(job)}
-                          className="px-3 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1 hover:bg-[#004c99]"
+                          className="px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1 hover:bg-[var(--color-primary-dark)]"
                         >
                           <Send size={14} />
                           Apply
@@ -2159,7 +2159,7 @@ function JobMarket({ guestMode = false }) {
                   </button>
                   <button
                     onClick={() => setShowAlertForm((prev) => !prev)}
-                    className="px-3 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1"
+                    className="px-3 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1"
                   >
                     <Plus size={14} />
                     New Alert
@@ -2190,7 +2190,7 @@ function JobMarket({ guestMode = false }) {
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowAlertForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Create Alert</button>
+                    <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium">Create Alert</button>
                   </div>
                 </form>
               ) : null}
@@ -2351,7 +2351,7 @@ function JobMarket({ guestMode = false }) {
                       setShowEditCategoryForm(false);
                       setShowCategoryForm((prev) => !prev);
                     }}
-                    className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1"
+                    className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1"
                   >
                     <Plus size={14} />
                     New Category
@@ -2383,7 +2383,7 @@ function JobMarket({ guestMode = false }) {
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowCategoryForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Create Category</button>
+                    <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium">Create Category</button>
                   </div>
                 </form>
               ) : null}
@@ -2413,7 +2413,7 @@ function JobMarket({ guestMode = false }) {
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowEditCategoryForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Update Category</button>
+                    <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium">Update Category</button>
                   </div>
                 </form>
               ) : null}
@@ -2501,7 +2501,7 @@ function JobMarket({ guestMode = false }) {
                         setShowEditSkillForm(false);
                         setShowSkillForm((prev) => !prev);
                       }}
-                      className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1"
+                      className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1"
                     >
                       <Plus size={14} />
                       Upsert Skill
@@ -2529,7 +2529,7 @@ function JobMarket({ guestMode = false }) {
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowSkillForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Save</button>
+                    <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium">Save</button>
                   </div>
                 </form>
               ) : null}
@@ -2554,7 +2554,7 @@ function JobMarket({ guestMode = false }) {
                   </div>
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowEditSkillForm(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium">Update Skill</button>
+                    <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium">Update Skill</button>
                   </div>
                 </form>
               ) : null}
@@ -2595,7 +2595,7 @@ function JobMarket({ guestMode = false }) {
                         <h3 className="font-semibold text-gray-900">{skill.skill}</h3>
                         <p className="text-sm text-gray-500 mt-1">{skill.category || 'Uncategorized'} • {skill.skillType}</p>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded bg-[#d6e3ff] text-[#004c99]">Demand {skill.demandScore}</span>
+                      <span className="text-xs px-2 py-1 rounded bg-[var(--color-primary-light)] text-[var(--color-primary-dark)]">Demand {skill.demandScore}</span>
                     </div>
                     <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                       <div className="p-2 rounded bg-gray-50">Growth: {skill.growthRate || 0}%</div>
@@ -2940,7 +2940,7 @@ function JobMarket({ guestMode = false }) {
               </div>
               <div className="flex justify-end gap-2">
                 <button type="button" onClick={() => setShowApply(false)} className="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-[#005eb5] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1">
+                <button type="submit" className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium inline-flex items-center gap-1">
                   <Send size={14} />
                   Submit Application
                 </button>
@@ -2996,7 +2996,7 @@ function JobMarket({ guestMode = false }) {
 
       {busy ? (
         <div className="fixed bottom-4 left-4 bg-white border rounded-lg px-3 py-2 text-sm text-gray-700 shadow inline-flex items-center gap-2">
-          <BarChart3 size={16} className="text-[#005eb5]" />
+          <BarChart3 size={16} className="text-[var(--color-primary)]" />
           Refreshing stats...
         </div>
       ) : null}

@@ -361,7 +361,7 @@ const Courses = () => {
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:justify-between">
                     <div>
-                      <div className="flex items-center gap-2 text-[#004c99] font-medium text-sm">
+                      <div className="flex items-center gap-2 text-[var(--color-primary)] font-medium text-sm">
                         <BookOpen size={16} />
                         {course.category}
                       </div>
@@ -383,7 +383,7 @@ const Courses = () => {
                       <button
                         onClick={() => handleEnroll(courseId)}
                         disabled={actionLoading === `enroll-${courseId}`}
-                        className="px-4 py-2 rounded-lg bg-[#005eb5] text-white text-sm font-medium hover:bg-[#004c99] disabled:opacity-60"
+                        className="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium hover:bg-[var(--color-primary-dark)] disabled:opacity-60"
                       >
                         {actionLoading === `enroll-${courseId}` ? "Enrolling..." : "Enroll"}
                       </button>
@@ -393,7 +393,7 @@ const Courses = () => {
                           <p className="text-sm text-gray-700">Your progress: {enrollment.progress || 0}%</p>
                           <div className="mt-1 h-2.5 w-56 bg-gray-100 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#005eb5]"
+                              className="h-full bg-[var(--color-primary)]"
                               style={{ width: `${enrollment.progress || 0}%` }}
                             />
                           </div>

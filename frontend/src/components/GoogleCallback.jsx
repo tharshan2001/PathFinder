@@ -19,7 +19,7 @@ const GoogleCallback = () => {
   if (!hasFetchedUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb5]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)]"></div>
         <span className="ml-3 text-gray-600">Completing sign in...</span>
       </div>
     );

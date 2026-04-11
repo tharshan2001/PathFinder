@@ -14,7 +14,7 @@ const ProtectedRoute = ({ children }) => {
   if (!hasFetchedUser) {
     return (
       <div className="min-h-screen bg-[#faf9f6] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb5]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)]"></div>
       </div>
     );
   }
