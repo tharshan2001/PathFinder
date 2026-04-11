@@ -1,0 +1,101 @@
+config:
+  target: "http://localhost:5080"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 20
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 40
+      name: "Stress test"
+    - duration: 30
+      arrivalRate: 5
+      name: "Cool down"
+  plugins:
+    expect: {}
+  processor: "./processors.js"
+
+scenarios:
+  - name: "User Registration"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "LoadTestUser{{ $randomNumber(1000, 9999) }}"
+            email: "loadtest{{ $randomNumber(1000, 9999) }}@test.com"
+            password: "testpass123"
+          expect:
+            - statusCode: 201
+            - hasProperty: "token"
+
+  - name: "User Login"
+    weight: 15
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "test@example.com"
+            password: "testpass123"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+          expect:
+            - statusCode: 200
+
+  - name: "Get All Courses"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/courses"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Course by ID"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/courses/507f1f77bcf86cd799439011"
+          expect:
+            - statusCode: 200
+
+  - name: "Get All Jobs"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/jobs"
+          expect:
+            - statusCode: 200
+
+  - name: "Search Jobs"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/jobs/search?q=developer"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Featured Jobs"
+    weight: 5
+    flow:
+      - get:
+          url: "/api/jobs/featured"
+          expect:
+            - statusCode: 200
+
+  - name: "Get Notifications (Authenticated)"
+    weight: 5
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "test@example.com"
+            password: "testpass123"
+      - get:
+          url: "/api/notifications"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200

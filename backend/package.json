@@ -8,7 +8,12 @@
     "dev": "nodemon server.js",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
-    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage"
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "test:smoke": "artillery run tests/performance/smoke-test.yml",
+    "test:load": "artillery run tests/performance/load-test.yml",
+    "test:stress": "artillery run tests/performance/stress-test.yml",
+    "test:spike": "artillery run tests/performance/spike-test.yml",
+    "test:performance": "bash tests/performance/run-tests.sh"
   },
   "keywords": [],
   "author": "",

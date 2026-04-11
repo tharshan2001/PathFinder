@@ -1,0 +1,29 @@
+config:
+  target: "http://localhost:5080"
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: "Baseline"
+    - duration: 10
+      arrivalRate: 100
+      name: "Spike up"
+    - duration: 30
+      arrivalRate: 100
+      name: "Sustained spike"
+    - duration: 10
+      arrivalRate: 100
+      name: "Spike down"
+    - duration: 10
+      arrivalRate: 5
+      name: "Return to baseline"
+  plugins:
+    expect: {}
+
+scenarios:
+  - name: "Spike Test - Mixed Operations"
+    weight: 100
+    flow:
+      - get:
+          url: "/api/courses"
+      - get:
+          url: "/api/jobs"

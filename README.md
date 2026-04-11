@@ -32,20 +32,15 @@ This full stack web application helps users discover local skill training course
 **Tech Stack:**
 
 *   Backend: Node.js + Express.js
-    
-*   Frontend: React.js (functional components, Hooks)
-    
-*   Database: MongoDB
-    
-*   State Management: Context API / Redux
-    
-*   Styling: Tailwind CSS / Bootstrap
-    
+*   Frontend: React 19 + Vite (functional components, Hooks)
+*   Database: MongoDB with Mongoose ODM
+*   State Management: Zustand
+*   Styling: Tailwind CSS 4
 *   Deployment: Backend → Render/Railway, Frontend → Vercel/Netlify
-    
-*   Testing: Jest, Supertest, Artillery
-    
+*   Testing: Jest (Unit), Integration tests
+*   Performance Testing: Artillery.io
 *   File Storage: AWS S3 for resumes & media
+*   API Documentation: Swagger/OpenAPI
     
 
 **Architecture Diagram:**
@@ -196,8 +191,41 @@ CollectionKey FieldsDescriptionusers\_id, name, email, password, role, skills, s
 **Notifications**
 
 *   GET /notifications/:userId
-    
+
 *   PUT /notifications/:id
+
+### API Documentation (Swagger)
+
+Interactive API documentation is available at `/api-docs`.
+
+**Swagger Route Files** (`backend/swagger/routes/`):
+
+| File | Description |
+|------|-------------|
+| `auth.js` | Authentication endpoints (login, register, logout) |
+| `users.js` | User profile & resume management |
+| `courses.js` | Course CRUD operations |
+| `jobs.js` | Job postings CRUD |
+| `enrollments.js` | Course enrollment tracking |
+| `recommendations.js` | Personalized recommendations |
+| `jobApplications.js` | Job application management |
+| `notifications.js` | User notifications |
+| `connections.js` | User connections/networking |
+| `forums.js` | Discussion forums & Q&A |
+| `learningPaths.js` | Personalized learning paths |
+| `trendingSkills.js` | Trending skills data |
+| `analytics.js` | Analytics & reporting |
+| `chat.js` | Real-time messaging |
+
+**Accessing Swagger UI:**
+
+```bash
+# Local development
+http://localhost:5080/api-docs
+
+# After deployment
+https://your-backend.onrender.com/api-docs
+```
     
 
 ### Frontend Integration Notes
@@ -219,16 +247,16 @@ CollectionKey FieldsDescriptionusers\_id, name, email, password, role, skills, s
 
 **Backend:** Render / Railway
 
-*   Environment Variables: MONGO\_URI, JWT\_SECRET, AWS\_ACCESS\_KEY\_ID, AWS\_SECRET\_ACCESS\_KEY, AWS\_BUCKET\_NAME
-    
-*   Live API URL: https://your-backend.onrender.com
-    
+*   Environment Variables: MONGO_URI, JWT_SECRET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET_NAME, PORT
+*   Live API URL: `https://your-backend.onrender.com`
+*   Swagger Docs: `https://your-backend.onrender.com/api-docs`
 
 **Frontend:** Vercel / Netlify
 
-*   Environment Variable: REACT\_APP\_API\_URL
-    
-*   Live Frontend URL: https://your-frontend.vercel.app
+*   Environment Variable: VITE_API_URL
+*   Live Frontend URL: `https://your-frontend.vercel.app`
+
+> **Note:** Update these URLs with your actual deployment endpoints before use.
     
 
 **Deployment Steps:**
@@ -266,33 +294,44 @@ npm run test:watch
 ```
 backend/__tests__/
 ├── middleware/
-│   └── auth.test.js      # Auth middleware unit tests
-└── setup.js             # Test configuration
+│   └── auth.test.js          # Auth middleware unit tests
+├── controllers/
+│   ├── logic.test.js         # Controller logic tests
+│   ├── userController.test.js
+│   ├── experienceController.test.js
+│   ├── educationController.test.js
+│   ├── certificationController.test.js
+│   ├── projectController.test.js
+│   ├── skillController.test.js
+│   ├── connectionController.test.js
+│   ├── notificationController.test.js
+│   ├── forumController.test.js
+│   └── enrollmentController.test.js
+├── integration.test.js       # Integration tests
+└── setup.js                 # Test configuration
+
+backend/tests/performance/   # Performance tests
+├── smoke-test.yml           # Quick endpoint validation
+├── load-test.yml            # Comprehensive load testing
+├── stress-test.yml          # Break point testing
+├── spike-test.yml           # Traffic spike testing
+└── processors.js           # Custom test data generators
 ```
 
-#### Writing Tests
+#### Integration Testing
 
-```javascript
-import { jest } from '@jest/globals';
-
-describe('Component Name', () => {
-  it('should do something', () => {
-    // Test implementation
-  });
-});
-```
-
-#### Integration Testing (Supertest)
-
-Integration tests require the actual Express app. Example:
+Integration tests cover full API flows:
 
 ```bash
-# Install supertest
-npm install --save-dev supertest
-
-# Run integration tests
-npm test -- --testPathPattern=integration
+# Run all tests including integration
+npm test
 ```
+
+Tests cover:
+- Auth: registration, login, logout, session management
+- CRUD: jobs, courses, users
+- Relationships: connections, enrollments, bookmarks
+- Pagination, filtering, error handling
 
 #### Performance Testing (Artillery.io)
 
@@ -300,25 +339,34 @@ npm test -- --testPathPattern=integration
 # Install Artillery
 npm install -g artillery
 
-# Run load test
-artillery run tests/load-test.yml
+# Run specific tests
+npm run test:smoke       # Quick validation
+npm run test:load       # Load testing
+npm run test:stress     # Stress testing
+npm run test:spike      # Spike testing
+
+# Run all performance tests
+npm run test:performance
+
+# Generate report
+artillery run tests/performance/load-test.yml --output results/report.json
+artillery report results/report.json
 ```
 
-Example Artillery config (`tests/load-test.yml`):
+Performance Metrics:
+| Metric | Target | Critical |
+|--------|--------|----------|
+| Response Time (avg) | < 500ms | > 1000ms |
+| Response Time (p95) | < 1000ms | > 2000ms |
+| Error Rate | < 1% | > 5% |
 
-```yaml
-config:
-  target: "http://localhost:5080"
-  phases:
-    - duration: 60
-      arrivalRate: 10
-scenarios:
-  - name: "Get courses"
-    flow:
-      - get:
-          url: "/api/courses"
+#### Performance Test Reports
+
+Performance test reports are generated as JSON files in `tests/performance/results/`. Use Artillery reports to visualize:
+
+```bash
+artillery report results/report.json
 ```
-    
 
 ### Git Workflow
 
