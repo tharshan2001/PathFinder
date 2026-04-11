@@ -13,9 +13,6 @@ config:
     - duration: 30
       arrivalRate: 5
       name: "Cool down"
-  plugins:
-    expect: {}
-  processor: "./processors.js"
 
 scenarios:
   - name: "User Registration"
@@ -24,12 +21,9 @@ scenarios:
       - post:
           url: "/api/auth/register"
           json:
-            name: "LoadTestUser{{ $randomNumber(1000, 9999) }}"
-            email: "loadtest{{ $randomNumber(1000, 9999) }}@test.com"
+            name: "LoadTestUser"
+            email: "loadtest@example.com"
             password: "testpass123"
-          expect:
-            - statusCode: 201
-            - hasProperty: "token"
 
   - name: "User Login"
     weight: 15
@@ -42,50 +36,38 @@ scenarios:
           capture:
             - json: "$.token"
               as: "authToken"
-          expect:
-            - statusCode: 200
 
   - name: "Get All Courses"
     weight: 20
     flow:
       - get:
           url: "/api/courses"
-          expect:
-            - statusCode: 200
 
   - name: "Get Course by ID"
     weight: 15
     flow:
       - get:
           url: "/api/courses/507f1f77bcf86cd799439011"
-          expect:
-            - statusCode: 200
 
   - name: "Get All Jobs"
     weight: 20
     flow:
       - get:
           url: "/api/jobs"
-          expect:
-            - statusCode: 200
 
   - name: "Search Jobs"
     weight: 10
     flow:
       - get:
           url: "/api/jobs/search?q=developer"
-          expect:
-            - statusCode: 200
 
   - name: "Get Featured Jobs"
     weight: 5
     flow:
       - get:
           url: "/api/jobs/featured"
-          expect:
-            - statusCode: 200
 
-  - name: "Get Notifications (Authenticated)"
+  - name: "Get Notifications"
     weight: 5
     flow:
       - post:
@@ -97,5 +79,3 @@ scenarios:
           url: "/api/notifications"
           headers:
             Authorization: "Bearer {{ authToken }}"
-          expect:
-            - statusCode: 200

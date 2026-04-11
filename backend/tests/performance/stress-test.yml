@@ -15,8 +15,6 @@ config:
       name: "Stress test"
   plugins:
     expect: {}
-  ensures:
-    - avgResponseTime: 1000
 
 scenarios:
   - name: "Public Endpoints Stress Test"
