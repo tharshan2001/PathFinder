@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { register, login, logout, getMe } from "../controllers/user/authController.js";
@@ -9,7 +7,6 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 
-// Configure Google Strategy
 passport.use(
   new GoogleStrategy(
     {
@@ -24,7 +21,7 @@ passport.use(
           user = new User({
             name: profile.displayName,
             email: profile.emails[0].value,
-            password: "", // Not used for Google users
+            password: "",
             profileMedia: { avatar: profile.photos[0]?.value }
           });
           await user.save();
@@ -37,7 +34,6 @@ passport.use(
   )
 );
 
-// Google OAuth routes
 const googleAuth = passport.authenticate("google", { scope: ["profile", "email"] });
 
 const googleAuthCallback = (req, res) => {
@@ -56,15 +52,10 @@ const googleAuthCallback = (req, res) => {
 
 const router = express.Router();
 
-
 router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", logout);
-
-// Authenticated route
 router.get("/me", getMe);
-
-// Google OAuth
 router.get("/google", googleAuth);
 router.get("/google/callback", passport.authenticate("google", { failureRedirect: "/login", session: false }), googleAuthCallback);
 

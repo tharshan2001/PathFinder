@@ -4,7 +4,6 @@ import * as notificationCtrl from "../controllers/notification/notificationContr
 
 const router = express.Router();
 
-// All routes require authentication
 router.use(authenticateJWT);
 
 router.get("/", notificationCtrl.getNotifications);

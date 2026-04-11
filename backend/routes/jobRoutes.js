@@ -14,7 +14,6 @@ import { authenticateJWT, authorizeRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// ---------------------- Job CRUD ----------------------
 router.post("/", authenticateJWT, authorizeRoles("admin"), createJob);
 router.get("/", getJobs);
 router.get("/featured", getFeaturedJobs);
