@@ -120,7 +120,7 @@ const UserProfile = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb5]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)]"></div>
       </div>
     );
   }
@@ -132,7 +132,7 @@ const UserProfile = () => {
           <h2 className="text-xl font-semibold text-gray-600">User not found</h2>
           <button 
             onClick={() => navigate('/network')}
-            className="mt-4 px-4 py-2 bg-[#005eb5] text-white rounded-full font-semibold"
+            className="mt-4 px-4 py-2 bg-[var(--color-primary)] text-white rounded-full font-medium"
           >
             Go to Network
           </button>
@@ -151,12 +151,12 @@ const UserProfile = () => {
             {/* Profile Card */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               {/* Banner */}
-              <div className="h-24 bg-gradient-to-r from-[#005eb5] to-[#004c99]"></div>
+              <div className="h-24 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)]"></div>
               
               <div className="px-4 pb-4">
                 <div className="relative -mt-10 mb-2">
                   <div className="w-20 h-20 bg-white rounded-full p-1">
-                    <div className="w-full h-full bg-[#005eb5] rounded-full flex items-center justify-center text-white text-2xl font-semibold">
+                    <div className="w-full h-full bg-[var(--color-primary)] rounded-full flex items-center justify-center text-white text-2xl font-medium">
                       {profile.name?.charAt(0).toUpperCase()}
                     </div>
                   </div>
@@ -197,7 +197,7 @@ const UserProfile = () => {
                 )}
                 
                 <div className="mt-3">
-                  <span className="font-semibold text-[#005eb5] text-sm">{profile.connectionsCount || 0} connections</span>
+                  <span className="font-medium text-[var(--color-primary)] text-sm">{profile.connectionsCount || 0} connections</span>
                 </div>
 
                 {/* Action Buttons */}
@@ -206,7 +206,7 @@ const UserProfile = () => {
                     <>
                       <button 
                         onClick={handleMessage}
-                        className="w-full py-1.5 bg-[#005eb5] text-white rounded-full font-semibold text-sm hover:bg-[#004c99]"
+                        className="w-full py-1.5 bg-[var(--color-primary)] text-white rounded-full font-medium text-sm hover:bg-[var(--color-primary-dark)]"
                       >
                         Message
                       </button>
@@ -223,7 +223,7 @@ const UserProfile = () => {
                     <>
                       <button 
                         onClick={handleAccept}
-                        className="w-full py-1.5 bg-[#005eb5] text-white rounded-full font-semibold text-sm hover:bg-[#004c99]"
+                        className="w-full py-1.5 bg-[var(--color-primary)] text-white rounded-full font-medium text-sm hover:bg-[var(--color-primary-dark)]"
                       >
                         Accept
                       </button>
@@ -248,7 +248,7 @@ const UserProfile = () => {
                   {connectionStatus === null && (
                     <button 
                       onClick={handleConnect}
-                      className="w-full py-1.5 bg-[#005eb5] text-white rounded-full font-semibold text-sm hover:bg-[#004c99]"
+                      className="w-full py-1.5 bg-[var(--color-primary)] text-white rounded-full font-semibold text-sm hover:bg-[var(--color-primary-dark)]"
                     >
                       <UserPlus size={16} className="inline mr-1" /> Connect
                     </button>
@@ -261,11 +261,11 @@ const UserProfile = () => {
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex justify-between items-center">
                 <h4 className="font-semibold text-gray-900">Profile viewers</h4>
-                <span className="text-[#005eb5] font-semibold text-sm">{profile.profileViews || 0}</span>
+                <span className="text-[var(--color-primary)] font-medium text-sm">{profile.profileViews || 0}</span>
               </div>
               <div className="flex justify-between items-center mt-2">
                 <h4 className="font-semibold text-gray-900">Post impressions</h4>
-                <span className="text-[#005eb5] font-semibold text-sm">0</span>
+                <span className="text-[var(--color-primary)] font-medium text-sm">0</span>
               </div>
             </div>
           </div>
@@ -339,7 +339,7 @@ const UserProfile = () => {
                   {profile.skills.map((skill, idx) => (
                     <span 
                       key={idx} 
-                      className="px-3 py-1 bg-[#d6e3ff] text-[#004c99] rounded-full text-sm font-semibold"
+                      className="px-3 py-1 bg-[var(--color-primary-light)] text-[var(--color-primary)] rounded-full text-sm font-medium"
                     >
                       {skill?.skill || skill?.name || skill}
                     </span>
@@ -366,7 +366,7 @@ const UserProfile = () => {
                         {project.technologies?.length > 0 && (
                           <div className="flex gap-1 mt-2">
                             {project.technologies.map((tech, i) => (
-                              <span key={i} className="px-2 py-0.5 bg-[#d6e3ff] text-[#004c99] text-xs rounded-full">{tech}</span>
+                              <span key={i} className="px-2 py-0.5 bg-[var(--color-primary-light)] text-[var(--color-primary)] text-xs rounded-full">{tech}</span>
                             ))}
                           </div>
                         )}
@@ -375,7 +375,7 @@ const UserProfile = () => {
                             href={project.link} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="inline-block mt-2 text-[#005eb5] text-sm hover:underline"
+                            className="inline-block mt-2 text-[var(--color-primary)] text-sm hover:underline"
                           >
                             View Project →
                           </a>
@@ -430,7 +430,7 @@ const UserProfile = () => {
                           href={resume.fileUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-[#005eb5] hover:text-[#004c99]"
+                          className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)]"
                         >
                           <Download size={18} />
                         </a>

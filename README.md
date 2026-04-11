@@ -248,12 +248,14 @@ https://your-backend.onrender.com/api-docs
 **Backend:** Render / Railway
 
 *   Environment Variables: MONGO_URI, JWT_SECRET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET_NAME, PORT
+*   Admin Access Variables: ADMIN_EMAILS (comma-separated) or ADMIN_EMAIL
 *   Live API URL: `https://your-backend.onrender.com`
 *   Swagger Docs: `https://your-backend.onrender.com/api-docs`
 
 **Frontend:** Vercel / Netlify
 
 *   Environment Variable: VITE_API_URL
+*   Admin Access Variable: VITE_ADMIN_EMAILS (comma-separated) or VITE_ADMIN_EMAIL
 *   Live Frontend URL: `https://your-frontend.vercel.app`
 
 > **Note:** Update these URLs with your actual deployment endpoints before use.
@@ -367,6 +369,70 @@ Performance test reports are generated as JSON files in `tests/performance/resul
 ```bash
 artillery report results/report.json
 ```
+
+### Course Module End-to-End Validation Plan (Frontend + Backend)
+
+This plan validates the full Learning / Course Components scope through the live frontend (`/courses`) and backend APIs.
+
+Admin workflow notes:
+
+1. Admin panel route: `/courses/admin`
+2. Only admin users (role `admin` or configured admin emails) can create/update/delete courses.
+3. Each course must include a valid `courseUrl` (`http`/`https`) added by admin.
+4. Learners enroll first, then use **Start Course** to open the admin-provided course link.
+5. Admin can delete any course review from the admin panel.
+
+#### Prerequisites
+
+1. Start backend:
+   - `cd backend`
+   - `npm install`
+   - `npm run dev`
+
+2. Start frontend:
+   - `cd frontend`
+   - `npm install`
+   - `npm run dev`
+
+3. Register/login with a valid user.
+
+#### Validation Scope Matrix
+
+1. **Course Management (CRUD)**
+   - Create a course from the Courses page form.
+   - Edit same course from the course card.
+   - Delete same course and verify list refresh.
+
+2. **Course Categories (industry / skill / level)**
+   - Create courses with different categories and levels.
+   - Use `industry`, `level`, and `skill` filters.
+   - Verify filtered data returns expected cards.
+
+3. **Course Enrollment**
+   - Enroll into a course from course card.
+   - Verify enrollment appears in user enrollment list.
+
+4. **Course Progress Tracker**
+   - Update progress to 25, 50, 75, and 100.
+   - Verify visual progress bar and `completed` behavior at 100.
+
+5. **Course Ratings & Feedback**
+   - Submit feedback after enrolling.
+   - Update and delete feedback.
+   - Verify course average rating and review count update correctly.
+
+#### API Negative Test Cases
+
+1. Create course with missing required fields -> expect `400`.
+2. Enroll same user in same course twice -> expect `409`.
+3. Update progress with value `< 0` or `> 100` -> expect `400`.
+4. Submit feedback without enrollment -> expect `403`.
+5. Submit duplicate feedback for same course/user -> expect `409`.
+6. Update/Delete another user's feedback -> expect `403`.
+
+#### Exit Criteria
+
+All validation cases pass and all five course components behave correctly from frontend UI to MongoDB persistence.
 
 ### Git Workflow
 

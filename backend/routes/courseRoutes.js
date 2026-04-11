@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getCourses,
+  getCourseMetaOptions,
   getCourseById,
   createCourse,
   updateCourse,
@@ -13,15 +14,16 @@ import {
   getMyCourseFeedback,
   updateFeedback,
 } from "../controllers/course/feedbackController.js";
-import { authenticateJWT } from "../middleware/auth.js";
+import { authenticateJWT, authorizeAdmin } from "../middleware/auth.js";
 
 const router = Router();
 
 router.get("/", getCourses);
+router.get("/meta/options", getCourseMetaOptions);
 router.get("/:id", getCourseById);
-router.post("/", createCourse);
-router.put("/:id", updateCourse);
-router.delete("/:id", deleteCourse);
+router.post("/", authenticateJWT, authorizeAdmin, createCourse);
+router.put("/:id", authenticateJWT, authorizeAdmin, updateCourse);
+router.delete("/:id", authenticateJWT, authorizeAdmin, deleteCourse);
 router.get("/:courseId/feedback", getCourseFeedback);
 router.get("/:courseId/feedback/me", authenticateJWT, getMyCourseFeedback);
 router.post("/:courseId/feedback", authenticateJWT, createFeedback);

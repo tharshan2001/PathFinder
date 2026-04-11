@@ -65,11 +65,11 @@ const Notifications = () => {
 
   const getNotificationIcon = (type) => {
     switch (type) {
-      case 'connection_request': return <UserPlus size={20} className="text-[#005eb5]" />;
-      case 'message': return <MessageSquare size={20} className="text-[#005eb5]" />;
-      case 'job_alert': return <Briefcase size={20} className="text-[#005eb5]" />;
-      case 'course_recommendation': return <BookOpen size={20} className="text-[#005eb5]" />;
-      default: return <Bell size={20} className="text-[#005eb5]" />;
+      case 'connection_request': return <UserPlus size={20} className="text-[var(--color-primary)]" />;
+      case 'message': return <MessageSquare size={20} className="text-[var(--color-primary)]" />;
+      case 'job_alert': return <Briefcase size={20} className="text-[var(--color-primary)]" />;
+      case 'course_recommendation': return <BookOpen size={20} className="text-[var(--color-primary)]" />;
+      default: return <Bell size={20} className="text-[var(--color-primary)]" />;
     }
   };
 
@@ -98,7 +98,7 @@ const Notifications = () => {
       <main className="max-w-3xl mx-auto px-4 py-6">
         <button 
           onClick={() => navigate('/home')}
-          className="flex items-center gap-2 text-gray-500 hover:text-[#005eb5] mb-4"
+          className="flex items-center gap-2 text-gray-500 hover:text-[var(--color-primary)] mb-4"
         >
           <ArrowLeft size={20} />
           Back to Home
@@ -108,10 +108,10 @@ const Notifications = () => {
           <div className="p-6 border-b">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Bell size={24} className="text-[#005eb5]" />
+                <Bell size={24} className="text-[var(--color-primary)]" />
                 <h1 className="text-2xl font-bold text-[#2f3330]">Notifications</h1>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 bg-[#d6e3ff] text-[#005eb5] text-sm rounded-full">
+                  <span className="px-2 py-0.5 bg-[var(--color-primary-light)] text-[var(--color-primary)] text-sm rounded-full">
                     {unreadCount} new
                   </span>
                 )}
@@ -132,7 +132,7 @@ const Notifications = () => {
                 onClick={() => setFilter('all')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   filter === 'all' 
-                    ? 'bg-[#005eb5] text-white' 
+                    ? 'bg-[var(--color-primary)] text-white' 
                     : 'bg-[#f4f4f0] text-[#5c605c] hover:bg-[#e6e9e4]'
                 }`}
               >
@@ -142,7 +142,7 @@ const Notifications = () => {
                 onClick={() => setFilter('unread')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   filter === 'unread' 
-                    ? 'bg-[#005eb5] text-white' 
+                    ? 'bg-[var(--color-primary)] text-white' 
                     : 'bg-[#f4f4f0] text-[#5c605c] hover:bg-[#e6e9e4]'
                 }`}
               >
@@ -154,7 +154,7 @@ const Notifications = () => {
           <div>
             {loading ? (
               <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#005eb5] mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)] mx-auto"></div>
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-12 text-center">
@@ -189,7 +189,7 @@ const Notifications = () => {
                       {!notification.isRead && (
                         <button
                           onClick={() => handleMarkAsRead(notification._id)}
-                          className="p-2 text-gray-400 hover:text-[#005eb5] hover:bg-[#e6e9e4] rounded-lg"
+                          className="p-2 text-gray-400 hover:text-[var(--color-primary)] hover:bg-[#e6e9e4] rounded-lg"
                           title="Mark as read"
                         >
                           <Check size={16} />

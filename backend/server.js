@@ -8,6 +8,7 @@ import connectDB from "./config/mongodb.js";
 import http from "http";
 import { initSocket } from "./controllers/message/chatController.js";
 import { swaggerSpec } from "./config/swagger.js";
+import { ensureAdminUser } from "./utils/ensureAdminUser.js";
 
 // Import controllers to initialize passport strategies
 import "./controllers/user/googleAuthController.js";
@@ -85,6 +86,7 @@ const startServer = async () => {
   try {
     await connectDB();
     console.log("MongoDB connected");
+    await ensureAdminUser();
 
     const server = http.createServer(app);
 
