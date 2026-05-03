@@ -4,6 +4,9 @@ import { useAuthStore } from '../stores/authStore';
 import { useToastStore } from '../stores/toastStore';
 import { Briefcase, BookOpen, Users, TrendingUp, ArrowRight, Globe, Lightbulb } from 'lucide-react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+const GOOGLE_AUTH_URL = `${API_BASE_URL.replace(/\/api$/, '')}/api/auth/google`;
+
 const Home = () => {
   const navigate = useNavigate();
   const { register, login, isLoading, clearError } = useAuthStore();
@@ -39,7 +42,7 @@ const Home = () => {
   };
 
   const handleGoogleAuth = () => {
-    window.location.href = 'http://localhost:5080/api/auth/google';
+    window.location.href = GOOGLE_AUTH_URL;
   };
 
   const features = [
