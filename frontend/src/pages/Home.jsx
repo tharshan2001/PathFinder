@@ -255,6 +255,7 @@ const Home = () => {
               <a href="#" className="text-[15px] hover:text-[#007AFF] transition-colors">Privacy</a>
               <a href="#" className="text-[15px] hover:text-[#007AFF] transition-colors">Terms</a>
               <a href="#" className="text-[15px] hover:text-[#007AFF] transition-colors">Help</a>
+              <a href="/sample" target="_blank" className="text-[15px] hover:text-[#007AFF] transition-colors">Sample UI</a>
             </div>
             <div className="text-[15px] text-[#86868B]">
               © 2026 PathFinder
