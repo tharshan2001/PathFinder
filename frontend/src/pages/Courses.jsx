@@ -41,7 +41,6 @@ const Courses = () => {
   const [formsByCourse, setFormsByCourse] = useState({});
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState("");
-  const [error, setError] = useState("");
 
   const userId = user?._id;
 
@@ -60,7 +59,6 @@ const Courses = () => {
     }
 
     setLoading(true);
-    setError("");
 
     try {
       const queryParams = {
@@ -112,7 +110,7 @@ const Courses = () => {
       setMyFeedbackByCourse(mineMap);
       setFormsByCourse(formsMap);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to load courses");
+      // Error toast handled by API interceptor
     } finally {
       setLoading(false);
     }
@@ -166,7 +164,6 @@ const Courses = () => {
 
   const handleStartCourse = (courseUrl) => {
     if (!courseUrl) {
-      setError("This course does not have an external course link yet.");
       return;
     }
 
@@ -178,7 +175,6 @@ const Courses = () => {
 
     const key = `enroll-${courseId}`;
     setActionLoading(key);
-    setError("");
 
     try {
       const enrollment = await enrollInCourse(courseId, userId);
@@ -188,7 +184,7 @@ const Courses = () => {
       };
       setEnrollmentsByCourse((prev) => ({ ...prev, [courseId]: hydrated }));
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to enroll in course");
+      // Error toast handled by API interceptor
     } finally {
       setActionLoading("");
     }
@@ -200,13 +196,12 @@ const Courses = () => {
 
     const key = `progress-${courseId}`;
     setActionLoading(key);
-    setError("");
 
     try {
       const updated = await updateEnrollmentProgress(enrollment._id, progressValue);
       setEnrollmentsByCourse((prev) => ({ ...prev, [courseId]: updated }));
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update progress");
+      // Error toast handled by API interceptor
     } finally {
       setActionLoading("");
     }
@@ -221,7 +216,6 @@ const Courses = () => {
 
     const key = `feedback-${courseId}`;
     setActionLoading(key);
-    setError("");
 
     try {
       const mine = myFeedbackByCourse[courseId];
@@ -235,7 +229,7 @@ const Courses = () => {
       setMyFeedbackByCourse((prev) => ({ ...prev, [courseId]: saved }));
       await loadCoursesPage();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to save feedback");
+      // Error toast handled by API interceptor
     } finally {
       setActionLoading("");
     }
@@ -247,13 +241,12 @@ const Courses = () => {
 
     const key = `delete-feedback-${courseId}`;
     setActionLoading(key);
-    setError("");
 
     try {
       await deleteFeedback(courseId, mine._id);
       await loadCoursesPage();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete feedback");
+      // Error toast handled by API interceptor
     } finally {
       setActionLoading("");
     }
@@ -330,12 +323,6 @@ const Courses = () => {
             </button>
           </div>
         </section>
-
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
 
         {loading ? (
           <div className="py-20 text-center text-gray-500">Loading courses...</div>

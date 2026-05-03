@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
+import { useToastStore } from '../stores/toastStore';
 import userApi from '../services/userApi';
 
 import { MapPin, Briefcase, GraduationCap, Award, FolderGit2, Edit2, Plus, Trash2, FileText, Download, Upload, X, Check, Pencil, Save } from 'lucide-react';
@@ -67,6 +68,7 @@ const Modal = ({ isOpen, onClose, title, onSubmit, children, submitText = 'Save'
 
 const Profile = () => {
   const { user: authUser } = useAuthStore();
+  const toast = useToastStore();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -104,8 +106,9 @@ const Profile = () => {
       await userApi.updateProfile(formData);
       setProfile({ ...profile, ...formData });
       setEditing(false);
+      toast.success('Profile updated successfully');
     } catch (err) {
-      console.error('Error updating profile:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -167,8 +170,9 @@ const Profile = () => {
       }
       setModalType(null);
       fetchProfile();
+      toast.success(editingItem ? 'Item updated successfully' : 'Item added successfully');
     } catch (err) {
-      console.error('Error saving item:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -184,8 +188,9 @@ const Profile = () => {
         case 'resume': await userApi.deleteResume(id); break;
       }
       fetchProfile();
+      toast.success('Item deleted successfully');
     } catch (err) {
-      console.error('Error deleting item:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -201,9 +206,9 @@ const Profile = () => {
       await userApi.uploadResume(formData);
       fetchProfile();
       setModalType(null);
+      toast.success('Resume uploaded successfully');
     } catch (err) {
-      console.error('Error uploading resume:', err);
-      alert('Failed to upload resume. Please try again.');
+      // Error toast handled by API interceptor
     } finally {
       setUploadingResume(false);
     }

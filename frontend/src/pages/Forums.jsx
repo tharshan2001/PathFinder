@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 
 import { useAuthStore } from '../stores/authStore';
+import { useToastStore } from '../stores/toastStore';
 import forumApi from '../services/forumApi';
 import { MessageCircle, ThumbsUp, User, Plus, X } from 'lucide-react';
 
 const Forums = () => {
   const { user } = useAuthStore();
+  const toast = useToastStore();
   const [forums, setForums] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -49,8 +51,9 @@ const Forums = () => {
       setNewPost({ title: '', content: '', category: 'General' });
       setShowForm(false);
       fetchForums();
+      toast.success('Post created successfully');
     } catch (err) {
-      console.error('Error creating post:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -59,7 +62,7 @@ const Forums = () => {
       await forumApi.voteForum(forumId, vote);
       fetchForums();
     } catch (err) {
-      console.error('Error voting:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -79,8 +82,9 @@ const Forums = () => {
       setReplyContent('');
       const res = await forumApi.getForumById(selectedForum._id);
       setSelectedForum(res.data);
+      toast.success('Reply posted');
     } catch (err) {
-      console.error('Error adding reply:', err);
+      // Error toast handled by API interceptor
     }
   };
 

@@ -14,12 +14,8 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:5080",
+        url: process.env.SERVER_URL || "http://localhost:5080",
         description: "Development server",
-      },
-      {
-        url: "https://your-backend.onrender.com",
-        description: "Production server",
       },
     ],
     paths: paths,

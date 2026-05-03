@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToastStore } from '../stores/toastStore';
 
 import notificationApi from '../services/notificationApi';
 import { Bell, Check, Trash2, CheckCircle, UserPlus, MessageSquare, Briefcase, BookOpen, ArrowLeft } from 'lucide-react';
 
 const Notifications = () => {
   const navigate = useNavigate();
+  const toast = useToastStore();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ const Notifications = () => {
       ));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (err) {
-      console.error('Error marking notification as read:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -45,8 +47,9 @@ const Notifications = () => {
       await notificationApi.markAllAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
+      toast.success('All notifications marked as read');
     } catch (err) {
-      console.error('Error marking all as read:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -58,8 +61,9 @@ const Notifications = () => {
       if (deleted && !deleted.isRead) {
         setUnreadCount(prev => Math.max(0, prev - 1));
       }
+      toast.success('Notification deleted');
     } catch (err) {
-      console.error('Error deleting notification:', err);
+      // Error toast handled by API interceptor
     }
   };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useToastStore } from '../stores/toastStore';
 import connectionApi from '../services/connectionApi';
 import chatApi from '../services/chatApi';
 
@@ -9,6 +10,7 @@ import { Check, X, MessageSquare, UserPlus, Trash2, Search } from 'lucide-react'
 const Network = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const toast = useToastStore();
   const [connections, setConnections] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -39,18 +41,20 @@ const Network = () => {
   const handleAccept = async (connectionId) => {
     try {
       await connectionApi.acceptRequest(connectionId);
+      toast.success('Connection request accepted');
       fetchData();
     } catch (err) {
-      console.error('Error accepting:', err);
+      // Error toast handled by API interceptor
     }
   };
 
   const handleReject = async (connectionId) => {
     try {
       await connectionApi.rejectRequest(connectionId);
+      toast.success('Connection request declined');
       fetchData();
     } catch (err) {
-      console.error('Error rejecting:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -58,9 +62,10 @@ const Network = () => {
     if (!confirm('Remove this connection?')) return;
     try {
       await connectionApi.removeConnection(connectionId);
+      toast.success('Connection removed');
       fetchData();
     } catch (err) {
-      console.error('Error removing:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -68,8 +73,9 @@ const Network = () => {
     try {
       await connectionApi.sendRequest(userId);
       setSuggestions(suggestions.filter(s => s._id !== userId));
+      toast.success('Connection request sent');
     } catch (err) {
-      console.error('Error connecting:', err);
+      // Error toast handled by API interceptor
     }
   };
 
