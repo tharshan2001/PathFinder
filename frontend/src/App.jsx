@@ -17,6 +17,7 @@ import RecommendedCourses from './pages/RecommendedCourses';
 import Notifications from './pages/Notifications';
 import CourseAdmin from './pages/CourseAdmin';
 import MyEnrollments from './pages/MyEnrollments';
+import OrbisLanding from './pages/OrbisLanding';
 
 // Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -28,6 +29,7 @@ function App() {
     <Routes>
       {/* Landing page - no sidebar */}
       <Route path="/" element={<Home />} />
+      <Route path="/sample" element={<OrbisLanding />} />
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
       {/* All protected routes with sidebar layout */}
