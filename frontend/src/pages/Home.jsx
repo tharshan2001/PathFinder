@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useToastStore } from '../stores/toastStore';
 import { Briefcase, BookOpen, Users, TrendingUp, ArrowRight, Globe, Lightbulb } from 'lucide-react';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { register, login, isLoading, error, clearError } = useAuthStore();
+  const { register, login, isLoading, clearError } = useAuthStore();
+  const toast = useToastStore();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -20,14 +22,19 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let success;
-    if (isLogin) {
-      success = await login({ email: formData.email, password: formData.password });
-    } else {
-      success = await register(formData);
-    }
-    if (success) {
-      navigate('/home');
+    try {
+      let success;
+      if (isLogin) {
+        success = await login({ email: formData.email, password: formData.password });
+      } else {
+        success = await register(formData);
+      }
+      if (success) {
+        toast.success('Welcome to PathFinder!');
+        navigate('/home');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || (isLogin ? 'Failed to sign in. Please check your credentials.' : 'Failed to create account. Please try again.'));
     }
   };
 
@@ -144,10 +151,6 @@ const Home = () => {
                   className="w-full px-4 py-3.5 bg-[#F5F5F7] border-0 rounded-[12px] text-[17px] placeholder-[#86868B] focus:ring-2 focus:ring-[#007AFF] focus:bg-white transition-all"
                   required
                 />
-
-                {error && (
-                  <p className="text-[#FF3B30] text-[14px] text-center">{error}</p>
-                )}
 
                 <button
                   type="submit"

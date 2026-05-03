@@ -1602,13 +1602,6 @@ function JobMarket({ guestMode = false }) {
           </div>
         </section>
 
-        {error ? (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 border border-red-200 text-sm flex items-start gap-2">
-            <AlertTriangle size={16} className="mt-0.5" />
-            <span>{error}</span>
-          </div>
-        ) : null}
-
         {isGuestMode ? (
           <div className="mb-4 p-3 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-sm flex items-start gap-2">
             <AlertTriangle size={16} className="mt-0.5" />
@@ -2950,11 +2943,9 @@ function JobMarket({ guestMode = false }) {
         </div>
       ) : null}
 
-      {!error && applicationNotice ? (
+      {applicationNotice ? (
         <div
-          className={`fixed right-4 z-50 w-88 max-w-[calc(100vw-2rem)] transition-all duration-300 ease-out ${
-            error ? 'bottom-16' : 'bottom-4'
-          } ${
+          className={`fixed right-4 z-50 w-88 max-w-[calc(100vw-2rem)] transition-all duration-300 ease-out bottom-4 ${
             applicationNoticeVisible
               ? 'opacity-100 translate-y-0 scale-100'
               : 'opacity-0 translate-y-2 scale-95 pointer-events-none'
@@ -2984,13 +2975,6 @@ function JobMarket({ guestMode = false }) {
               />
             </div>
           </div>
-        </div>
-      ) : null}
-
-      {error ? (
-        <div className="fixed bottom-4 right-4 bg-red-600 text-white px-3 py-2 rounded-lg shadow-lg text-sm inline-flex items-center gap-2">
-          <AlertTriangle size={16} />
-          {error}
         </div>
       ) : null}
 

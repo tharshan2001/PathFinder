@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useToastStore } from '../stores/toastStore';
 import userApi from '../services/userApi';
 import connectionApi from '../services/connectionApi';
 import chatApi from '../services/chatApi';
@@ -11,6 +12,7 @@ const UserProfile = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
   const { user: currentUser } = useAuthStore();
+  const toast = useToastStore();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState(null);
@@ -59,8 +61,9 @@ const UserProfile = () => {
     try {
       await connectionApi.sendRequest(userId);
       setConnectionStatus('sent');
+      toast.success('Connection request sent');
     } catch (err) {
-      console.error('Error sending connection request:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -74,9 +77,10 @@ const UserProfile = () => {
       if (connection) {
         await connectionApi.removeConnection(connection._id);
         setConnectionStatus(null);
+        toast.success('Connection removed');
       }
     } catch (err) {
-      console.error('Error removing connection:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -87,9 +91,10 @@ const UserProfile = () => {
       if (request) {
         await connectionApi.acceptRequest(request._id);
         setConnectionStatus('connected');
+        toast.success('Connection request accepted');
       }
     } catch (err) {
-      console.error('Error accepting request:', err);
+      // Error toast handled by API interceptor
     }
   };
 
@@ -102,7 +107,7 @@ const UserProfile = () => {
         setConnectionStatus(null);
       }
     } catch (err) {
-      console.error('Error ignoring request:', err);
+      // Error toast handled by API interceptor
     }
   };
 

@@ -1,15 +1,23 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useToastStore } from '../stores/toastStore';
 
 const GoogleCallback = () => {
   const navigate = useNavigate();
   const { user, hasFetchedUser, fetchUser } = useAuthStore();
+  const toast = useToastStore();
 
   useEffect(() => {
     if (!hasFetchedUser) {
-      fetchUser().then(() => {
-        navigate('/home', { replace: true });
+      fetchUser().then((userData) => {
+        if (userData) {
+          toast.success('Welcome to PathFinder!');
+          navigate('/home', { replace: true });
+        } else {
+          toast.error('Unable to sign in with Google. Please try again.');
+          navigate('/', { replace: true });
+        }
       });
     } else if (user) {
       navigate('/home', { replace: true });
